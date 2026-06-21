@@ -15,31 +15,42 @@ from calcmopro.api_server import start_server
 
 
 HTML_NAME = "CALCUL_MOYENNE_ORIENTATION.html"
+LOGIN_NAME = "login.html"
+
+# Desktop passwords
+os.environ.setdefault("APP_PASSWORD", "RECEPTIOn8@2024")
+os.environ.setdefault("STUDENT_PASSWORD", "RECEPTIOn8@2025")
 
 
 def resource_root() -> Path:
     return Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parents[1]))
 
 
-def find_interface_file() -> Path:
-    bundled = resource_root() / "web" / HTML_NAME
+def find_file(name: str) -> Path:
+    bundled = resource_root() / "web" / name
     if bundled.exists():
         return bundled
-    local = Path(__file__).resolve().parents[1] / "web" / HTML_NAME
+    local = Path(__file__).resolve().parents[1] / "web" / name
     if local.exists():
         return local
-    raise FileNotFoundError(f"Interface HTML introuvable : {HTML_NAME}")
+    raise FileNotFoundError(f"Fichier introuvable : {name}")
 
 
-def materialize_interface() -> Path:
-    """Copy the bundled page to a persistent location before the one-file app exits."""
-    source = find_interface_file().resolve()
+def materialize() -> tuple[Path, Path]:
+    """Copy bundled pages to a persistent location. Returns (html_path, login_path)."""
     local_root = Path(os.environ.get("LOCALAPPDATA", tempfile.gettempdir()))
     target_dir = local_root / "CALCMO-Pro"
     target_dir.mkdir(parents=True, exist_ok=True)
-    target = target_dir / HTML_NAME
-    shutil.copy2(source, target)
-    return target
+
+    html_src = find_file(HTML_NAME).resolve()
+    html_dst = target_dir / HTML_NAME
+    shutil.copy2(html_src, html_dst)
+
+    login_src = find_file(LOGIN_NAME).resolve()
+    login_dst = target_dir / LOGIN_NAME
+    shutil.copy2(login_src, login_dst)
+
+    return html_dst, login_dst
 
 
 def find_edge() -> Path | None:
@@ -80,22 +91,21 @@ def main() -> None:
         log_path.parent.mkdir(parents=True, exist_ok=True)
         with open(log_path, "w", encoding="utf-8") as f:
             f.write(f"CALCMO-Pro starting...\n")
-        html_path = materialize_interface()
+        html_path, login_path = materialize()
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(f"HTML: {html_path} (exists={html_path.exists()})\n")
-        port = start_server(html_path)
+            f.write(f"LOGIN: {login_path} (exists={login_path.exists()})\n")
+        port = start_server(html_path, login_path=login_path)
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(f"Server started on port {port}\n")
         open_app_window(port)
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(f"Edge launched\n")
-        # Keep the process alive so the server thread keeps running.
-        # Sleep in small intervals so the daemon thread stays alive.
         while True:
             time.sleep(2)
     except KeyboardInterrupt:
         pass
-    except Exception as exc:  # noqa: BLE001 - user-facing launcher boundary.
+    except Exception as exc:
         try:
             with open(log_path, "a", encoding="utf-8") as f:
                 f.write(f"ERROR: {exc}\n{traceback.format_exc()}\n")
