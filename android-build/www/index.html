@@ -1969,25 +1969,20 @@ async function downloadBulletinPDF(id){
     try{const r=await fetch(API+'/api/eleves/'+id);if(r.ok)h=await r.json();}catch(e){}
   }
   if(!h||!h.matieres){toast('Données indisponibles.',true);return;}
-  const m=h.matieres;
-  const setVal=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val;};
-  setVal('mo-nom',h.nom||'');
-  setVal('mo-matricule',h.matricule||'');
-  setVal('mo-classe',h.classe||'');
-  setVal('mo-etablissement',h.etablissement||'');
-  setVal('mo-annee',h.annee||'');
-  MATIERES.forEach(mat=>{
-    const d=m[mat.id]||{};
-    setVal(mat.id+'_mga',d.mga!=null?d.mga:'');
-    if(mat.anglais){
-      setVal(mat.id+'_bepc_e',d.bepc_ecrit!=null?d.bepc_ecrit:'');
-      setVal(mat.id+'_bepc_o',d.bepc_oral!=null?d.bepc_oral:'');
-    }else{
-      setVal(mat.id+'_bepc',d.bepc!=null?d.bepc:'');
-    }
-  });
-  buildBulletin();
-  setTimeout(()=>window.print(),100);
+  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+  const page=buildBulletinHTML(h);
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Bulletin — ${h.nom||'Élève'} — SAPHIR Pro</title>
+${styles}
+<style>
+  body{margin:0;padding:0;background:#fff;}
+  .bulletin-sheet{page-break-after:always;margin:0;padding:0;}
+  @page{size:A4 portrait;margin:8mm 10mm;}
+</style></head><body>${page}</body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),600);
 }
 
 /* ════ IMPRESSION MULTIPLE ════ */
