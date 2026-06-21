@@ -26,7 +26,7 @@ _thread: threading.Thread | None = None
 
 # Auth
 _APP_PASSWORD: str = os.environ.get("APP_PASSWORD", "RECEPTIOn8@2024")
-_STUDENT_PASSWORD: str = os.environ.get("STUDENT_PASSWORD", "ELEVE2024")
+_STUDENT_PASSWORD: str = os.environ.get("STUDENT_PASSWORD", "RECEPTIOn8@2025")
 _sessions: dict[str, tuple[float, str]] = {}  # token -> (expiry, role)
 _SESSION_TTL = 86400 * 7  # 7 days
 
