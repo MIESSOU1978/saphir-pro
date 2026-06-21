@@ -1934,10 +1934,12 @@ function confirmDelHistory(id){
 
 async function clearHistory(){
   try{
-    await fetch(API+'/api/eleves/clear',{method:'DELETE'});
-    await loadHistory();
-    toast('Historique vidé.');
+    const r=await fetch(API+'/api/eleves/clear',{method:'DELETE'});
+    if(!r.ok) throw 0;
   }catch(e){}
+  histData=[];
+  renderHistory();
+  toast('Historique vidé.');
 }
 
 function confirmClearHistory(){
