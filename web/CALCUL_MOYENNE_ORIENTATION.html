@@ -720,7 +720,6 @@ header:not(.bp-header){
 nav{
   top:96px;
   min-height:48px;
-  justify-content:center;
   gap:2px;
   padding:0 24px;
   background:linear-gradient(180deg,#ffffff,#f8faf8);
@@ -728,6 +727,9 @@ nav{
   border-top:none;
   box-shadow:0 2px 12px rgba(6,78,59,.06);
   backdrop-filter:none;
+}
+.nav-center{
+  display:flex;align-items:center;justify-content:center;flex:1;gap:2px;
 }
 .nav-item{
   min-height:52px;
@@ -1171,16 +1173,18 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 
 <!-- ══ NAV MENU ══ -->
 <nav>
-  <div class="nav-item" onclick="showPage('mga')" id="nav-mga">
-    <span class="nav-ico">01</span> Calcul MGA
-  </div>
-  <div class="nav-sep"></div>
-  <div class="nav-item" onclick="showPage('mo')" id="nav-mo">
-    <span class="nav-ico">02</span> Calcul MO
-  </div>
-  <div class="nav-sep"></div>
-  <div class="nav-item" onclick="showPage('hist')" id="nav-hist">
-    <span class="nav-ico">03</span> Historique
+  <div class="nav-center">
+    <div class="nav-item" onclick="showPage('mga')" id="nav-mga">
+      <span class="nav-ico">01</span> Calcul MGA
+    </div>
+    <div class="nav-sep"></div>
+    <div class="nav-item" onclick="showPage('mo')" id="nav-mo">
+      <span class="nav-ico">02</span> Calcul MO
+    </div>
+    <div class="nav-sep"></div>
+    <div class="nav-item" onclick="showPage('hist')" id="nav-hist">
+      <span class="nav-ico">03</span> Historique
+    </div>
   </div>
   <button class="logout-btn" onclick="doLogout()" title="Se déconnecter">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
