@@ -49,7 +49,7 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
   try{
     const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
     const d=await r.json();
-    if(d.ok){window.location.href='/'}
+    if(d.ok){localStorage.setItem('saphir_role',d.role||'admin');window.location.href='/'}
     else{err.textContent=d.error||'Mot de passe incorrect';btn.disabled=false;btn.textContent='Se connecter'}
   }catch(ex){err.textContent='Erreur de connexion';btn.disabled=false;btn.textContent='Se connecter'}
 });

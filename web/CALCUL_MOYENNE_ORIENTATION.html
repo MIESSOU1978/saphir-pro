@@ -2257,21 +2257,15 @@ function toast(msg,isErr=false){
 }
 
 /* ── ROLE-BASED UI ── */
-async function applyRole(){
-  try{
-    const r=await fetch(API+'/api/role');
-    if(!r.ok) return;
-    const d=await r.json();
-    if(d.role!=='admin'){
-      const nav=document.getElementById('nav-hist');
-      const page=document.getElementById('page-hist');
-      if(nav) nav.style.display='none';
-      if(page) page.style.display='none';
-      if(document.getElementById('page-hist').classList.contains('active')){
-        showPage('mo');
-      }
-    }
-  }catch(e){}
+function applyRole(){
+  const role=localStorage.getItem('saphir_role');
+  if(role&&role!=='admin'){
+    const nav=document.getElementById('nav-hist');
+    const page=document.getElementById('page-hist');
+    if(nav) nav.style.display='none';
+    if(page) page.style.display='none';
+    if(page&&page.classList.contains('active')) showPage('mo');
+  }
 }
 
 /* ── INIT ── */
