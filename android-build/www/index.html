@@ -1595,6 +1595,8 @@ const TOTAL_COEF = MATIERES.reduce((s,m)=>s+m.coef,0);
 
 /* ── NAVIGATION ── */
 function showPage(id){
+  const role=localStorage.getItem('saphir_role');
+  if(id==='hist'&&role!=='admin') return;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
@@ -2277,8 +2279,8 @@ function applyRole(){
   if(role&&role!=='admin'){
     const nav=document.getElementById('nav-hist');
     const page=document.getElementById('page-hist');
-    if(nav) nav.style.display='none';
-    if(page) page.style.display='none';
+    if(nav){nav.style.display='none';nav.removeAttribute('onclick');}
+    if(page){page.style.display='none';}
     if(page&&page.classList.contains('active')) showPage('mo');
   }
 }
