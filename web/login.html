@@ -5,58 +5,205 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SAPHIR Pro — Connexion</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Ebrima,sans-serif;background:#064E3B;min-height:100vh;display:flex;align-items:center;justify-content:center}
-.login-box{background:#fff;border-radius:16px;padding:48px 40px;width:100%;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.2);text-align:center}
-.logo{font-size:2.2rem;margin-bottom:8px}
-h1{font-size:1.1rem;color:#003B32;margin-bottom:4px}
-.sub{font-size:.78rem;color:#60736D;margin-bottom:28px}
-.field{position:relative;margin-bottom:20px}
-.field input{width:100%;padding:14px 48px 14px 16px;border:2px solid #D9E5DE;border-radius:10px;font-size:.95rem;color:#003B32;background:#F4F8F6;outline:none;transition:.2s}
-.field input:focus{border-color:#064E3B;box-shadow:0 0 0 3px rgba(6,78,59,.12)}
-.field .eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:1.2rem;color:#60736D;user-select:none}
-.remember{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px;font-size:.82rem;color:#60736D;cursor:pointer;user-select:none}
-.remember input[type=checkbox]{width:16px;height:16px;accent-color:#064E3B;cursor:pointer}
-.btn{width:100%;padding:14px;background:#064E3B;color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;transition:.2s}
-.btn:hover{background:#0b4a35;box-shadow:0 4px 12px rgba(6,78,59,.3)}
-.btn:disabled{opacity:.5;cursor:default}
-.error{color:#B42318;font-size:.8rem;margin-top:12px;min-height:20px}
-.footer{margin-top:24px;font-size:.7rem;color:#9fb0a6}
+body{font-family:'Inter','Segoe UI',Ebrima,sans-serif;min-height:100vh;display:flex;background:#064E3B}
+
+/* ── LEFT PANEL ── */
+.left-panel{
+  flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  background:linear-gradient(135deg,#064E3B 0%,#0b4a35 40%,#0FAC71 100%);
+  padding:60px 48px;position:relative;overflow:hidden;
+}
+.left-panel::before{
+  content:'';position:absolute;width:500px;height:500px;
+  background:radial-gradient(circle,rgba(245,166,35,.12) 0%,transparent 70%);
+  top:-120px;right:-120px;border-radius:50%;
+}
+.left-panel::after{
+  content:'';position:absolute;width:400px;height:400px;
+  background:radial-gradient(circle,rgba(255,255,255,.06) 0%,transparent 70%);
+  bottom:-100px;left:-100px;border-radius:50%;
+}
+.left-content{position:relative;z-index:1;text-align:center;max-width:400px}
+.left-icon{font-size:4rem;margin-bottom:20px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.2))}
+.left-title{color:#fff;font-size:1.8rem;font-weight:700;margin-bottom:12px;line-height:1.3}
+.left-subtitle{color:rgba(255,255,255,.75);font-size:.95rem;line-height:1.7;margin-bottom:36px}
+.features{display:flex;flex-direction:column;gap:16px;text-align:left}
+.feature{display:flex;align-items:center;gap:14px;color:rgba(255,255,255,.9);font-size:.88rem}
+.feature-dot{width:8px;height:8px;background:#F5A623;border-radius:50%;flex-shrink:0}
+.feature-dot.green{background:#0FAC71}
+.bottom-strip{
+  position:absolute;bottom:0;left:0;right:0;height:4px;
+  display:flex;
+}
+.bottom-strip span{flex:1}
+.bottom-strip span:nth-child(1){background:#F5A623}
+.bottom-strip span:nth-child(2){background:#fff}
+.bottom-strip span:nth-child(3){background:#0FAC71}
+
+/* ── RIGHT PANEL ── */
+.right-panel{
+  width:480px;display:flex;align-items:center;justify-content:center;
+  background:#f8faf9;padding:48px;
+}
+.login-card{width:100%;max-width:360px}
+.login-header{margin-bottom:36px}
+.login-header h1{font-size:1.6rem;color:#003B32;font-weight:700;margin-bottom:6px}
+.login-header p{font-size:.88rem;color:#60736D;line-height:1.5}
+
+/* ── FORM ── */
+.form-group{margin-bottom:22px}
+.form-group label{display:block;font-size:.82rem;font-weight:600;color:#374E47;margin-bottom:8px;letter-spacing:.3px}
+.input-wrap{
+  position:relative;display:flex;align-items:center;
+  background:#fff;border:2px solid #D9E5DE;border-radius:12px;
+  transition:border-color .25s,box-shadow .25s;
+}
+.input-wrap:focus-within{border-color:#064E3B;box-shadow:0 0 0 4px rgba(6,78,59,.08)}
+.input-wrap input{
+  flex:1;border:none;outline:none;background:transparent;
+  padding:14px 16px;font-size:.92rem;color:#003B32;font-family:inherit;
+}
+.input-wrap input::placeholder{color:#a0b0a8}
+.toggle-pwd{
+  background:none;border:none;cursor:pointer;padding:14px;
+  color:#60736D;display:flex;align-items:center;justify-content:center;
+  transition:color .2s;
+}
+.toggle-pwd:hover{color:#064E3B}
+.toggle-pwd svg{width:20px;height:20px}
+
+/* ── OPTIONS ROW ── */
+.options-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.remember{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.remember input[type=checkbox]{
+  width:18px;height:18px;accent-color:#064E3B;cursor:pointer;
+  border:2px solid #D9E5DE;border-radius:4px;
+}
+.remember span{font-size:.82rem;color:#60736D;font-weight:500}
+
+/* ── BUTTON ── */
+.login-btn{
+  width:100%;padding:15px;background:#064E3B;color:#fff;
+  border:none;border-radius:12px;font-size:.95rem;font-weight:700;
+  cursor:pointer;transition:all .25s;font-family:inherit;
+  letter-spacing:.3px;
+}
+.login-btn:hover{background:#0b4a35;transform:translateY(-1px);box-shadow:0 6px 20px rgba(6,78,59,.25)}
+.login-btn:active{transform:translateY(0)}
+.login-btn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+
+/* ── ERROR ── */
+.error-msg{
+  margin-top:14px;padding:12px 16px;background:#FEF3F2;border:1px solid #FECDD3;
+  border-radius:10px;color:#B42318;font-size:.82rem;font-weight:500;
+  display:none;align-items:center;gap:8px;
+}
+.error-msg.show{display:flex}
+.error-msg svg{width:18px;height:18px;flex-shrink:0}
+
+/* ── FOOTER ── */
+.login-footer{
+  margin-top:36px;text-align:center;font-size:.75rem;color:#9fb0a6;
+  line-height:1.6;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  body{flex-direction:column}
+  .left-panel{padding:40px 32px;min-height:auto}
+  .left-panel::before,.left-panel::after{display:none}
+  .features{display:none}
+  .right-panel{width:100%;flex:1;padding:32px 24px}
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.login-card{animation:fadeUp .5s ease-out}
 </style>
 </head>
 <body>
-<div class="login-box">
-  <div class="logo">💎</div>
-  <h1>SAPHIR Pro</h1>
-  <div class="sub">Système d'Aide à l'Orientation Scolaire</div>
-  <form id="loginForm">
-    <div class="field">
-      <input type="password" id="pwd" placeholder="Mot de passe" autofocus autocomplete="current-password">
-      <span class="eye" id="eyeBtn" onclick="togglePwd()">👁</span>
+
+<div class="left-panel">
+  <div class="left-content">
+    <div class="left-icon">💎</div>
+    <div class="left-title">Bienvenue sur SAPHIR Pro</div>
+    <div class="left-subtitle">Système d'Aide à l'Orientation Scolaire — Calculez les moyennes d'orientation avec précision et generatez les bulletins en un clic.</div>
+    <div class="features">
+      <div class="feature"><div class="feature-dot"></div>Calcul automatique des moyennes MGA / MO</div>
+      <div class="feature"><div class="feature-dot green"></div>Generation des bulletins PDF individuels</div>
+      <div class="feature"><div class="feature-dot"></div>Historique complet des éleves</div>
+      <div class="feature"><div class="feature-dot green"></div>Impression multiple en un clic</div>
     </div>
-    <label class="remember"><input type="checkbox" id="rememberMe"> Retenir le mot de passe</label>
-    <button type="submit" class="btn" id="submitBtn">Se connecter</button>
-    <div class="error" id="errMsg"></div>
-  </form>
-  <div class="footer">République de Côte d'Ivoire</div>
+  </div>
+  <div class="bottom-strip"><span></span><span></span><span></span></div>
 </div>
+
+<div class="right-panel">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>Connexion</h1>
+      <p>Entrez votre mot de passe pour accéder à l'application</p>
+    </div>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="pwd">Mot de passe</label>
+        <div class="input-wrap">
+          <input type="password" id="pwd" placeholder="Entrez votre mot de passe" autocomplete="current-password" autofocus>
+          <button type="button" class="toggle-pwd" id="eyeBtn" aria-label="Afficher le mot de passe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="options-row">
+        <label class="remember">
+          <input type="checkbox" id="rememberMe">
+          <span>Retenir le mot de passe</span>
+        </label>
+      </div>
+      <button type="submit" class="login-btn" id="submitBtn">Se connecter</button>
+      <div class="error-msg" id="errMsg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <span id="errText"></span>
+      </div>
+    </form>
+    <div class="login-footer">
+      République de Côte d'Ivoire<br>
+      <strong>SAPHIR Pro</strong> v2.0.0
+    </div>
+  </div>
+</div>
+
 <script>
-function togglePwd(){const i=document.getElementById('pwd');const e=document.getElementById('eyeBtn');if(i.type==='password'){i.type='text';e.textContent='🔒'}else{i.type='password';e.textContent='👁'}}
+const eyeBtn=document.getElementById('eyeBtn');
+const pwdInput=document.getElementById('pwd');
+eyeBtn.addEventListener('click',()=>{
+  const isPass=pwdInput.type==='password';
+  pwdInput.type=isPass?'text':'password';
+  eyeBtn.innerHTML=isPass
+    ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
+    :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+});
 
 (function(){
   const saved=localStorage.getItem('saphir_pwd');
   const chk=document.getElementById('rememberMe');
-  if(saved){document.getElementById('pwd').value=saved;chk.checked=true;}
+  if(saved){pwdInput.value=saved;chk.checked=true;}
 })();
 
 document.getElementById('loginForm').addEventListener('submit',async function(e){
   e.preventDefault();
   const btn=document.getElementById('submitBtn');
-  const err=document.getElementById('errMsg');
-  const pwd=document.getElementById('pwd').value;
+  const errMsg=document.getElementById('errMsg');
+  const errText=document.getElementById('errText');
+  const pwd=pwdInput.value;
   const remember=document.getElementById('rememberMe').checked;
-  if(!pwd){err.textContent='Entrez le mot de passe';return}
-  btn.disabled=true;btn.textContent='Connexion...';err.textContent='';
+  if(!pwd){errText.textContent='Veuillez entrer le mot de passe';errMsg.classList.add('show');return}
+  btn.disabled=true;btn.textContent='Connexion...';errMsg.classList.remove('show');
   try{
     const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
     const d=await r.json();
@@ -65,8 +212,8 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
       if(remember) localStorage.setItem('saphir_pwd',pwd);
       else localStorage.removeItem('saphir_pwd');
       window.location.href='/';
-    }else{err.textContent=d.error||'Mot de passe incorrect';btn.disabled=false;btn.textContent='Se connecter'}
-  }catch(ex){err.textContent='Erreur de connexion';btn.disabled=false;btn.textContent='Se connecter'}
+    }else{errText.textContent=d.error||'Mot de passe incorrect';errMsg.classList.add('show');btn.disabled=false;btn.textContent='Se connecter'}
+  }catch(ex){errText.textContent='Erreur de connexion au serveur';errMsg.classList.add('show');btn.disabled=false;btn.textContent='Se connecter'}
 });
 </script>
 </body>
