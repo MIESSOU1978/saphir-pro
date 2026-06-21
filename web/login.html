@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SAPHIR Pro — Connexion</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Ebrima,sans-serif;background:#064E3B;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.login-box{background:#fff;border-radius:16px;padding:48px 40px;width:100%;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.2);text-align:center}
+.logo{font-size:2.2rem;margin-bottom:8px}
+h1{font-size:1.1rem;color:#003B32;margin-bottom:4px}
+.sub{font-size:.78rem;color:#60736D;margin-bottom:28px}
+.field{position:relative;margin-bottom:20px}
+.field input{width:100%;padding:14px 48px 14px 16px;border:2px solid #D9E5DE;border-radius:10px;font-size:.95rem;color:#003B32;background:#F4F8F6;outline:none;transition:.2s}
+.field input:focus{border-color:#064E3B;box-shadow:0 0 0 3px rgba(6,78,59,.12)}
+.field .eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:1.2rem;color:#60736D;user-select:none}
+.btn{width:100%;padding:14px;background:#064E3B;color:#fff;border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;transition:.2s}
+.btn:hover{background:#0b4a35;box-shadow:0 4px 12px rgba(6,78,59,.3)}
+.btn:disabled{opacity:.5;cursor:default}
+.error{color:#B42318;font-size:.8rem;margin-top:12px;min-height:20px}
+.footer{margin-top:24px;font-size:.7rem;color:#9fb0a6}
+</style>
+</head>
+<body>
+<div class="login-box">
+  <div class="logo">💎</div>
+  <h1>SAPHIR Pro</h1>
+  <div class="sub">Système d'Aide à l'Orientation Scolaire</div>
+  <form id="loginForm">
+    <div class="field">
+      <input type="password" id="pwd" placeholder="Mot de passe" autofocus autocomplete="current-password">
+      <span class="eye" id="eyeBtn" onclick="togglePwd()">👁</span>
+    </div>
+    <button type="submit" class="btn" id="submitBtn">Se connecter</button>
+    <div class="error" id="errMsg"></div>
+  </form>
+  <div class="footer">République de Côte d'Ivoire</div>
+</div>
+<script>
+function togglePwd(){const i=document.getElementById('pwd');const e=document.getElementById('eyeBtn');if(i.type==='password'){i.type='text';e.textContent='🔒'}else{i.type='password';e.textContent='👁'}}
+document.getElementById('loginForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  const btn=document.getElementById('submitBtn');
+  const err=document.getElementById('errMsg');
+  const pwd=document.getElementById('pwd').value;
+  if(!pwd){err.textContent='Entrez le mot de passe';return}
+  btn.disabled=true;btn.textContent='Connexion...';err.textContent='';
+  try{
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
+    const d=await r.json();
+    if(d.ok){window.location.href='/'}
+    else{err.textContent=d.error||'Mot de passe incorrect';btn.disabled=false;btn.textContent='Se connecter'}
+  }catch(ex){err.textContent='Erreur de connexion';btn.disabled=false;btn.textContent='Se connecter'}
+});
+</script>
+</body>
+</html>

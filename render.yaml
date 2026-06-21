@@ -11,3 +11,5 @@ services:
         value: "libsql://saphir-pro-miessou1978.aws-ap-northeast-1.turso.io"
       - key: TURSO_TOKEN
         sync: false
+      - key: APP_PASSWORD
+        sync: false
