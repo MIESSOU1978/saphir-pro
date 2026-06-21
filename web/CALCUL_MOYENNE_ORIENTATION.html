@@ -535,6 +535,9 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
   font-size:11pt;
   line-height:1.35;
   letter-spacing:0;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
   -webkit-print-color-adjust:exact;
   print-color-adjust:exact;
 }
@@ -1148,11 +1151,11 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 
 @media print{
   @page{size:A4 portrait;margin:10mm;@top-left{content:none;}@top-center{content:none;}@top-right{content:none;}@bottom-left{content:none;}@bottom-center{content:none;}@bottom-right{content:none;}}
-  html,body{width:auto!important;min-height:0!important;background:#fff!important;}
+  html,body{width:auto!important;min-height:0!important;background:#fff!important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
   body{display:block!important;}
   body>header,body>nav,body>main,body>#toast{display:none!important;}
   #bulletin-print{display:block!important;}
-  .bulletin-sheet{width:100%;margin:0;box-shadow:none;}
+  .bulletin-sheet{width:100%;margin:0;box-shadow:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
 }
 </style>
 </head>
@@ -2086,7 +2089,8 @@ async function printAllBulletins(){
 <title>Bulletins - SAPHIR Pro</title>
 ${styles}
 <style>
-  body{margin:0;padding:0;background:#fff;}
+  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+  body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
   .bulletin-sheet{page-break-after:always;margin:0;padding:0;}
   .bulletin-sheet:last-child{page-break-after:auto;}
   @page{size:A4 portrait;margin:8mm 10mm;}
