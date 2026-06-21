@@ -200,6 +200,9 @@ class _Handler(BaseHTTPRequestHandler):
 
         self.send_error(404)
 
+    def do_HEAD(self) -> None:
+        self.do_GET()
+
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/")
