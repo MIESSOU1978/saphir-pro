@@ -1,7 +1,7 @@
 """Lightweight HTTP API server for CALCMO Pro.
 
 Serves the HTML interface and exposes REST endpoints backed by SQLite.
-Supports optional password authentication when APP_PASSWORD env var is set.
+Supports optional password authentication with admin/student roles.
 """
 
 from __future__ import annotations
@@ -26,7 +26,8 @@ _thread: threading.Thread | None = None
 
 # Auth
 _APP_PASSWORD: str = os.environ.get("APP_PASSWORD", "RECEPTIOn8@2024")
-_sessions: dict[str, float] = {}  # token -> expiry timestamp
+_STUDENT_PASSWORD: str = os.environ.get("STUDENT_PASSWORD", "ELEVE2024")
+_sessions: dict[str, tuple[float, str]] = {}  # token -> (expiry, role)
 _SESSION_TTL = 86400 * 7  # 7 days
 
 
@@ -34,22 +35,27 @@ def _hash_password(pwd: str) -> str:
     return hashlib.sha256(pwd.encode()).hexdigest()
 
 
-def _create_session() -> str:
+def _create_session(role: str = "admin") -> str:
     token = secrets.token_hex(32)
-    _sessions[token] = time.time() + _SESSION_TTL
+    _sessions[token] = (time.time() + _SESSION_TTL, role)
     return token
 
 
-def _check_session(token: str | None) -> bool:
+def _get_session_role(token: str | None) -> str | None:
     if not token:
-        return False
-    expiry = _sessions.get(token)
-    if expiry is None:
-        return False
+        return None
+    session = _sessions.get(token)
+    if session is None:
+        return None
+    expiry, role = session
     if time.time() > expiry:
         del _sessions[token]
-        return False
-    return True
+        return None
+    return role
+
+
+def _check_session(token: str | None) -> bool:
+    return _get_session_role(token) is not None
 
 
 def _auth_required() -> bool:
@@ -119,27 +125,29 @@ class _Handler(BaseHTTPRequestHandler):
         self._redirect("/login")
         return False
 
+    def _get_role(self) -> str:
+        token = self._get_cookie("session")
+        role = _get_session_role(token)
+        return role or "guest"
+
     # ── routing ──────────────────────────────────────────────
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/")
 
-        # Login page — always accessible
         if path == "/login":
             if _login_path and _login_path.exists():
                 return self._html(_login_path)
             return self._json({"error": "Login page not found"}, 404)
 
-        # Static assets for login (no auth needed)
-        if path.startswith("/api/login"):
-            return
-
-        # Check auth for everything else
         if not self._require_auth():
             return
 
         if path == "" or path == "/index.html":
             return self._html(_html_path)
+
+        if path == "/api/role":
+            return self._json({"role": self._get_role()})
 
         if path == "/api/eleves":
             return self._json(db.list_eleves())
@@ -168,18 +176,22 @@ class _Handler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/")
 
-        # Login endpoint
         if path == "/api/login":
             if not _auth_required():
-                return self._json({"ok": True})
+                return self._json({"ok": True, "role": "admin"})
             body = self._read_body()
             pwd = body.get("password", "")
+
             if _hash_password(pwd) == _hash_password(_APP_PASSWORD):
-                token = _create_session()
-                return self._json_with_cookie({"ok": True}, "session", token)
+                token = _create_session("admin")
+                return self._json_with_cookie({"ok": True, "role": "admin"}, "session", token)
+
+            if _STUDENT_PASSWORD and _hash_password(pwd) == _hash_password(_STUDENT_PASSWORD):
+                token = _create_session("student")
+                return self._json_with_cookie({"ok": True, "role": "student"}, "session", token)
+
             return self._json({"error": "Mot de passe incorrect"}, 401)
 
-        # Logout
         if path == "/api/logout":
             token = self._get_cookie("session")
             if token and token in _sessions:
@@ -190,7 +202,6 @@ class _Handler(BaseHTTPRequestHandler):
             self.end_headers()
             return
 
-        # Check auth for API
         if not self._require_auth():
             return
 
@@ -218,14 +229,20 @@ class _Handler(BaseHTTPRequestHandler):
         if not self._require_auth():
             return
 
+        role = self._get_role()
+
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/")
 
         if path == "/api/eleves/clear":
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
             db.clear_all()
             return self._json({"ok": True})
 
         if path.startswith("/api/eleves/"):
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
             try:
                 eid = int(path.split("/")[-1])
             except ValueError:
@@ -245,7 +262,6 @@ class _Handler(BaseHTTPRequestHandler):
 
 def start_server(html_path: Path, port: int = 0, host: str = "127.0.0.1",
                  login_path: Path | None = None) -> int:
-    """Start the server in a daemon thread. Returns the bound port."""
     global _html_path, _login_path, _server, _thread
     _html_path = html_path
     _login_path = login_path
@@ -257,7 +273,6 @@ def start_server(html_path: Path, port: int = 0, host: str = "127.0.0.1",
 
 
 def serve_forever_blocking() -> None:
-    """Block the main thread keeping the server alive (for web deployments)."""
     if _server:
         _server.serve_forever()
 

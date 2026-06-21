@@ -2247,12 +2247,31 @@ function toast(msg,isErr=false){
   t._timer=setTimeout(()=>t.classList.remove('show'),isErr?5000:3200);
 }
 
+/* ── ROLE-BASED UI ── */
+async function applyRole(){
+  try{
+    const r=await fetch(API+'/api/role');
+    if(!r.ok) return;
+    const d=await r.json();
+    if(d.role!=='admin'){
+      const nav=document.getElementById('nav-hist');
+      const page=document.getElementById('page-hist');
+      if(nav) nav.style.display='none';
+      if(page) page.style.display='none';
+      if(document.getElementById('page-hist').classList.contains('active')){
+        showPage('mo');
+      }
+    }
+  }catch(e){}
+}
+
 /* ── INIT ── */
 buildMGATable();
 updateMGASummary();
 buildMOTable();
 document.querySelectorAll('#page-mo .field-group input').forEach(el=>el.addEventListener('input',updateMOInfo));
 document.querySelectorAll('input').forEach(el=>{el.setAttribute('autocomplete','off');el.setAttribute('data-lpignore','true');});
+applyRole();
 loadHistory();
 window.addEventListener('beforeprint',buildBulletin);
 if(new URLSearchParams(window.location.search).get('bulletin-preview')==='demo') loadBulletinPreview();
