@@ -12,31 +12,40 @@ body{font-family:'Inter','Segoe UI',Ebrima,sans-serif;min-height:100vh;display:f
 /* ── LEFT PANEL ── */
 .left-panel{
   flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;
-  background:linear-gradient(135deg,#064E3B 0%,#0b4a35 40%,#0FAC71 100%);
-  padding:36px 32px;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#064E3B 0%,#0b4a35 50%,#0FAC71 100%);
+  padding:40px 36px;position:relative;overflow:hidden;
 }
 .left-panel::before{
-  content:'';position:absolute;width:350px;height:350px;
-  background:radial-gradient(circle,rgba(245,166,35,.12) 0%,transparent 70%);
-  top:-80px;right:-80px;border-radius:50%;
+  content:'';position:absolute;width:400px;height:400px;
+  background:radial-gradient(circle,rgba(245,166,35,.10) 0%,transparent 70%);
+  top:-100px;right:-100px;border-radius:50%;
 }
 .left-panel::after{
-  content:'';position:absolute;width:280px;height:280px;
-  background:radial-gradient(circle,rgba(255,255,255,.06) 0%,transparent 70%);
-  bottom:-70px;left:-70px;border-radius:50%;
+  content:'';position:absolute;width:300px;height:300px;
+  background:radial-gradient(circle,rgba(255,255,255,.05) 0%,transparent 70%);
+  bottom:-80px;left:-80px;border-radius:50%;
 }
-.left-content{position:relative;z-index:1;text-align:center;max-width:320px}
-.left-icon{font-size:2.8rem;margin-bottom:14px;filter:drop-shadow(0 3px 8px rgba(0,0,0,.2))}
-.left-title{color:#fff;font-size:1.35rem;font-weight:700;margin-bottom:8px;line-height:1.3}
-.left-subtitle{color:rgba(255,255,255,.72);font-size:.82rem;line-height:1.6;margin-bottom:24px}
-.features{display:flex;flex-direction:column;gap:10px;text-align:left}
+.left-content{position:relative;z-index:1;text-align:center;max-width:340px}
+.left-icon{
+  width:72px;height:72px;margin:0 auto 18px;
+  background:rgba(255,255,255,.12);border-radius:20px;
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);
+}
+.left-icon svg{width:38px;height:38px;stroke:#fff;stroke-width:1.5}
+.left-title{color:#fff;font-size:1.4rem;font-weight:700;margin-bottom:10px;line-height:1.3}
+.left-subtitle{color:rgba(255,255,255,.70);font-size:.82rem;line-height:1.65;margin-bottom:28px}
+.features{display:flex;flex-direction:column;gap:11px;text-align:left}
 .feature{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.88);font-size:.78rem}
-.feature-dot{width:6px;height:6px;background:#F5A623;border-radius:50%;flex-shrink:0}
-.feature-dot.green{background:#0FAC71}
-.bottom-strip{
-  position:absolute;bottom:0;left:0;right:0;height:3px;
-  display:flex;
+.feature-check{
+  width:20px;height:20px;border-radius:6px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(245,166,35,.18);
 }
+.feature-check svg{width:12px;height:12px;stroke:#F5A623;stroke-width:2.5}
+.feature-check.green{background:rgba(15,172,113,.18)}
+.feature-check.green svg{stroke:#0FAC71}
+.bottom-strip{position:absolute;bottom:0;left:0;right:0;height:3px;display:flex}
 .bottom-strip span{flex:1}
 .bottom-strip span:nth-child(1){background:#F5A623}
 .bottom-strip span:nth-child(2){background:#fff}
@@ -44,59 +53,70 @@ body{font-family:'Inter','Segoe UI',Ebrima,sans-serif;min-height:100vh;display:f
 
 /* ── RIGHT PANEL ── */
 .right-panel{
-  width:380px;display:flex;align-items:center;justify-content:center;
-  background:#f8faf9;padding:28px;
+  width:400px;display:flex;align-items:center;justify-content:center;
+  background:#F4FAF7;padding:32px;
 }
-.login-card{width:100%;max-width:300px}
-.login-header{margin-bottom:22px}
-.login-header h1{font-size:1.3rem;color:#003B32;font-weight:700;margin-bottom:4px}
+.login-card{
+  width:100%;max-width:320px;
+  background:#fff;border-radius:16px;padding:32px 28px;
+  box-shadow:0 2px 16px rgba(6,78,59,.06),0 0 0 1px rgba(6,78,59,.04);
+}
+.login-header{margin-bottom:26px;text-align:center}
+.login-header h1{font-size:1.25rem;color:#003B32;font-weight:700;margin-bottom:5px}
 .login-header p{font-size:.78rem;color:#60736D;line-height:1.45}
 
 /* ── FORM ── */
-.form-group{margin-bottom:16px}
+.form-group{margin-bottom:18px}
 .form-group label{display:block;font-size:.74rem;font-weight:600;color:#374E47;margin-bottom:6px;letter-spacing:.3px}
 .input-wrap{
   position:relative;display:flex;align-items:center;
-  background:#fff;border:2px solid #D9E5DE;border-radius:10px;
+  background:#fff;border:1.5px solid #D9E5DE;border-radius:10px;
   transition:border-color .25s,box-shadow .25s;
 }
 .input-wrap:focus-within{border-color:#064E3B;box-shadow:0 0 0 3px rgba(6,78,59,.08)}
+.input-wrap.error{border-color:#B42318;box-shadow:0 0 0 3px rgba(180,35,24,.06)}
 .input-wrap input{
   flex:1;border:none;outline:none;background:transparent;
-  padding:11px 14px;font-size:.85rem;color:#003B32;font-family:inherit;
+  padding:12px 14px;font-size:.85rem;color:#003B32;font-family:inherit;
 }
 .input-wrap input::placeholder{color:#a0b0a8}
 .toggle-pwd{
-  background:none;border:none;cursor:pointer;padding:11px;
+  background:none;border:none;cursor:pointer;padding:12px;
   color:#60736D;display:flex;align-items:center;justify-content:center;
   transition:color .2s;
 }
 .toggle-pwd:hover{color:#064E3B}
 .toggle-pwd svg{width:18px;height:18px}
+.capslock-warn{
+  display:none;align-items:center;gap:5px;margin-top:5px;
+  font-size:.7rem;color:#B45309;font-weight:500;
+}
+.capslock-warn.show{display:flex}
+.capslock-warn svg{width:14px;height:14px;stroke:#B45309}
 
 /* ── OPTIONS ROW ── */
-.options-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.options-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
 .remember{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none}
 .remember input[type=checkbox]{
   width:16px;height:16px;accent-color:#064E3B;cursor:pointer;
-  border:2px solid #D9E5DE;border-radius:4px;
+  border:1.5px solid #D9E5DE;border-radius:4px;
 }
 .remember span{font-size:.75rem;color:#60736D;font-weight:500}
 
 /* ── BUTTON ── */
 .login-btn{
-  width:100%;padding:12px;background:#064E3B;color:#fff;
+  width:100%;padding:13px;background:#064E3B;color:#fff;
   border:none;border-radius:10px;font-size:.88rem;font-weight:700;
   cursor:pointer;transition:all .25s;font-family:inherit;
   letter-spacing:.3px;
 }
-.login-btn:hover{background:#0b4a35;transform:translateY(-1px);box-shadow:0 4px 14px rgba(6,78,59,.25)}
+.login-btn:hover{background:#0b4a35;transform:translateY(-1px);box-shadow:0 4px 16px rgba(6,78,59,.22)}
 .login-btn:active{transform:translateY(0)}
 .login-btn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
 
 /* ── ERROR ── */
 .error-msg{
-  margin-top:10px;padding:9px 12px;background:#FEF3F2;border:1px solid #FECDD3;
+  margin-top:12px;padding:10px 12px;background:#FEF3F2;border:1px solid #FECDD3;
   border-radius:8px;color:#B42318;font-size:.75rem;font-weight:500;
   display:none;align-items:center;gap:6px;
 }
@@ -105,7 +125,7 @@ body{font-family:'Inter','Segoe UI',Ebrima,sans-serif;min-height:100vh;display:f
 
 /* ── FOOTER ── */
 .login-footer{
-  margin-top:22px;text-align:center;font-size:.68rem;color:#9fb0a6;
+  margin-top:24px;text-align:center;font-size:.68rem;color:#9fb0a6;
   line-height:1.5;
 }
 
@@ -119,7 +139,7 @@ body{font-family:'Inter','Segoe UI',Ebrima,sans-serif;min-height:100vh;display:f
 }
 
 /* ── ANIMATIONS ── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .login-card{animation:fadeUp .4s ease-out}
 </style>
 </head>
@@ -127,14 +147,31 @@ body{font-family:'Inter','Segoe UI',Ebrima,sans-serif;min-height:100vh;display:f
 
 <div class="left-panel">
   <div class="left-content">
-    <div class="left-icon">💎</div>
-    <div class="left-title">Bienvenue sur SAPHIR Pro</div>
-    <div class="left-subtitle">Système d'Aide à l'Orientation Scolaire — Calculez les moyennes d'orientation avec précision et générez les bulletins en un clic.</div>
+    <div class="left-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+      </svg>
+    </div>
+    <div class="left-title">Bienvenue dans SAPHIR Pro</div>
+    <div class="left-subtitle">Système d'aide à l'orientation scolaire pour le calcul des moyennes d'orientation et la génération des bulletins.</div>
     <div class="features">
-      <div class="feature"><div class="feature-dot"></div>Calcul automatique des moyennes MGA / MO</div>
-      <div class="feature"><div class="feature-dot green"></div>Génération des bulletins PDF individuels</div>
-      <div class="feature"><div class="feature-dot"></div>Historique complet des élèves</div>
-      <div class="feature"><div class="feature-dot green"></div>Impression multiple en un clic</div>
+      <div class="feature">
+        <div class="feature-check"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        Calcul automatique des moyennes MGA / MO
+      </div>
+      <div class="feature">
+        <div class="feature-check green"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        Génération des bulletins PDF individuels
+      </div>
+      <div class="feature">
+        <div class="feature-check"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        Historique complet des élèves
+      </div>
+      <div class="feature">
+        <div class="feature-check green"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        Impression multiple en un clic
+      </div>
     </div>
   </div>
   <div class="bottom-strip"><span></span><span></span><span></span></div>
@@ -143,14 +180,14 @@ body{font-family:'Inter','Segoe UI',Ebrima,sans-serif;min-height:100vh;display:f
 <div class="right-panel">
   <div class="login-card">
     <div class="login-header">
-      <h1>Connexion</h1>
-      <p>Entrez votre mot de passe pour accéder à l'application</p>
+      <h1>Connexion sécurisée</h1>
+      <p>Entrez votre mot de passe pour accéder à SAPHIR Pro.</p>
     </div>
     <form id="loginForm">
       <div class="form-group">
         <label for="pwd">Mot de passe</label>
-        <div class="input-wrap">
-          <input type="password" id="pwd" placeholder="Mot de passe" autocomplete="current-password" autofocus>
+        <div class="input-wrap" id="pwdWrap">
+          <input type="password" id="pwd" placeholder="Saisissez votre mot de passe" autocomplete="current-password" autofocus>
           <button type="button" class="toggle-pwd" id="eyeBtn" aria-label="Afficher le mot de passe">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -158,11 +195,15 @@ body{font-family:'Inter','Segoe UI',Ebrima,sans-serif;min-height:100vh;display:f
             </svg>
           </button>
         </div>
+        <div class="capslock-warn" id="capsWarn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Verr. Maj est activée</span>
+        </div>
       </div>
       <div class="options-row">
         <label class="remember">
           <input type="checkbox" id="rememberMe">
-          <span>Retenir le mot de passe</span>
+          <span>Mémoriser le mot de passe</span>
         </label>
       </div>
       <button type="submit" class="login-btn" id="submitBtn">Se connecter</button>
@@ -181,6 +222,9 @@ body{font-family:'Inter','Segoe UI',Ebrima,sans-serif;min-height:100vh;display:f
 <script>
 const eyeBtn=document.getElementById('eyeBtn');
 const pwdInput=document.getElementById('pwd');
+const capsWarn=document.getElementById('capsWarn');
+const pwdWrap=document.getElementById('pwdWrap');
+
 eyeBtn.addEventListener('click',()=>{
   const isPass=pwdInput.type==='password';
   pwdInput.type=isPass?'text':'password';
@@ -188,6 +232,11 @@ eyeBtn.addEventListener('click',()=>{
     ?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>'
     :'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
 });
+
+pwdInput.addEventListener('keyup',e=>{
+  capsWarn.classList.toggle('show',e.getModifierState&&e.getModifierState('CapsLock'));
+});
+pwdInput.addEventListener('blur',()=>capsWarn.classList.remove('show'));
 
 (function(){
   const saved=localStorage.getItem('saphir_pwd');
@@ -203,7 +252,7 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
   const pwd=pwdInput.value;
   const remember=document.getElementById('rememberMe').checked;
   if(!pwd){errText.textContent='Veuillez entrer le mot de passe';errMsg.classList.add('show');return}
-  btn.disabled=true;btn.textContent='Connexion...';errMsg.classList.remove('show');
+  btn.disabled=true;btn.textContent='Connexion...';errMsg.classList.remove('show');pwdWrap.classList.remove('error');
   try{
     const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
     const d=await r.json();
@@ -212,8 +261,17 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
       if(remember) localStorage.setItem('saphir_pwd',pwd);
       else localStorage.removeItem('saphir_pwd');
       window.location.href='/';
-    }else{errText.textContent=d.error||'Mot de passe incorrect';errMsg.classList.add('show');btn.disabled=false;btn.textContent='Se connecter'}
-  }catch(ex){errText.textContent='Erreur de connexion au serveur';errMsg.classList.add('show');btn.disabled=false;btn.textContent='Se connecter'}
+    }else{
+      errText.textContent='Mot de passe incorrect. Veuillez réessayer.';
+      errMsg.classList.add('show');
+      pwdWrap.classList.add('error');
+      btn.disabled=false;btn.textContent='Se connecter';
+    }
+  }catch(ex){
+    errText.textContent='Erreur de connexion au serveur';
+    errMsg.classList.add('show');
+    btn.disabled=false;btn.textContent='Se connecter';
+  }
 });
 </script>
 </body>
