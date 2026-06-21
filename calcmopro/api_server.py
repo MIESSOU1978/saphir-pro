@@ -177,10 +177,14 @@ class _Handler(BaseHTTPRequestHandler):
         path = parsed.path.rstrip("/")
 
         if path == "/api/login":
-            if not _auth_required():
-                return self._json({"ok": True, "role": "admin"})
             body = self._read_body()
             pwd = body.get("password", "")
+
+            if not _auth_required():
+                if _STUDENT_PASSWORD and _hash_password(pwd) == _hash_password(_STUDENT_PASSWORD):
+                    token = _create_session("student")
+                    return self._json_with_cookie({"ok": True, "role": "student"}, "session", token)
+                return self._json({"ok": True, "role": "admin"})
 
             if _hash_password(pwd) == _hash_password(_APP_PASSWORD):
                 token = _create_session("admin")
