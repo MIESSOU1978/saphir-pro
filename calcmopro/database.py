@@ -1,25 +1,37 @@
-"""SQLite database for CALCMO Pro — stores students and results."""
+"""SQLite database for CALCMO Pro — stores students and results.
+Uses Turso (libSQL) when TURSO_URL env var is set, else local SQLite."""
 
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
 from datetime import date
 from pathlib import Path
 from typing import Any
 
 
-_DEFAULT_DIR = Path.home() / ".calcmo"
 _DB_NAME = "calcmo.db"
 
 
-def _db_path() -> Path:
+def _connect():
+    turso_url = os.environ.get("TURSO_URL")
+    turso_token = os.environ.get("TURSO_TOKEN")
+
+    if turso_url:
+        import libsql_experimental as libsql
+        conn = libsql.connect(
+            database="saphir-pro",
+            sync_url=turso_url,
+            auth_token=turso_token,
+        )
+        conn.sync()
+        return conn
+
+    _DEFAULT_DIR = Path.home() / ".calcmo"
     _DEFAULT_DIR.mkdir(parents=True, exist_ok=True)
-    return _DEFAULT_DIR / _DB_NAME
-
-
-def _connect() -> sqlite3.Connection:
-    conn = sqlite3.connect(str(_db_path()))
+    db_path = _DEFAULT_DIR / _DB_NAME
+    conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
@@ -52,6 +64,12 @@ def init_db() -> None:
     conn.close()
 
 
+def _row_to_dict(row) -> dict:
+    if hasattr(row, "keys"):
+        return dict(row)
+    return row
+
+
 def save_eleve(nom: str, matricule: str = "", classe: str = "",
                etablissement: str = "", annee: str = "",
                total: float = 0, mo: float = 0, mention: str = "",
@@ -70,7 +88,7 @@ def save_eleve(nom: str, matricule: str = "", classe: str = "",
     row = conn.execute("SELECT * FROM eleves WHERE id=?", (eleve_id,)).fetchone()
     res = conn.execute("SELECT * FROM resultats WHERE eleve_id=?", (eleve_id,)).fetchone()
     conn.close()
-    return {"eleve": dict(row), "resultat": dict(res)}
+    return {"eleve": _row_to_dict(row), "resultat": _row_to_dict(res)}
 
 
 def list_eleves() -> list[dict[str, Any]]:
@@ -85,9 +103,10 @@ def list_eleves() -> list[dict[str, Any]]:
     conn.close()
     result = []
     for row in rows:
-        d = dict(row)
+        d = _row_to_dict(row)
         if d.get("matieres"):
-            d["matieres"] = json.loads(d["matieres"])
+            if isinstance(d["matieres"], str):
+                d["matieres"] = json.loads(d["matieres"])
         result.append(d)
     return result
 
@@ -104,9 +123,10 @@ def get_eleve(eleve_id: int) -> dict[str, Any] | None:
     conn.close()
     if row is None:
         return None
-    result = dict(row)
+    result = _row_to_dict(row)
     if result.get("matieres"):
-        result["matieres"] = json.loads(result["matieres"])
+        if isinstance(result["matieres"], str):
+            result["matieres"] = json.loads(result["matieres"])
     return result
 
 
