@@ -679,15 +679,6 @@ header:not(.bp-header){
   word-spacing:0;
   white-space:nowrap;
 }
-.switch-user-btn{
-  display:inline-flex;align-items:center;gap:6px;
-  margin-top:10px;padding:6px 14px;
-  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:8px;
-  color:#fff;font-size:.72rem;font-weight:600;cursor:pointer;
-  transition:.2s;
-}
-.switch-user-btn:hover{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.4);}
-.switch-user-btn svg{stroke:#fff;flex-shrink:0;}
 .header-title{
   align-self:center;
   color:#fff;
@@ -1167,11 +1158,6 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       <div class="country-name">République de Côte d'Ivoire</div>
       <div class="country-motto">Union - Discipline - Travail</div>
     </div>
-    <button class="switch-user-btn" onclick="switchUser()" title="Changer d'utilisateur">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span>Changer d'utilisateur</span>
-    </button>
-  </div>
 </header>
 
 <!-- ══ NAV MENU ══ -->
@@ -2265,11 +2251,6 @@ function toast(msg,isErr=false){
 }
 
 /* ── ROLE-BASED UI ── */
-function switchUser(){
-  localStorage.removeItem('saphir_role');
-  localStorage.removeItem('saphir_pwd');
-  window.location.href='/login';
-}
 function applyRole(){
   const role=localStorage.getItem('saphir_role');
   if(role&&role!=='admin'){
