@@ -1,33 +1,129 @@
 """SQLite database for CALCMO Pro — stores students and results.
-Uses Turso (libSQL) when TURSO_URL env var is set, else local SQLite."""
+Uses Turso HTTP API when TURSO_URL env var is set, else local SQLite."""
 
 from __future__ import annotations
 
 import json
 import os
 import sqlite3
+import urllib.request
+import urllib.error
 from datetime import date
 from pathlib import Path
 from typing import Any
 
 
 _DB_NAME = "calcmo.db"
+_TURSO_URL: str = os.environ.get("TURSO_URL", "")
+_TURSO_TOKEN: str = os.environ.get("APP_PASSWORD", "")
+_TURSO_TOKEN = os.environ.get("TURSO_TOKEN", _TURSO_TOKEN)
+
+
+def _turso_enabled() -> bool:
+    return bool(_TURSO_URL and _TURSO_TOKEN)
+
+
+def _turso_exec(sql: str, args: list | None = None) -> list[dict]:
+    """Execute SQL via Turso HTTP API and return rows as dicts."""
+    url = f"https://{_TURSO_URL}/v2/pipeline"
+    stmt = {"sql": sql}
+    if args:
+        stmt["args"] = [{"type": "text", "value": str(a)} for a in args]
+    payload = json.dumps({
+        "requests": [
+            {"type": "execute", "stmt": stmt},
+            {"type": "close"},
+        ]
+    }).encode()
+    req = urllib.request.Request(url, data=payload, method="POST")
+    req.add_header("Authorization", f"Bearer {_TURSO_TOKEN}")
+    req.add_header("Content-Type", "application/json")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read())
+    except Exception as e:
+        print(f"[Turso Error] {e}")
+        return []
+
+    results = data.get("results", [])
+    if not results:
+        return []
+    first = results[0]
+    if "response" not in first:
+        return []
+    resp_data = first["response"]
+    if resp_data.get("type") != "ok":
+        return []
+    result = resp_data.get("result", {})
+    cols = result.get("cols", [])
+    rows = result.get("rows", [])
+    col_names = [c.get("name", f"col{i}") for i, c in enumerate(cols)]
+    return [dict(zip(col_names, row)) for row in rows]
+
+
+def _turso_exec_write(sql: str, args: list | None = None) -> int:
+    """Execute write SQL via Turso HTTP API."""
+    url = f"https://{_TURSO_URL}/v2/pipeline"
+    stmt = {"sql": sql}
+    if args:
+        stmt["args"] = [{"type": "text", "value": str(a)} for a in args]
+    payload = json.dumps({
+        "requests": [
+            {"type": "execute", "stmt": stmt},
+            {"type": "close"},
+        ]
+    }).encode()
+    req = urllib.request.Request(url, data=payload, method="POST")
+    req.add_header("Authorization", f"Bearer {_TURSO_TOKEN}")
+    req.add_header("Content-Type", "application/json")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read())
+    except Exception as e:
+        print(f"[Turso Error] {e}")
+        return 0
+
+    results = data.get("results", [])
+    if results and "response" in results[0]:
+        resp_data = results[0]["response"]
+        if resp_data.get("type") == "ok":
+            return resp_data.get("result", {}).get("rows_affected", 0)
+    return 0
+
+
+def _turso_exec_insert(sql: str, args: list | None = None) -> int:
+    """Execute INSERT via Turso and return last_insert_rowid."""
+    url = f"https://{_TURSO_URL}/v2/pipeline"
+    stmt = {"sql": sql}
+    if args:
+        stmt["args"] = [{"type": "text", "value": str(a)} for a in args]
+    payload = json.dumps({
+        "requests": [
+            {"type": "execute", "stmt": stmt},
+            {"type": "close"},
+        ]
+    }).encode()
+    req = urllib.request.Request(url, data=payload, method="POST")
+    req.add_header("Authorization", f"Bearer {_TURSO_TOKEN}")
+    req.add_header("Content-Type", "application/json")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read())
+    except Exception as e:
+        print(f"[Turso Error] {e}")
+        return 0
+
+    results = data.get("results", [])
+    if results and "response" in results[0]:
+        resp_data = results[0]["response"]
+        if resp_data.get("type") == "ok":
+            return resp_data.get("result", {}).get("last_insert_rowid", 0)
+    return 0
 
 
 def _connect():
-    turso_url = os.environ.get("TURSO_URL")
-    turso_token = os.environ.get("TURSO_TOKEN")
-
-    if turso_url:
-        import libsql_experimental as libsql
-        conn = libsql.connect(
-            database="saphir-pro",
-            sync_url=turso_url,
-            auth_token=turso_token,
-        )
-        conn.sync()
-        return conn
-
+    if _turso_enabled():
+        return None
     _DEFAULT_DIR = Path.home() / ".calcmo"
     _DEFAULT_DIR.mkdir(parents=True, exist_ok=True)
     db_path = _DEFAULT_DIR / _DB_NAME
@@ -39,6 +135,31 @@ def _connect():
 
 
 def init_db() -> None:
+    if _turso_enabled():
+        _turso_exec("""
+            CREATE TABLE IF NOT EXISTS eleves (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                nom         TEXT NOT NULL,
+                matricule   TEXT DEFAULT '',
+                classe      TEXT DEFAULT '',
+                etablissement TEXT DEFAULT '',
+                annee       TEXT DEFAULT '',
+                created_at  TEXT DEFAULT (date('now'))
+            )
+        """)
+        _turso_exec("""
+            CREATE TABLE IF NOT EXISTS resultats (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                eleve_id    INTEGER NOT NULL,
+                total       REAL,
+                mo          REAL,
+                mention     TEXT DEFAULT '',
+                matieres    TEXT DEFAULT '{}',
+                date_calc   TEXT DEFAULT (date('now'))
+            )
+        """)
+        return
+
     conn = _connect()
     conn.executescript("""
         CREATE TABLE IF NOT EXISTS eleves (
@@ -50,7 +171,6 @@ def init_db() -> None:
             annee       TEXT DEFAULT '',
             created_at  TEXT DEFAULT (date('now'))
         );
-
         CREATE TABLE IF NOT EXISTS resultats (
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
             eleve_id    INTEGER NOT NULL REFERENCES eleves(id) ON DELETE CASCADE,
@@ -64,16 +184,25 @@ def init_db() -> None:
     conn.close()
 
 
-def _row_to_dict(row) -> dict:
-    if hasattr(row, "keys"):
-        return dict(row)
-    return row
-
-
 def save_eleve(nom: str, matricule: str = "", classe: str = "",
                etablissement: str = "", annee: str = "",
                total: float = 0, mo: float = 0, mention: str = "",
                matieres: dict | None = None) -> dict[str, Any]:
+    matieres_json = json.dumps(matieres or {}, ensure_ascii=False)
+
+    if _turso_enabled():
+        eid = _turso_exec_insert(
+            "INSERT INTO eleves (nom, matricule, classe, etablissement, annee) VALUES (?, ?, ?, ?, ?)",
+            [nom, matricule, classe, etablissement, annee],
+        )
+        _turso_exec_write(
+            "INSERT INTO resultats (eleve_id, total, mo, mention, matieres) VALUES (?, ?, ?, ?, ?)",
+            [eid, total, mo, mention, matieres_json],
+        )
+        rows = _turso_exec("SELECT * FROM eleves WHERE id=?", [eid])
+        res = _turso_exec("SELECT * FROM resultats WHERE eleve_id=?", [eid])
+        return {"eleve": rows[0] if rows else {}, "resultat": res[0] if res else {}}
+
     conn = _connect()
     cur = conn.execute(
         "INSERT INTO eleves (nom, matricule, classe, etablissement, annee) VALUES (?, ?, ?, ?, ?)",
@@ -82,16 +211,32 @@ def save_eleve(nom: str, matricule: str = "", classe: str = "",
     eleve_id = cur.lastrowid
     conn.execute(
         "INSERT INTO resultats (eleve_id, total, mo, mention, matieres) VALUES (?, ?, ?, ?, ?)",
-        (eleve_id, total, mo, mention, json.dumps(matieres or {}, ensure_ascii=False)),
+        (eleve_id, total, mo, mention, matieres_json),
     )
     conn.commit()
     row = conn.execute("SELECT * FROM eleves WHERE id=?", (eleve_id,)).fetchone()
     res = conn.execute("SELECT * FROM resultats WHERE eleve_id=?", (eleve_id,)).fetchone()
     conn.close()
-    return {"eleve": _row_to_dict(row), "resultat": _row_to_dict(res)}
+    return {"eleve": dict(row), "resultat": dict(res)}
 
 
 def list_eleves() -> list[dict[str, Any]]:
+    if _turso_enabled():
+        rows = _turso_exec("""
+            SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.created_at,
+                   r.total, r.mo, r.mention, r.matieres, r.date_calc
+            FROM eleves e
+            LEFT JOIN resultats r ON r.eleve_id = e.id
+            ORDER BY e.id DESC
+        """)
+        for d in rows:
+            if d.get("matieres") and isinstance(d["matieres"], str):
+                try:
+                    d["matieres"] = json.loads(d["matieres"])
+                except Exception:
+                    pass
+        return rows
+
     conn = _connect()
     rows = conn.execute("""
         SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.created_at,
@@ -103,7 +248,7 @@ def list_eleves() -> list[dict[str, Any]]:
     conn.close()
     result = []
     for row in rows:
-        d = _row_to_dict(row)
+        d = dict(row)
         if d.get("matieres"):
             if isinstance(d["matieres"], str):
                 d["matieres"] = json.loads(d["matieres"])
@@ -112,6 +257,24 @@ def list_eleves() -> list[dict[str, Any]]:
 
 
 def get_eleve(eleve_id: int) -> dict[str, Any] | None:
+    if _turso_enabled():
+        rows = _turso_exec("""
+            SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.created_at,
+                   r.total, r.mo, r.mention, r.matieres, r.date_calc
+            FROM eleves e
+            LEFT JOIN resultats r ON r.eleve_id = e.id
+            WHERE e.id = ?
+        """, [eleve_id])
+        if not rows:
+            return None
+        d = rows[0]
+        if d.get("matieres") and isinstance(d["matieres"], str):
+            try:
+                d["matieres"] = json.loads(d["matieres"])
+            except Exception:
+                pass
+        return d
+
     conn = _connect()
     row = conn.execute("""
         SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.created_at,
@@ -123,7 +286,7 @@ def get_eleve(eleve_id: int) -> dict[str, Any] | None:
     conn.close()
     if row is None:
         return None
-    result = _row_to_dict(row)
+    result = dict(row)
     if result.get("matieres"):
         if isinstance(result["matieres"], str):
             result["matieres"] = json.loads(result["matieres"])
@@ -131,6 +294,9 @@ def get_eleve(eleve_id: int) -> dict[str, Any] | None:
 
 
 def delete_eleve(eleve_id: int) -> bool:
+    if _turso_enabled():
+        _turso_exec_write("DELETE FROM eleves WHERE id=?", [eleve_id])
+        return True
     conn = _connect()
     conn.execute("DELETE FROM eleves WHERE id=?", (eleve_id,))
     conn.commit()
@@ -140,6 +306,10 @@ def delete_eleve(eleve_id: int) -> bool:
 
 
 def clear_all() -> int:
+    if _turso_enabled():
+        _turso_exec_write("DELETE FROM resultats")
+        _turso_exec_write("DELETE FROM eleves")
+        return 0
     conn = _connect()
     conn.execute("DELETE FROM resultats")
     count = conn.execute("SELECT changes()").fetchone()[0]
@@ -150,6 +320,9 @@ def clear_all() -> int:
 
 
 def count_eleves() -> int:
+    if _turso_enabled():
+        rows = _turso_exec("SELECT COUNT(*) as n FROM eleves")
+        return rows[0]["n"] if rows else 0
     conn = _connect()
     n = conn.execute("SELECT COUNT(*) FROM eleves").fetchone()[0]
     conn.close()

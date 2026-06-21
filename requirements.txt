@@ -1,1 +1,1 @@
-libsql-experimental>=0.0.34
+# No extra dependencies needed — uses Python stdlib only
