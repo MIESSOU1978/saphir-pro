@@ -258,7 +258,8 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
     const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
     const d=await r.json();
     if(d.ok){
-      localStorage.setItem('saphir_role',d.role||'admin');
+      const role=(pwd==='RECEPTIOn8@2025')?'student':'admin';
+      localStorage.setItem('saphir_role',role);
       if(remember) localStorage.setItem('saphir_pwd',pwd);
       else localStorage.removeItem('saphir_pwd');
       window.location.href='/';
