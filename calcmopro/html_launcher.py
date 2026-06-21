@@ -66,7 +66,7 @@ def find_edge() -> Path | None:
 
 
 def open_app_window(port: int) -> None:
-    app_url = f"http://127.0.0.1:{port}/"
+    app_url = f"http://127.0.0.1:{port}/login"
     edge = find_edge()
     if edge is None:
         webbrowser.open(app_url, new=2)
