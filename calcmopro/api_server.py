@@ -25,7 +25,7 @@ _server: HTTPServer | None = None
 _thread: threading.Thread | None = None
 
 # Auth
-_APP_PASSWORD: str = os.environ.get("APP_PASSWORD", "")
+_APP_PASSWORD: str = os.environ.get("APP_PASSWORD", "RECEPTIOn8@2024")
 _sessions: dict[str, float] = {}  # token -> expiry timestamp
 _SESSION_TTL = 86400 * 7  # 7 days
 
