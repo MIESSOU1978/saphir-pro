@@ -13,28 +13,28 @@ body{font-family:'Inter','Segoe UI',Ebrima,sans-serif;min-height:100vh;display:f
 .left-panel{
   flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;
   background:linear-gradient(135deg,#064E3B 0%,#0b4a35 40%,#0FAC71 100%);
-  padding:60px 48px;position:relative;overflow:hidden;
+  padding:36px 32px;position:relative;overflow:hidden;
 }
 .left-panel::before{
-  content:'';position:absolute;width:500px;height:500px;
+  content:'';position:absolute;width:350px;height:350px;
   background:radial-gradient(circle,rgba(245,166,35,.12) 0%,transparent 70%);
-  top:-120px;right:-120px;border-radius:50%;
+  top:-80px;right:-80px;border-radius:50%;
 }
 .left-panel::after{
-  content:'';position:absolute;width:400px;height:400px;
+  content:'';position:absolute;width:280px;height:280px;
   background:radial-gradient(circle,rgba(255,255,255,.06) 0%,transparent 70%);
-  bottom:-100px;left:-100px;border-radius:50%;
+  bottom:-70px;left:-70px;border-radius:50%;
 }
-.left-content{position:relative;z-index:1;text-align:center;max-width:400px}
-.left-icon{font-size:4rem;margin-bottom:20px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.2))}
-.left-title{color:#fff;font-size:1.8rem;font-weight:700;margin-bottom:12px;line-height:1.3}
-.left-subtitle{color:rgba(255,255,255,.75);font-size:.95rem;line-height:1.7;margin-bottom:36px}
-.features{display:flex;flex-direction:column;gap:16px;text-align:left}
-.feature{display:flex;align-items:center;gap:14px;color:rgba(255,255,255,.9);font-size:.88rem}
-.feature-dot{width:8px;height:8px;background:#F5A623;border-radius:50%;flex-shrink:0}
+.left-content{position:relative;z-index:1;text-align:center;max-width:320px}
+.left-icon{font-size:2.8rem;margin-bottom:14px;filter:drop-shadow(0 3px 8px rgba(0,0,0,.2))}
+.left-title{color:#fff;font-size:1.35rem;font-weight:700;margin-bottom:8px;line-height:1.3}
+.left-subtitle{color:rgba(255,255,255,.72);font-size:.82rem;line-height:1.6;margin-bottom:24px}
+.features{display:flex;flex-direction:column;gap:10px;text-align:left}
+.feature{display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.88);font-size:.78rem}
+.feature-dot{width:6px;height:6px;background:#F5A623;border-radius:50%;flex-shrink:0}
 .feature-dot.green{background:#0FAC71}
 .bottom-strip{
-  position:absolute;bottom:0;left:0;right:0;height:4px;
+  position:absolute;bottom:0;left:0;right:0;height:3px;
   display:flex;
 }
 .bottom-strip span{flex:1}
@@ -44,83 +44,83 @@ body{font-family:'Inter','Segoe UI',Ebrima,sans-serif;min-height:100vh;display:f
 
 /* ── RIGHT PANEL ── */
 .right-panel{
-  width:480px;display:flex;align-items:center;justify-content:center;
-  background:#f8faf9;padding:48px;
+  width:380px;display:flex;align-items:center;justify-content:center;
+  background:#f8faf9;padding:28px;
 }
-.login-card{width:100%;max-width:360px}
-.login-header{margin-bottom:36px}
-.login-header h1{font-size:1.6rem;color:#003B32;font-weight:700;margin-bottom:6px}
-.login-header p{font-size:.88rem;color:#60736D;line-height:1.5}
+.login-card{width:100%;max-width:300px}
+.login-header{margin-bottom:22px}
+.login-header h1{font-size:1.3rem;color:#003B32;font-weight:700;margin-bottom:4px}
+.login-header p{font-size:.78rem;color:#60736D;line-height:1.45}
 
 /* ── FORM ── */
-.form-group{margin-bottom:22px}
-.form-group label{display:block;font-size:.82rem;font-weight:600;color:#374E47;margin-bottom:8px;letter-spacing:.3px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:.74rem;font-weight:600;color:#374E47;margin-bottom:6px;letter-spacing:.3px}
 .input-wrap{
   position:relative;display:flex;align-items:center;
-  background:#fff;border:2px solid #D9E5DE;border-radius:12px;
+  background:#fff;border:2px solid #D9E5DE;border-radius:10px;
   transition:border-color .25s,box-shadow .25s;
 }
-.input-wrap:focus-within{border-color:#064E3B;box-shadow:0 0 0 4px rgba(6,78,59,.08)}
+.input-wrap:focus-within{border-color:#064E3B;box-shadow:0 0 0 3px rgba(6,78,59,.08)}
 .input-wrap input{
   flex:1;border:none;outline:none;background:transparent;
-  padding:14px 16px;font-size:.92rem;color:#003B32;font-family:inherit;
+  padding:11px 14px;font-size:.85rem;color:#003B32;font-family:inherit;
 }
 .input-wrap input::placeholder{color:#a0b0a8}
 .toggle-pwd{
-  background:none;border:none;cursor:pointer;padding:14px;
+  background:none;border:none;cursor:pointer;padding:11px;
   color:#60736D;display:flex;align-items:center;justify-content:center;
   transition:color .2s;
 }
 .toggle-pwd:hover{color:#064E3B}
-.toggle-pwd svg{width:20px;height:20px}
+.toggle-pwd svg{width:18px;height:18px}
 
 /* ── OPTIONS ROW ── */
-.options-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
-.remember{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.options-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.remember{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none}
 .remember input[type=checkbox]{
-  width:18px;height:18px;accent-color:#064E3B;cursor:pointer;
+  width:16px;height:16px;accent-color:#064E3B;cursor:pointer;
   border:2px solid #D9E5DE;border-radius:4px;
 }
-.remember span{font-size:.82rem;color:#60736D;font-weight:500}
+.remember span{font-size:.75rem;color:#60736D;font-weight:500}
 
 /* ── BUTTON ── */
 .login-btn{
-  width:100%;padding:15px;background:#064E3B;color:#fff;
-  border:none;border-radius:12px;font-size:.95rem;font-weight:700;
+  width:100%;padding:12px;background:#064E3B;color:#fff;
+  border:none;border-radius:10px;font-size:.88rem;font-weight:700;
   cursor:pointer;transition:all .25s;font-family:inherit;
   letter-spacing:.3px;
 }
-.login-btn:hover{background:#0b4a35;transform:translateY(-1px);box-shadow:0 6px 20px rgba(6,78,59,.25)}
+.login-btn:hover{background:#0b4a35;transform:translateY(-1px);box-shadow:0 4px 14px rgba(6,78,59,.25)}
 .login-btn:active{transform:translateY(0)}
 .login-btn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
 
 /* ── ERROR ── */
 .error-msg{
-  margin-top:14px;padding:12px 16px;background:#FEF3F2;border:1px solid #FECDD3;
-  border-radius:10px;color:#B42318;font-size:.82rem;font-weight:500;
-  display:none;align-items:center;gap:8px;
+  margin-top:10px;padding:9px 12px;background:#FEF3F2;border:1px solid #FECDD3;
+  border-radius:8px;color:#B42318;font-size:.75rem;font-weight:500;
+  display:none;align-items:center;gap:6px;
 }
 .error-msg.show{display:flex}
-.error-msg svg{width:18px;height:18px;flex-shrink:0}
+.error-msg svg{width:16px;height:16px;flex-shrink:0}
 
 /* ── FOOTER ── */
 .login-footer{
-  margin-top:36px;text-align:center;font-size:.75rem;color:#9fb0a6;
-  line-height:1.6;
+  margin-top:22px;text-align:center;font-size:.68rem;color:#9fb0a6;
+  line-height:1.5;
 }
 
 /* ── RESPONSIVE ── */
-@media(max-width:900px){
+@media(max-width:750px){
   body{flex-direction:column}
-  .left-panel{padding:40px 32px;min-height:auto}
+  .left-panel{padding:28px 24px;min-height:auto}
   .left-panel::before,.left-panel::after{display:none}
   .features{display:none}
-  .right-panel{width:100%;flex:1;padding:32px 24px}
+  .right-panel{width:100%;flex:1;padding:24px 20px}
 }
 
 /* ── ANIMATIONS ── */
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.login-card{animation:fadeUp .5s ease-out}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.login-card{animation:fadeUp .4s ease-out}
 </style>
 </head>
 <body>
@@ -150,7 +150,7 @@ body{font-family:'Inter','Segoe UI',Ebrima,sans-serif;min-height:100vh;display:f
       <div class="form-group">
         <label for="pwd">Mot de passe</label>
         <div class="input-wrap">
-          <input type="password" id="pwd" placeholder="Entrez votre mot de passe" autocomplete="current-password" autofocus>
+          <input type="password" id="pwd" placeholder="Mot de passe" autocomplete="current-password" autofocus>
           <button type="button" class="toggle-pwd" id="eyeBtn" aria-label="Afficher le mot de passe">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>

@@ -75,7 +75,7 @@ def open_app_window(port: int) -> None:
         [
             str(edge),
             f"--app={app_url}",
-            "--start-maximized",
+            "--window-size=900,600",
             "--new-window",
         ],
         close_fds=True,
