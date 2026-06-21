@@ -108,6 +108,22 @@ class _Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _xml(self, path: Path, status: int = 200) -> None:
+        body = path.read_bytes()
+        self.send_response(status)
+        self.send_header("Content-Type", "application/xml; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _text(self, path: Path, status: int = 200) -> None:
+        body = path.read_bytes()
+        self.send_response(status)
+        self.send_header("Content-Type", "text/plain; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
     def _redirect(self, url: str) -> None:
         self.send_response(302)
         self.send_header("Location", url)
@@ -139,6 +155,18 @@ class _Handler(BaseHTTPRequestHandler):
             if _login_path and _login_path.exists():
                 return self._html(_login_path)
             return self._json({"error": "Login page not found"}, 404)
+
+        if path == "/sitemap.xml":
+            sm = _html_path.parent / "sitemap.xml"
+            if sm.exists():
+                return self._xml(sm)
+            return self.send_error(404)
+
+        if path == "/robots.txt":
+            rt = _html_path.parent / "robots.txt"
+            if rt.exists():
+                return self._text(rt)
+            return self.send_error(404)
 
         if not self._require_auth():
             return
