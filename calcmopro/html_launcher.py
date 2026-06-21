@@ -71,11 +71,20 @@ def open_app_window(port: int) -> None:
     if edge is None:
         webbrowser.open(app_url, new=2)
         return
+    try:
+        import ctypes
+        user32 = ctypes.windll.user32
+        sw, sh = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+    except Exception:
+        sw, sh = 1920, 1080
+    w, h = int(sw * 0.50), int(sh * 0.50)
+    x, y = (sw - w) // 2, (sh - h) // 2
     subprocess.Popen(
         [
             str(edge),
             f"--app={app_url}",
-            "--window-size=900,600",
+            f"--window-size={w},{h}",
+            f"--window-position={x},{y}",
             "--new-window",
         ],
         close_fds=True,
