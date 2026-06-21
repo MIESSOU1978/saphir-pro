@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=overlays-content">
 <meta name="google-site-verification" content="YZf2o0U5chCswRvGy9i2XFqozxTBtVfAy2wnlYH-Yj0" />
 <title></title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
   --navy:    #050b14;
@@ -36,8 +39,9 @@ html::-webkit-scrollbar{width:12px;}
 html::-webkit-scrollbar-track{background:#e7eee9;}
 html::-webkit-scrollbar-thumb{background:#7f9f8d;border:3px solid #e7eee9;border-radius:999px;}
 html::-webkit-scrollbar-thumb:hover{background:#557a65;}
+*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 body{
-  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;
   background:var(--navy);
   color:var(--white);
   min-height:100vh;
@@ -72,10 +76,10 @@ header{
   display:flex;align-items:center;justify-content:center;
   font-size:0.78rem;font-weight:800;letter-spacing:1px;box-shadow:var(--glow);
 }
-.app-name{font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:1rem;font-weight:800;color:var(--cyan);letter-spacing:1.4px;}
+.app-name{font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;font-size:1rem;font-weight:800;color:var(--cyan);letter-spacing:1.4px;}
 .app-sub{font-size:0.68rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
 .header-title{
-  font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:1.25rem;font-weight:800;
+  font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;font-size:1.25rem;font-weight:800;
   color:var(--gold);letter-spacing:1px;text-align:center;flex:1;text-transform:uppercase;
 }
 .header-meta{font-size:0.68rem;color:var(--muted);text-align:right;line-height:1.6;}
@@ -95,7 +99,7 @@ nav{
 .nav-item{
   display:flex;align-items:center;gap:8px;
   padding:14px 22px;
-  font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:0.82rem;font-weight:600;
+  font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;font-size:0.82rem;font-weight:600;
   text-transform:uppercase;letter-spacing:0.8px;
   color:rgba(255,255,255,.45);
   cursor:pointer;
@@ -131,7 +135,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 
 /* ── SECTION TITLE ── */
 .section-title{
-  font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:0.74rem;font-weight:800;
+  font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;font-size:0.74rem;font-weight:800;
   text-transform:uppercase;letter-spacing:3px;color:var(--cyan);
   border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:14px;
 }
@@ -150,7 +154,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .field-group label{font-size:0.65rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1.2px;font-weight:500;}
 .field-group input,.field-group select{
   background:rgba(10,22,40,0.7);border:1px solid rgba(255,255,255,.08);border-radius:8px;
-  color:var(--white);font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:0.84rem;
+  color:var(--white);font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;font-size:0.84rem;
   padding:8px 11px;min-height:39px;outline:none;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
 }
 .field-group input:focus,.field-group select:focus{
@@ -177,7 +181,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 }
 .mat-table tbody td:first-child{text-align:left;border-left:1px solid rgba(255,255,255,.04);border-radius:8px 0 0 8px;padding-left:14px;}
 .mat-table tbody td:last-child{border-right:1px solid rgba(255,255,255,.04);border-radius:0 8px 8px 0;}
-.mat-label{font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:0.85rem;font-weight:700;color:rgba(255,255,255,.85);}
+.mat-label{font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;font-size:0.85rem;font-weight:700;color:rgba(255,255,255,.85);}
 .mat-coef{
   display:inline-flex;align-items:center;justify-content:center;
   width:32px;height:32px;
@@ -188,20 +192,20 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .note-input{
   width:82px;text-align:center;
   background:rgba(10,22,40,0.8);border:1px solid var(--border);border-radius:8px;
-  color:var(--white);font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:0.92rem;font-weight:800;
+  color:var(--white);font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;font-size:0.92rem;font-weight:800;
   padding:6px 7px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;
 }
 .note-input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(56,189,248,0.18);}
 .note-input.note-limit-warning{border-color:#b42318!important;background:#fff5f4!important;box-shadow:0 0 0 3px rgba(180,35,24,.14)!important;}
 .note-input::placeholder{color:rgba(148,163,184,0.4);font-size:0.78rem;}
-.computed-val{font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:1rem;font-weight:800;color:var(--accent);}
-.sum-val{font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:1.03rem;font-weight:800;color:var(--green);}
+.computed-val{font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;font-size:1rem;font-weight:800;color:var(--accent);}
+.sum-val{font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;font-size:1.03rem;font-weight:800;color:var(--green);}
 .two-notes{display:flex;gap:5px;align-items:center;}
 .note-sub-label{font-size:0.6rem;color:var(--muted);letter-spacing:0.5px;}
 
 /* ── MGA SPÉCIFIQUE ── */
 .mga-val{
-  font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:0.88rem;font-weight:700;
+  font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;font-size:0.88rem;font-weight:700;
   color:#4ade80;
   background:rgba(74,222,128,.08);
   border:1px solid rgba(74,222,128,.18);
@@ -236,7 +240,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
   text-transform:uppercase;
 }
 .result-value{
-  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;
   font-size:2.35rem;
   font-weight:900;
   font-variant-numeric:tabular-nums;
@@ -256,7 +260,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .btn{
   display:inline-flex;align-items:center;gap:7px;
   padding:9px 20px;border-radius:9px;border:none;cursor:pointer;
-  font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-weight:800;font-size:0.82rem;
+  font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;font-weight:800;font-size:0.82rem;
   letter-spacing:0.5px;text-transform:uppercase;transition:all 0.2s;
 }
 .btn-primary{background:linear-gradient(135deg,var(--blue2),var(--cyan));color:#fff;box-shadow:0 4px 14px rgba(56,189,248,0.3);}
@@ -427,7 +431,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
   display:inline-flex;align-items:center;gap:6px;
   padding:8px 18px;border-radius:8px;
   font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;
-  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;
   white-space:nowrap;
 }
 .hist-btn-print{
@@ -462,7 +466,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
   background:#F4FAF7;border:1px solid #D5E5DE;
 }
 .hist-card-mo .mo-value{
-  font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:.82rem;font-weight:800;
+  font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;font-size:.82rem;font-weight:800;
   color:#004032;line-height:1.2;white-space:nowrap;
 }
 .hist-card-mo .mo-label{font-size:.58rem;color:#60736D;text-transform:uppercase;letter-spacing:.6px;margin-top:3px;white-space:nowrap;}
@@ -530,7 +534,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
   margin:0 auto;
   background:#fff;
   color:#1a2420;
-  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;
   font-size:11pt;
   line-height:1.35;
   letter-spacing:0;
@@ -799,7 +803,7 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
   border-radius:8px;
   color:#1a3d30;
   font-size:.82rem;
-  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;
   transition:border-color .2s,box-shadow .2s,background .2s;
 }
 .field-group input::placeholder{color:#8fa398;opacity:.8;}
@@ -958,7 +962,7 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
   display:inline-flex;align-items:center;justify-content:center;gap:7px;
   min-height:50px;padding:0 24px;
   border-radius:8px;
-  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  font-family:'Inter','Ebrima','Segoe UI',Arial,sans-serif;
   font-size:.76rem;font-weight:700;letter-spacing:.3px;
   box-shadow:none;cursor:pointer;transition:all .2s;
   white-space:nowrap;
