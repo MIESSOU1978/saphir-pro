@@ -1642,12 +1642,17 @@ function updateMGASummary(){
 }
 
 function resetMGA(){
+  document.getElementById('nomEleve').value='';
+  document.getElementById('matricule').value='';
+  document.getElementById('classe').value='';
+  document.getElementById('annee').value='';
+  document.getElementById('etablissement').value='';
   MATIERES.forEach(m=>{
     ['t1','t2','t3'].forEach(t=>{const el=document.getElementById(m.id+'_'+t);if(el)el.value='';});
     document.getElementById(m.id+'_mga_val').textContent='0,00';
   });
-  toast('MGA réinitialisée.');
   updateMGASummary();
+  toast('Tous les champs ont été réinitialisés.');
 }
 
 function exportMGAtoMO(){
@@ -1812,6 +1817,11 @@ function setMention(mo){
 }
 
 function resetMO(){
+  document.getElementById('mo-nom').value='';
+  document.getElementById('mo-matricule').value='';
+  document.getElementById('mo-classe').value='';
+  document.getElementById('mo-annee').value='';
+  document.getElementById('mo-etablissement').value='';
   document.querySelectorAll('#page-mo .note-input').forEach(el=>el.value='');
   document.querySelectorAll('#mo-tbody .computed-val, #mo-tbody .sum-val').forEach(el=>el.textContent='—');
   document.getElementById('r-total').textContent='0,00';
@@ -1821,7 +1831,7 @@ function resetMO(){
   m.textContent='Non calculée';m.style.background='rgba(255,255,255,.12)';m.style.color='rgba(255,255,255,.55)';
   document.getElementById('mga-badge').style.display='none';
   updateMOProgress(0);
-  toast('Module MO réinitialisé.');
+  toast('Tous les champs ont été réinitialisés.');
 }
 
 function updateMOInfo(){
