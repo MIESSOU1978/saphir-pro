@@ -1,0 +1,20 @@
+{
+  "name": "saphir-pro",
+  "version": "2.0.0",
+  "description": "SAPHIR Pro - Calcul de la Moyenne d'Orientation",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx cap sync android",
+    "open": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor-community/sqlite": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "jeep-sqlite": "^2.0.0"
+  },
+  "devDependencies": {},
+  "author": "SAPHIR Pro",
+  "license": "MIT"
+}

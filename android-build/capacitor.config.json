@@ -1,0 +1,21 @@
+{
+  "appId": "com.calcmo.saphirpro",
+  "appName": "SAPHIR Pro",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#064E3B"
+  },
+  "plugins": {
+    "SQLite": {
+      "androidIsEncryption": false,
+      "iosIsEncryption": false,
+      "androidDatabaseLocation": "default",
+      "webDatabase": true
+    }
+  }
+}

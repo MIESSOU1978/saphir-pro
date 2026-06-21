@@ -1,0 +1,14 @@
+{
+  "name": "SAPHIR Pro",
+  "short_name": "SAPHIR Pro",
+  "description": "Calcul de la Moyenne d'Orientation - Application de calcul scolaire",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#064E3B",
+  "theme_color": "#064E3B",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

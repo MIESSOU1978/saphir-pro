@@ -1,0 +1,17 @@
+build/
+dist/
+*.spec
+__pycache__/
+*.pyc
+*.pyo
+.calcmo/
+android-build/node_modules/
+android-build/android/.gradle/
+android-build/android/app/build/
+android-build/android/capacitor-cordova-android-plugins/build/
+android-build/android/capacitor-android/build/
+android-build/android/capacitor-community-sqlite/build/
+*.apk
+CALCMO-SAPHIR-Pro.exe
+crash.log
+test_web.py

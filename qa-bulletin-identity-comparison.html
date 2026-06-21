@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comparaison identité SAPHIR</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:24px;background:#e8ece9;color:#173f31;font-family:Ebrima,"Segoe UI",Arial,sans-serif}
+h1{margin:0 0 18px;font-size:20px;text-align:center}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+.panel{min-width:0;background:#fff;border:1px solid #ccd8d0;border-radius:8px;overflow:hidden;box-shadow:0 8px 28px rgba(20,61,46,.10)}
+.label{padding:12px 16px;background:#0b4a35;color:#fff;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.canvas{height:840px;padding:14px;display:flex;align-items:flex-start;justify-content:center;overflow:auto;background:#f7f9f7}
+img{display:block;max-width:100%;height:auto;object-fit:contain}
+</style>
+</head>
+<body>
+<h1>Identité visuelle SAPHIR Pro</h1>
+<div class="compare">
+  <section class="panel">
+    <div class="label">Bulletin source</div>
+    <div class="canvas"><img src="tmp/pdfs/bulletin-reference-page-1.png" alt="Bulletin SAPHIR de référence"></div>
+  </section>
+  <section class="panel">
+    <div class="label">Application harmonisée</div>
+    <div class="canvas"><img src="qa-bulletin-identity-mo.png" alt="Écran MO harmonisé"></div>
+  </section>
+</div>
+</body>
+</html>

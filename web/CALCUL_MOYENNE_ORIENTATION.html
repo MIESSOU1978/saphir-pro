@@ -1,0 +1,2260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title></title>
+<style>
+:root {
+  --navy:    #050b14;
+  --navy2:   #081524;
+  --blue:    #0e2f56;
+  --blue2:   #1b50cc;
+  --accent:  #f59e0b;
+  --gold:    #fbbf24;
+  --green:   #0fac71;
+  --red:     #a7001e;
+  --cyan:    #60a5fa;
+  --white:   #edf4ff;
+  --muted:   #8bb9d8;
+  --border:  rgba(96,165,250,0.26);
+  --glow:    0 18px 50px rgba(27,80,204,0.26);
+  --card-bg: rgba(8,21,36,0.94);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{
+  width:100%;
+  min-height:100%;
+  overflow-x:hidden;
+  overflow-y:scroll;
+  scrollbar-gutter:stable;
+  scrollbar-color:#7f9f8d #e7eee9;
+  scrollbar-width:auto;
+}
+html::-webkit-scrollbar{width:12px;}
+html::-webkit-scrollbar-track{background:#e7eee9;}
+html::-webkit-scrollbar-thumb{background:#7f9f8d;border:3px solid #e7eee9;border-radius:999px;}
+html::-webkit-scrollbar-thumb:hover{background:#557a65;}
+body{
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  background:var(--navy);
+  color:var(--white);
+  min-height:100vh;
+  display:flex; flex-direction:column; align-items:center;
+  background-image:
+    radial-gradient(ellipse 90% 48% at 50% -8%,rgba(27,80,204,0.42) 0%,transparent 68%),
+    radial-gradient(circle at 8% 18%,rgba(15,172,113,0.16),transparent 34%),
+    linear-gradient(180deg,rgba(4,10,18,0.35),rgba(5,11,20,1)),
+    repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(96,165,250,0.035) 40px),
+    repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(96,165,250,0.035) 40px);
+  letter-spacing:0;
+  overflow-x:hidden;
+  overflow-y:visible;
+}
+
+/* ── HEADER ── */
+header{
+  width:100%;
+  background:linear-gradient(135deg,#040a12 0%,#081524 42%,#0e2f56 100%);
+  border-bottom:1px solid rgba(96,165,250,0.45);
+  box-shadow:0 10px 42px rgba(0,0,0,0.45);
+  padding:14px 32px;
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:200;
+}
+.logo-zone{display:flex;align-items:center;gap:14px;}
+.logo-icon{
+  width:44px;height:44px;
+  background:linear-gradient(135deg,var(--blue2),var(--cyan));
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.78rem;font-weight:800;letter-spacing:1px;box-shadow:var(--glow);
+}
+.app-name{font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:1rem;font-weight:800;color:var(--cyan);letter-spacing:1.4px;}
+.app-sub{font-size:0.68rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+.header-title{
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:1.25rem;font-weight:800;
+  color:var(--gold);letter-spacing:1px;text-align:center;flex:1;text-transform:uppercase;
+}
+.header-meta{font-size:0.68rem;color:var(--muted);text-align:right;line-height:1.6;}
+.header-meta strong{color:var(--cyan);}
+
+/* ── NAV MENU ── */
+nav{
+  width:100%;
+  background:linear-gradient(180deg,rgba(5,11,20,.97),rgba(7,15,28,.95));
+  border-bottom:1px solid rgba(242,182,50,.12);
+  display:flex; align-items:center; gap:2px;
+  padding:0 28px;
+  position:sticky; top:72px; z-index:190;
+  backdrop-filter:blur(14px);
+  min-height:52px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:14px 22px;
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:0.82rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:0.8px;
+  color:rgba(255,255,255,.45);
+  cursor:pointer;
+  border-bottom:3px solid transparent;
+  transition:all 0.2s;
+  white-space:nowrap;
+  position:relative;
+  border-left:none;outline:none;
+}
+.nav-item:hover{color:rgba(255,255,255,.8);background:rgba(242,182,50,.05);}
+.nav-item.active{
+  color:#4ade80;
+  border-bottom-color:#f5a623;
+  background:rgba(74,222,128,.06);
+}
+.nav-item .nav-ico{
+  font-size:0.62rem;font-weight:800;
+  padding:2px 7px;border-radius:4px;
+  background:rgba(255,255,255,.06);color:rgba(255,255,255,.35);
+  letter-spacing:.5px;line-height:1;
+}
+.nav-item.active .nav-ico{
+  background:rgba(245,166,35,.15);color:#f5a623;
+}
+.nav-sep{width:1px;height:20px;background:rgba(255,255,255,.08);margin:0 2px;flex-shrink:0;}
+
+/* ── MAIN CONTENT ── */
+main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direction:column;gap:18px;}
+
+/* ── PAGES ── */
+.page{display:none;}
+.page.active{display:flex;flex-direction:column;gap:18px;}
+
+/* ── SECTION TITLE ── */
+.section-title{
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:0.74rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:3px;color:var(--cyan);
+  border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:14px;
+}
+
+/* ── CARD ── */
+.card{
+  background:linear-gradient(180deg,rgba(8,21,36,0.98),rgba(7,19,33,0.94));
+  border:1px solid var(--border);border-radius:18px;
+  padding:20px;backdrop-filter:blur(14px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* ── FIELD ── */
+.eleve-grid{display:grid;grid-template-columns:2.1fr 1fr 1fr 1fr 2.1fr;gap:12px;align-items:end;}
+.field-group{display:flex;flex-direction:column;gap:5px;}
+.field-group label{font-size:0.65rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:1.2px;font-weight:500;}
+.field-group input,.field-group select{
+  background:rgba(10,22,40,0.7);border:1px solid rgba(255,255,255,.08);border-radius:8px;
+  color:var(--white);font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:0.84rem;
+  padding:8px 11px;min-height:39px;outline:none;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
+}
+.field-group input:focus,.field-group select:focus{
+  border-color:#f5a623;box-shadow:0 0 0 3px rgba(245,166,35,.12);background:rgba(15,28,48,.9);
+}
+.field-group select option{background:var(--navy2);}
+
+/* ── TABLE COMMUNE ── */
+.mat-table{width:100%;border-collapse:separate;border-spacing:0 4px;}
+.mat-table thead th{
+  font-size:0.62rem;text-transform:uppercase;letter-spacing:1.5px;
+  color:rgba(255,255,255,.7);font-weight:700;padding:10px 10px;text-align:center;
+  background:rgba(6,78,59,.35);border-bottom:2px solid rgba(245,166,35,.2);
+}
+.mat-table thead th:first-child{text-align:left;border-radius:8px 0 0 8px;padding-left:14px;}
+.mat-table thead th:last-child{border-radius:0 8px 8px 0;background:rgba(245,166,35,.1);color:#f5a623;}
+.mat-table tbody tr{background:rgba(255,255,255,.025);transition:background 0.15s;border-radius:8px;}
+.mat-table tbody tr:nth-child(even){background:rgba(255,255,255,.045);}
+.mat-table tbody tr:hover{background:rgba(245,166,35,.06);}
+.mat-table tbody td{
+  padding:8px 10px;text-align:center;
+  border-top:1px solid rgba(255,255,255,.04);
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.mat-table tbody td:first-child{text-align:left;border-left:1px solid rgba(255,255,255,.04);border-radius:8px 0 0 8px;padding-left:14px;}
+.mat-table tbody td:last-child{border-right:1px solid rgba(255,255,255,.04);border-radius:0 8px 8px 0;}
+.mat-label{font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:0.85rem;font-weight:700;color:rgba(255,255,255,.85);}
+.mat-coef{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;
+  background:linear-gradient(135deg,var(--blue2),var(--cyan));
+  border-radius:50%;font-weight:700;font-size:0.88rem;color:#fff;
+  box-shadow:0 0 10px rgba(56,189,248,0.3);
+}
+.note-input{
+  width:82px;text-align:center;
+  background:rgba(10,22,40,0.8);border:1px solid var(--border);border-radius:8px;
+  color:var(--white);font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:0.92rem;font-weight:800;
+  padding:6px 7px;outline:none;transition:border-color 0.2s,box-shadow 0.2s;
+}
+.note-input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(56,189,248,0.18);}
+.note-input.note-limit-warning{border-color:#b42318!important;background:#fff5f4!important;box-shadow:0 0 0 3px rgba(180,35,24,.14)!important;}
+.note-input::placeholder{color:rgba(148,163,184,0.4);font-size:0.78rem;}
+.computed-val{font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:1rem;font-weight:800;color:var(--accent);}
+.sum-val{font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:1.03rem;font-weight:800;color:var(--green);}
+.two-notes{display:flex;gap:5px;align-items:center;}
+.note-sub-label{font-size:0.6rem;color:var(--muted);letter-spacing:0.5px;}
+
+/* ── MGA SPÉCIFIQUE ── */
+.mga-val{
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:0.88rem;font-weight:700;
+  color:#4ade80;
+  background:rgba(74,222,128,.08);
+  border:1px solid rgba(74,222,128,.18);
+  border-radius:7px;padding:5px 12px;min-width:80px;display:inline-block;text-align:center;
+  letter-spacing:.3px;
+}
+
+/* ── RÉSULTAT ── */
+.result-bar{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 1px minmax(0,1fr);
+  gap:0;
+  min-height:136px;
+  padding:22px 28px;
+}
+.result-item{
+  min-width:0;
+  padding:4px 24px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  text-align:center;
+}
+.result-label{
+  color:var(--muted);
+  font-size:0.78rem;
+  font-weight:800;
+  line-height:1.3;
+  letter-spacing:0;
+  text-transform:uppercase;
+}
+.result-value{
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  font-size:2.35rem;
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+  line-height:1;
+}
+.rv-total{color:var(--gold);text-shadow:0 0 20px rgba(251,191,36,0.5);}
+.rv-mo{color:var(--green);text-shadow:0 0 20px rgba(34,197,94,0.5);}
+.result-divider{width:1px;background:var(--border);align-self:stretch;}
+.mention-badge{
+  display:inline-block;padding:5px 16px;border-radius:99px;
+  font-size:0.78rem;font-weight:700;letter-spacing:.5px;margin-top:6px;
+  transition:all .2s ease;
+}
+
+/* ── ACTIONS ── */
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 20px;border-radius:9px;border:none;cursor:pointer;
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-weight:800;font-size:0.82rem;
+  letter-spacing:0.5px;text-transform:uppercase;transition:all 0.2s;
+}
+.btn-primary{background:linear-gradient(135deg,var(--blue2),var(--cyan));color:#fff;box-shadow:0 4px 14px rgba(56,189,248,0.3);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(56,189,248,0.45);}
+.btn-accent{background:linear-gradient(135deg,#c2410c,var(--accent));color:#fff;box-shadow:0 4px 14px rgba(249,115,22,0.3);}
+.btn-accent:hover{transform:translateY(-2px);}
+.btn-gold{background:linear-gradient(135deg,#b45309,var(--gold));color:#000;}
+.btn-gold:hover{transform:translateY(-2px);}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--white);border-color:var(--cyan);background:rgba(56,189,248,0.08);}
+.btn-success{background:linear-gradient(135deg,#15803d,var(--green));color:#fff;}
+.btn-success:hover{transform:translateY(-2px);}
+
+.btn-icon{font-size:0.95rem;line-height:1;transition:transform .2s;}
+.btn-ghost:hover .btn-icon{transform:rotate(-90deg);}
+.btn-success:hover .btn-icon{transform:translateX(3px);}
+
+#page-mga .btn-ghost{
+  background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);
+  border:1px solid rgba(255,255,255,.12);border-radius:8px;
+}
+#page-mga .btn-ghost:hover{
+  background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.25);
+}
+#page-mga .btn-success{
+  background:linear-gradient(135deg,#064e3b,#0d7a56);
+  color:#fff;border-radius:8px;
+  box-shadow:0 2px 10px rgba(6,78,59,.3);
+}
+#page-mga .btn-success:hover{
+  background:linear-gradient(135deg,#0d7a56,#10b981);
+  transform:translateY(-2px);box-shadow:0 4px 16px rgba(6,78,59,.4);
+}
+
+/* ── ACCUEIL ── */
+.start-hero{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:24px;
+  align-items:stretch;
+}
+.start-intro{
+  text-align:center;
+  color:var(--muted);
+  font-size:.95rem;
+  font-weight:500;
+  letter-spacing:.3px;
+  padding:0 0 4px;
+  line-height:1.5;
+}
+.start-card{
+  position:relative;
+  overflow:hidden;
+  min-width:0;
+  padding:0;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:#fff;
+  box-shadow:0 4px 20px rgba(0,0,0,.06);
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  align-items:stretch;
+  transition:box-shadow .25s,transform .25s;
+}
+.start-card:hover{
+  box-shadow:0 8px 32px rgba(0,0,0,.1);
+  transform:translateY(-3px);
+}
+.start-card-head{
+  padding:28px 28px 0;
+}
+.start-kicker{
+  display:inline-block;
+  font-size:.68rem;
+  font-weight:800;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+  padding:3px 10px;
+  border-radius:4px;
+}
+.start-card strong{
+  display:block;
+  font-size:1.35rem;
+  line-height:1.25;
+  letter-spacing:0;
+  margin-bottom:12px;
+  text-wrap:balance;
+}
+.start-card p{
+  color:#60736d;
+  font-size:.88rem;
+  line-height:1.65;
+  text-wrap:pretty;
+}
+.start-card-body{
+  padding:0 28px 20px;
+}
+.start-card-foot{
+  padding:0 28px 26px;
+}
+.start-card .btn{
+  width:100%;
+  min-height:46px;
+  border-radius:10px;
+  font-weight:700;
+  font-size:.92rem;
+  letter-spacing:.3px;
+  justify-content:center;
+  transition:filter .2s,transform .15s;
+}
+.start-card .btn:hover{
+  filter:brightness(1.08);
+  transform:scale(1.015);
+}
+.start-card .btn-icon{
+  font-size:1.1rem;
+  margin-right:4px;
+}
+
+/* Carte gauche — vert */
+.start-card--mga{border-color:#c8ddd4;background:#0b4a35;}
+.start-card--mga .start-kicker{background:rgba(242,182,50,.18);color:#f2b632;}
+.start-card--mga strong{color:#fff;}
+.start-card--mga p{color:#c2dbd0;}
+.start-card--mga .btn{background:#f2b632;color:#15372b;}
+.start-card--mga .btn:active{background:#d9a028;}
+
+/* Carte droite — crème */
+.start-card--mo{border-color:#eadfbe;background:#fbf7ec;}
+.start-card--mo .start-kicker{background:rgba(11,74,53,.1);color:#0b4a35;}
+.start-card--mo strong{color:#0b4a35;}
+.start-card--mo p{color:#60736d;}
+.start-card--mo .btn{background:#0b4a35;color:#fff;}
+.start-card--mo .btn:active{background:#064e3b;}
+
+@media (max-width:900px){
+  main{padding:18px 14px 34px;}
+  .eleve-grid{grid-template-columns:repeat(2,1fr);}
+  .field-group{grid-column:auto!important;}
+  .start-hero{grid-template-columns:1fr;}
+}
+
+@media (max-width:560px){
+  .start-card-head{padding:20px 20px 0;}
+  .start-card-body{padding:0 20px 14px;}
+  .start-card-foot{padding:0 20px 20px;}
+  .start-card strong{font-size:1.15rem;}
+}
+
+/* ── HISTORIQUE ── */
+/* ── HISTORIQUE ── */
+.hist-container{
+  background:#fff;border:1px solid #d9e5de;border-radius:14px;
+  padding:24px 26px 20px;box-shadow:0 1px 8px rgba(0,0,0,.04);
+}
+.hist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.hist-header-left{display:flex;align-items:center;gap:12px;}
+.hist-header-icon{
+  width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(135deg,#064E3B,#0d7a56);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.1rem;flex-shrink:0;
+}
+.hist-title{font-size:.95rem;font-weight:700;color:#003b32;letter-spacing:.2px;}
+.hist-subtitle{font-size:.74rem;color:#60736d;margin-top:2px;}
+.hist-btn-print,.hist-btn-clear{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 18px;border-radius:8px;
+  font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  white-space:nowrap;
+}
+.hist-btn-print{
+  background:#064E3B;color:#fff;border:1px solid #064E3B;
+}
+.hist-btn-print:hover{
+  background:#053d2e;box-shadow:0 3px 10px rgba(6,78,59,.25);
+}
+.hist-btn-clear{
+  background:#FFF8F6;color:#B42318;border:1px solid #E7A6A0;
+}
+.hist-btn-clear:hover{
+  background:#FDECEA;border-color:#d4817a;color:#911b12;
+}
+.hist-actions-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
+
+.hist-card{
+  background:#fff;border:1px solid #e5ece8;border-radius:12px;
+  padding:16px 18px;margin-bottom:10px;transition:all .2s;
+  display:grid;grid-template-columns:1fr 155px 150px auto;align-items:center;gap:18px;
+}
+.hist-card:last-child{margin-bottom:0;}
+.hist-card:hover{border-color:#a3c4b5;box-shadow:0 3px 14px rgba(6,78,59,.09);background:#f6faf8;}
+
+.hist-card-info{min-width:0;}
+.hist-card-name{font-size:.9rem;font-weight:700;color:#003b32;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hist-card-meta{font-size:.72rem;color:#60736d;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.hist-card-mo{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;min-width:110px;min-height:56px;padding:8px 14px;border-radius:10px;
+  background:#F4FAF7;border:1px solid #D5E5DE;
+}
+.hist-card-mo .mo-value{
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:.82rem;font-weight:800;
+  color:#004032;line-height:1.2;white-space:nowrap;
+}
+.hist-card-mo .mo-label{font-size:.58rem;color:#60736D;text-transform:uppercase;letter-spacing:.6px;margin-top:3px;white-space:nowrap;}
+
+.hist-badge{
+  display:flex;align-items:center;justify-content:center;
+  width:155px;height:32px;border-radius:20px;
+  font-size:.7rem;font-weight:700;white-space:nowrap;text-align:center;
+}
+.hist-badge-pass{background:#FFF7ED;color:#C2410C;border:1px solid #FDBA74;}
+.hist-badge-warn{background:#FFF7ED;color:#B45309;border:1px solid #FCD34D;}
+.hist-badge-fail{background:#FEF2F2;color:#B42318;border:1px solid #FECACA;}
+.hist-badge-none{background:#F9FAFB;color:#60736D;border:1px solid #E5E7EB;}
+
+.hist-actions{display:flex;align-items:center;gap:12px;}
+.hist-btn-pdf{
+  display:inline-flex;align-items:center;gap:6px;width:150px;height:38px;
+  padding:0 16px;border-radius:8px;
+  border:none;background:#064E3B;
+  color:#fff;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s;
+  white-space:nowrap;justify-content:center;
+}
+.hist-btn-pdf:hover{background:#0d7a56;box-shadow:0 2px 8px rgba(6,78,59,.2);}
+.hist-btn-pdf-icon{font-size:.82rem;color:#fff;}
+.hist-btn-del{
+  display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;
+  border-radius:8px;border:1px solid #e5ece8;background:transparent;
+  color:#9fb0a6;cursor:pointer;font-size:.85rem;transition:all .2s;
+}
+.hist-btn-del:hover{background:#FDECEA;border-color:#E7A6A0;color:#B42318;}
+
+.hist-empty-state{text-align:center;padding:48px 20px;}
+.hist-empty-icon{
+  width:56px;height:56px;border-radius:14px;margin:0 auto 14px;
+  background:rgba(6,78,59,.05);display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;opacity:.6;
+}
+.hist-empty-text{font-size:.9rem;color:#003b32;font-weight:600;}
+.hist-empty-sub{font-size:.76rem;color:#9fb0a6;margin-top:6px;line-height:1.5;}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:26px;right:26px;
+  background:var(--blue2);color:var(--white);
+  padding:11px 20px;border-radius:10px;
+  font-size:0.83rem;font-weight:600;
+  box-shadow:0 8px 30px rgba(0,0,0,0.4);
+  opacity:0;transform:translateY(10px);
+  transition:all 0.3s;pointer-events:none;z-index:999;
+  border-left:4px solid var(--cyan);
+}
+#toast.show{opacity:1;transform:translateY(0);}
+
+/* ── BADGE MGA INJECTÉ ── */
+.mga-injected{
+  font-size:0.68rem;color:var(--green);
+  background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.25);
+  border-radius:4px;padding:1px 6px;margin-left:6px;
+}
+
+/* ── BULLETIN A4 ── */
+#bulletin-print{display:none;}
+.bulletin-sheet{
+  width:190mm;
+  margin:0 auto;
+  background:#fff;
+  color:#1a2420;
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  font-size:11pt;
+  line-height:1.35;
+  letter-spacing:0;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+}
+.bp-tricolor{display:grid;grid-template-columns:1fr minmax(88mm,auto) 1fr;overflow:hidden;border-radius:2.5mm 2.5mm 0 0;background:#fff;}
+.bp-tricolor span:nth-child(1){background:#f77f00;height:3.5mm;align-self:start;}
+.bp-tricolor span:nth-child(2){display:flex;align-items:center;justify-content:center;padding:0 5mm;background:#fff;color:#0b3d2e;font-size:10.5pt;font-weight:900;line-height:1;white-space:nowrap;text-align:center;}
+.bp-tricolor span:nth-child(2) strong{color:#d99a13;}
+.bp-tricolor span:nth-child(3){background:#009e60;height:3.5mm;align-self:start;}
+.bp-header{display:block;position:relative;top:auto;width:auto;padding:6mm 10mm 5mm;border:1px solid #dfe7e2;border-top:0;border-radius:0 0 2.5mm 2.5mm;background:#fff;color:#0b3d2e;box-shadow:none;}
+.bp-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10mm;}
+.bp-state{width:max-content;text-align:center;margin-left:auto;}
+.bp-republique{font-size:10pt;font-weight:900;line-height:1.15;text-transform:uppercase;white-space:nowrap;}
+.bp-devise{width:84%;margin:1mm auto 0;color:#d99a13;font-size:8.5pt;font-style:italic;line-height:1.15;letter-spacing:0;word-spacing:0;white-space:nowrap;text-align:center;}
+.bp-brand{text-align:left;}
+.bp-brand-name{font-size:20pt;font-weight:900;line-height:1;}
+.bp-brand-name span{color:#f2b632;}
+.bp-brand-sub{margin-top:1.2mm;color:#6b7a70;font-size:9pt;}
+.bp-brand-contact{margin-top:1.2mm;color:#0b4a35;font-size:8.5pt;font-weight:800;letter-spacing:.15mm;}
+.bp-header-rule{height:1px;margin:4mm 0;background:#dfe7e2;}
+.bp-title-row{position:relative;min-height:14mm;display:flex;align-items:center;justify-content:center;text-align:center;}
+.bp-title-row>div:last-child{width:100%;padding:0 18mm;}
+.bp-mark{position:absolute;left:0;top:50%;transform:translateY(-50%);width:14mm;height:14mm;border:.5mm solid #f2b632;border-radius:2.5mm;background:#0b4a35;color:#f2b632;display:flex;align-items:center;justify-content:center;box-shadow:0 0.8mm 2mm rgba(11,74,53,.14);}
+.bp-mark svg{width:7mm;height:7mm;display:block;}
+.bp-title{font-size:15pt;font-weight:900;line-height:1.2;}
+.bp-subtitle{margin-top:1mm;color:#6b7a70;font-size:9pt;line-height:1.3;}
+
+.bp-content{padding-top:5mm;}
+.bp-section-title{display:flex;align-items:center;gap:2mm;margin-bottom:3mm;color:#0b3d2e;font-size:9.5pt;font-weight:900;text-transform:uppercase;}
+.bp-section-num{width:6.5mm;height:6.5mm;border-radius:1.5mm;background:#0b3d2e;color:#f2b632;display:flex;align-items:center;justify-content:center;font-size:8.5pt;flex:0 0 auto;}
+.bp-section-line{height:1px;background:#dfe7e2;flex:1;}
+.bp-student{min-height:22mm;margin-bottom:5mm;padding:3.5mm 5mm 3.5mm 6mm;border:1px solid #eadfbe;border-left:1.2mm solid #f2b632;border-radius:2.5mm;background:#fbf7ec;display:flex;align-items:center;gap:4mm;}
+.bp-avatar{width:15mm;height:15mm;border-radius:50%;border:.8mm solid #f2b632;background:#0b4a35;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13pt;font-weight:900;flex:0 0 auto;}
+.bp-student-info{min-width:0;flex:1;}
+.bp-student-name{color:#0b3d2e;font-size:14pt;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bp-student-meta{margin-top:2mm;color:#66756c;font-size:9.5pt;display:flex;align-items:center;gap:2.5mm;flex-wrap:wrap;}
+.bp-student-meta strong{color:#39483f;}
+.bp-student-sep{color:#c7a84f;}
+.bp-matricule{min-width:30mm;padding:2.5mm 4mm;border-radius:2mm;background:#0b4a35;color:#fff;text-align:center;font-size:10.5pt;font-weight:800;}
+.bp-matricule small{display:block;margin-bottom:0.8mm;color:#f2b632;font-size:7.5pt;font-weight:900;text-transform:uppercase;}
+.bp-table-wrap{margin-bottom:5mm;border:1px solid #bdcdc4;border-radius:2.5mm;overflow:hidden;}
+.bp-grades{width:100%;border-collapse:collapse;table-layout:fixed;}
+.bp-grades col:nth-child(1){width:22%;}.bp-grades col:nth-child(2){width:12%;}.bp-grades col:nth-child(3){width:20%;}.bp-grades col:nth-child(4){width:14%;}.bp-grades col:nth-child(5){width:10%;}.bp-grades col:nth-child(6){width:22%;}
+.bp-grades th{padding:3.5mm 1.5mm;background:#0b3d2e;color:#fff;font-size:8.5pt;font-weight:900;text-align:center;text-transform:uppercase;}
+.bp-grades th:first-child,.bp-grades td:first-child{text-align:left;padding-left:5mm;}
+.bp-grades th:last-child{background:#0f5132;}
+.bp-grades td{height:15mm;padding:2.5mm 1.5mm;border-bottom:1px solid #e9efeb;text-align:center;font-size:11pt;vertical-align:middle;}
+.bp-grades tr:last-child td{border-bottom:none;}
+.bp-grades tbody tr:nth-child(even) td:not(:last-child){background:#fafbf9;}
+.bp-matiere{color:#0b3d2e;font-weight:900;font-size:10.5pt;}
+.bp-pill{display:inline-block;min-width:12mm;padding:2mm;border:1px solid #a9bbb0;border-radius:2mm;background:#f4f8f5;font-weight:800;font-variant-numeric:tabular-nums;box-shadow:inset 0 0 0 .2mm rgba(11,74,53,.025);}
+.bp-pill-bepc{border-color:#d2b456;background:#fbf6e9;color:#8a6a12;box-shadow:inset 0 0 0 .2mm rgba(138,106,18,.035);}
+.bp-dual{display:flex;align-items:center;justify-content:center;gap:0;}
+.bp-dual-item{min-width:12mm;padding:1.8mm 1.2mm;border:1px solid #d2b456;border-radius:2mm;background:#fbf6e9;color:#8a6a12;font-weight:900;box-shadow:inset 0 0 0 .2mm rgba(138,106,18,.035);}
+.bp-dual-link{width:4mm;height:.35mm;background:#d5a72a;flex:0 0 auto;}
+.bp-dual-item small{display:block;margin-top:.5mm;color:#aa8a32;font-size:7pt;text-transform:uppercase;}
+.bp-sum{color:#0b3d2e;font-weight:900;font-variant-numeric:tabular-nums;}
+.bp-coef{width:8mm;height:8mm;margin:auto;border:1px solid #f2b632;border-radius:50%;background:#fff7df;color:#8a6a12;display:flex;align-items:center;justify-content:center;font-weight:900;}
+.bp-result{border-left:1px solid #e0e8e3;background:#fff!important;color:#0b4a35;font-size:11.5pt!important;font-weight:900;font-variant-numeric:tabular-nums;}
+.bp-table-note{margin-top:1.5mm;color:#87958d;font-size:7.5pt;font-style:italic;text-align:right;}
+.bp-summary{display:grid;grid-template-columns:1fr 1.35fr;gap:4mm;margin-bottom:5mm;}
+.bp-summary-box{min-height:28mm;padding:4mm 7mm;border-radius:2.5mm;display:flex;flex-direction:column;justify-content:center;}
+.bp-summary-total{border:1px solid #dfe7e2;background:#f4f8f5;}
+.bp-summary-mo{align-items:center;border:1px solid #b8cfc2;background:#fff;color:#0b3d2e;text-align:center;box-shadow:inset 0 0 0 .3mm #eef4f0;}
+.bp-summary-label{color:#6b7a70;font-size:8.5pt;font-weight:900;text-transform:uppercase;}
+.bp-summary-mo .bp-summary-label{color:#4f675a;}
+.bp-total-value{margin-top:2mm;color:#0b3d2e;font-size:28pt;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;}
+.bp-mo-value{margin-top:1.5mm;font-size:34pt;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;}
+.bp-summary-mo.is-passing .bp-mo-value{color:#087443;}
+.bp-summary-mo.is-failing .bp-mo-value{color:#b42318;}
+.bp-mo-value small{font-size:15pt;}
+.bp-summary-sub{margin-top:2mm;color:#87958d;font-size:8.5pt;}
+.bp-summary-mo .bp-summary-sub{color:#f2b632;font-weight:800;}
+.bp-mention{display:inline-block;margin-top:2.5mm;padding:1.5mm 5mm;border-radius:99px;font-size:8pt;font-weight:800;letter-spacing:.3px;}
+.bp-mention.mention-pass{background:rgba(8,116,67,.12);color:#087443;}
+.bp-mention.mention-warn{background:rgba(217,154,19,.15);color:#92710a;}
+.bp-mention.mention-fail{background:rgba(180,35,24,.1);color:#b42318;}
+.bp-footer{padding-top:3.5mm;border-top:.4mm solid #0b3d2e;display:flex;justify-content:space-between;align-items:flex-end;color:#87958d;font-size:8pt;}
+#bp-filename{color:#0b3d2e;font-size:8pt;font-weight:700;text-align:center;align-self:center;display:none;}
+.bp-footer strong{color:#0b3d2e;}
+.bp-footer-right{text-align:left;}
+.bp-footer-date{color:#0b3d2e;font-weight:700;}
+
+/* ── IDENTITÉ VISUELLE SAPHIR / BULLETIN ── */
+:root{
+  --navy:#f3f6f3;
+  --navy2:#ffffff;
+  --blue:#0b4a35;
+  --blue2:#0f5a3d;
+  --accent:#f2b632;
+  --gold:#f2b632;
+  --green:#0b4a35;
+  --red:#a93636;
+  --cyan:#0b4a35;
+  --white:#163f31;
+  --muted:#697a70;
+  --border:#d8e2dc;
+  --glow:0 8px 24px rgba(11,74,53,.10);
+  --card-bg:#ffffff;
+}
+
+body{
+  background:#f3f6f3;
+  background-image:none;
+  color:#173f31;
+}
+
+header:not(.bp-header){
+  min-height:104px;
+  padding:14px 34px 12px;
+  display:grid;
+  grid-template-columns:minmax(250px,1fr) minmax(420px,1.55fr) minmax(250px,1fr);
+  gap:24px;
+  background:#064E3B;
+  border-bottom:none;
+  box-shadow:0 4px 18px rgba(6,78,59,.35);
+}
+.header-tricolor{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:3px;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+}
+.header-tricolor span:nth-child(1){background:#F5A623;}
+.header-tricolor span:nth-child(2){background:#fff;}
+.header-tricolor span:nth-child(3){background:#0FAC71;}
+.logo-zone{gap:0;align-items:flex-start;justify-content:flex-end;text-align:center;}
+.country-block{width:max-content;}
+.country-name{
+  color:#fff;
+  font-size:.7rem;
+  font-weight:900;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+}
+.country-motto{
+  width:82%;
+  margin:6px auto 0;
+  color:#F5A623;
+  font-size:.68rem;
+  font-style:italic;
+  letter-spacing:0;
+  word-spacing:0;
+  white-space:nowrap;
+}
+.header-title{
+  align-self:center;
+  color:#fff;
+  font-size:.95rem;
+  font-weight:700;
+  line-height:1.25;
+  letter-spacing:.3px;
+  text-transform:none;
+  text-align:center;
+}
+.header-title span{
+  display:block;
+  margin-top:5px;
+  color:#cdded6;
+  font-size:.78rem;
+  font-weight:500;
+  line-height:1.35;
+}
+.header-meta{align-self:center;color:#cdded6;text-align:left;line-height:1.45;}
+.header-meta .app-name{
+  color:#fff;
+  font-size:1.35rem;
+  line-height:1;
+  letter-spacing:0;
+}
+.header-meta .app-name span{color:#F5A623;}
+.header-meta strong{color:#fff;}
+.header-contact{margin-top:6px;color:#d9e7e0;font-size:.7rem;font-weight:700;letter-spacing:.35px;}
+
+nav{
+  top:96px;
+  min-height:48px;
+  justify-content:center;
+  gap:2px;
+  padding:0 24px;
+  background:linear-gradient(180deg,#ffffff,#f8faf8);
+  border-bottom:1px solid #d9e5de;
+  border-top:none;
+  box-shadow:0 2px 12px rgba(6,78,59,.06);
+  backdrop-filter:none;
+}
+.nav-item{
+  min-height:52px;
+  padding:0 22px;
+  color:#8a9c8f;
+  border-bottom:3px solid transparent;
+  font-size:0.88rem;
+  letter-spacing:.5px;
+  border-left:none;outline:none;
+}
+.nav-item:hover{color:#064e3b;background:rgba(6,78,59,.04);}
+.nav-item.active{
+  color:#064e3b;
+  border-bottom-color:#f5a623;
+  background:rgba(6,78,59,.04);
+}
+.nav-item .nav-ico{
+  min-width:auto;
+  padding:2px 7px;border-radius:4px;
+  background:rgba(6,78,59,.06);
+  color:#60736d;
+  font-size:0.65rem;
+  font-weight:800;
+  letter-spacing:.5px;
+}
+.nav-item.active .nav-ico{
+  background:rgba(245,166,35,.12);
+  color:#b45309;
+}
+.nav-sep{height:18px;background:#e2ebe5;margin:0 2px;flex-shrink:0;}
+
+main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
+.page.active{gap:20px;}
+.card{
+  padding:22px;
+  background:#fff;
+  border:1px solid #d8e2dc;
+  border-radius:10px;
+  box-shadow:0 8px 24px rgba(20,61,46,.07);
+  backdrop-filter:none;
+}
+.section-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:17px;
+  padding:0 0 9px 11px;
+  color:#064e3b;
+  border-bottom:1px solid #e2ebe5;
+  border-left:4px solid #f5a623;
+  font-size:.73rem;
+  letter-spacing:1.7px;
+}
+
+.start-hero{gap:24px;}
+
+.eleve-grid{gap:14px;}
+.field-group{gap:6px;}
+.field-group label{color:#4a5c52;font-size:.62rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;}
+.field-group input,.field-group select{
+  min-height:40px;
+  padding:9px 14px;
+  background:#f6faf7;
+  border:1px solid #d1ddd6;
+  border-radius:8px;
+  color:#1a3d30;
+  font-size:.82rem;
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+}
+.field-group input::placeholder{color:#8fa398;opacity:.8;}
+.field-group input:hover,.field-group select:hover{border-color:#a3b8ad;}
+.field-group input:focus,.field-group select:focus{
+  border-color:#064E3B;
+  box-shadow:0 0 0 3px rgba(6,78,59,.1);
+  background:#fff;
+  outline:none;
+}
+.field-group select option{background:#fff;color:#1a3d30;}
+#mo-eleve-info{color:#75847b!important;}
+
+.mat-table{border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:8px;border:1px solid #e2ebe5;}
+.mat-table thead th{
+  padding:14px 12px;
+  color:#fff;
+  background:#064e3b;
+  font-size:.68rem;
+  font-weight:700;
+  letter-spacing:1.2px;
+  border-bottom:3px solid #f5a623;
+  text-align:center;
+  vertical-align:middle;
+}
+.mat-table thead th:first-child{text-align:left;border-radius:7px 0 0 0;padding-left:14px;}
+.mat-table thead th:last-child{border-radius:0 7px 0 0;background:#0a6b4e;color:#f5a623;}
+.mat-table tbody tr,.mat-table tbody tr:hover{background:#fff;}
+.mat-table tbody tr:nth-child(even){background:#f6faf7;}
+.mat-table tbody td{
+  padding:12px 10px;
+  border:0;
+  border-bottom:1px solid #e8f0eb;
+}
+.mat-table tbody td:first-child{text-align:left;border-left:none;border-radius:0;padding-left:14px;}
+.mat-table tbody td:last-child{border-right:none;border-radius:0;background:#f0f6f2;color:#064e3b;font-weight:700;}
+.mat-table tbody tr:last-child td:first-child{border-radius:0 0 0 7px;}
+.mat-table tbody tr:last-child td:last-child{border-radius:0 0 7px 0;}
+.mat-label{color:#064e3b;font-size:.88rem;font-weight:700;}
+.mga-summary{
+  margin-top:14px;padding:10px 16px;font-size:.72rem;
+  color:#60736d;letter-spacing:.5px;
+  border-top:1px solid #e2ebe5;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.mga-summary-left{display:flex;align-items:center;gap:10px;}
+.mga-summary-label{font-weight:600;color:#4a5c52;}
+.mga-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:44px;padding:3px 10px;border-radius:12px;
+  font-size:.68rem;font-weight:800;
+  background:#F4FAF7;color:#064E3B;border:1px solid #D5E5DE;
+}
+.mga-badge.complete{background:#064E3B;color:#fff;border-color:#064E3B;}
+.mga-badge.almost{background:#F0FAF4;color:#15803D;border-color:#BBF7D0;}
+.mga-badge.half{background:#FFFBEB;color:#B45309;border-color:#FDE68A;}
+.mga-badge.started{background:#FEF2F2;color:#B42318;border-color:#FECACA;}
+.mga-summary-right{display:flex;align-items:center;gap:8px;}
+.mga-summary-msg{font-size:.65rem;color:#064E3B;font-weight:600;opacity:0;transition:opacity .3s;}
+.mga-summary-msg.show{opacity:1;}
+.mga-progress{width:60px;height:4px;background:#e2ebe5;border-radius:2px;overflow:hidden;}
+.mga-progress-fill{height:100%;background:#cbd5d0;border-radius:2px;transition:width .3s ease,background .3s;}
+.mga-progress-fill.fill-started{background:#E7A6A0;}
+.mga-progress-fill.fill-half{background:#F5A623;}
+.mga-progress-fill.fill-almost{background:#6BBF8A;}
+.mga-progress-fill.fill-complete{background:#064E3B;}
+
+.mo-progress-bar{
+  margin-top:14px;padding:10px 16px;font-size:.72rem;
+  color:#60736d;letter-spacing:.5px;
+  border-top:1px solid #e2ebe5;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.mo-progress-left{display:flex;align-items:center;gap:10px;}
+.mo-progress-label{font-weight:600;color:#4a5c52;}
+.mo-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:44px;padding:3px 10px;border-radius:12px;
+  font-size:.68rem;font-weight:800;
+  background:#F4FAF7;color:#064E3B;border:1px solid #D5E5DE;
+}
+.mo-badge.complete{background:#064E3B;color:#fff;border-color:#064E3B;}
+.mo-badge.almost{background:#F0FAF4;color:#15803D;border-color:#BBF7D0;}
+.mo-badge.half{background:#FFFBEB;color:#B45309;border-color:#FDE68A;}
+.mo-badge.started{background:#FEF2F2;color:#B42318;border-color:#FECACA;}
+.mo-progress-right{display:flex;align-items:center;gap:8px;}
+.mo-progress-msg{font-size:.65rem;color:#064E3B;font-weight:600;opacity:0;transition:opacity .3s;}
+.mo-progress-msg.show{opacity:1;}
+.mo-track{width:60px;height:4px;background:#e2ebe5;border-radius:2px;overflow:hidden;}
+.mo-track-fill{height:100%;background:#cbd5d0;border-radius:2px;transition:width .3s ease,background .3s;}
+.mo-track-fill.fill-started{background:#E7A6A0;}
+.mo-track-fill.fill-half{background:#F5A623;}
+.mo-track-fill.fill-almost{background:#6BBF8A;}
+.mo-track-fill.fill-complete{background:#064E3B;}
+.mat-coef{
+  width:31px;
+  height:31px;
+  background:#fff7df;
+  border:1px solid #f2b632;
+  color:#8a6a12;
+  box-shadow:none;
+}
+.note-input{
+  width:82px;
+  padding:7px;
+  background:#fbfcfa;
+  border:1px solid #cedbd3;
+  border-radius:6px;
+  color:#183f31;
+}
+.note-input:focus{border-color:#f5a623;box-shadow:0 0 0 3px rgba(245,166,35,.14);background:#fff;}
+.note-input::placeholder{color:#9aa79f;}
+.note-sub-label{color:#7b887f;}
+.computed-val{color:#0b4a35;}
+.sum-val{color:#0f5a3d;}
+.mga-val{
+  color:#064e3b;
+  background:#f0f6f2;
+  border:1px solid #c5d5ca;
+  border-radius:7px;
+  font-weight:700;
+  letter-spacing:.3px;
+}
+.mga-injected{color:#0b4a35;background:#edf6f1;border-color:#c7ded1;}
+
+.result-bar{
+  grid-template-columns:1fr 1.15fr;
+  min-height:150px;
+  padding:0;
+  gap:0;
+  overflow:hidden;
+  border:1px solid #d5e5de;
+  background:#fff;
+  border-radius:12px;
+}
+.result-divider{display:none;}
+.result-item{padding:28px 24px;gap:10px;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.result-item.result-total{background:#F4FAF7;border-radius:12px 0 0 12px;border-right:1px solid #d5e5de;}
+.result-item.result-mo{background:#064E3B;color:#fff;border-radius:0 12px 12px 0;}
+.result-label{color:#60736D;font-size:.7rem;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;}
+.result-item.result-mo .result-label{color:#a7c4b8;}
+.result-value{font-size:2.2rem;text-shadow:none;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1;}
+.rv-total{color:#064E3B;text-shadow:none;}
+.rv-mo{color:#f87171;text-shadow:none;transition:color .18s ease;}
+.rv-mo.is-passing{color:#86efac;}
+.rv-mo.is-failing{color:#f87171;}
+.rv-mo.is-none{color:rgba(255,255,255,.45);}
+.result-mo .mention-badge{
+  margin-top:6px;padding:4px 14px;border-radius:20px;
+  font-size:.68rem;font-weight:700;letter-spacing:.3px;
+  background:rgba(255,255,255,.12);color:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.12);
+}
+
+.actions{gap:14px;align-items:center;}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  min-height:50px;padding:0 24px;
+  border-radius:8px;
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  font-size:.76rem;font-weight:700;letter-spacing:.3px;
+  box-shadow:none;cursor:pointer;transition:all .2s;
+  white-space:nowrap;
+}
+.btn:hover{transform:translateY(-1px);}
+.btn-icon{font-size:.85rem;line-height:1;}
+
+.btn-ghost{
+  background:#fff;color:#064E3B;border:1px solid #c4d4cb;
+}
+.btn-ghost:hover{background:#f4faf6;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
+
+.btn-success{
+  background:#fff;color:#064E3B;border:1px solid #c4d4cb;
+}
+.btn-success:hover{background:#f4faf6;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
+
+.btn-primary{
+  background:#fff;color:#064E3B;border:1px solid #c4d4cb;
+}
+.btn-primary:hover{background:#f4faf6;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
+
+.btn-accent{
+  background:#F5A623;color:#fff;border:1px solid #F5A623;
+}
+.btn-accent:hover{background:#e09520;border-color:#e09520;box-shadow:0 3px 12px rgba(245,166,35,.25);}
+
+/* ── CONFORT TYPOGRAPHIQUE : MODULES MGA ET MO (+2 pt) ── */
+#page-mga .section-title,
+#page-mo .section-title{margin-bottom:18px;padding-bottom:10px;font-size:.987rem;line-height:1.35;letter-spacing:1.35px;}
+#page-mga .eleve-grid,
+#page-mo .eleve-grid{gap:16px;grid-template-columns:2.1fr 0.5fr 0.5fr 0.5fr 3.5fr;}
+#page-mga .field-group,
+#page-mo .field-group{gap:6px;}
+#page-mga .field-group label,
+#page-mo .field-group label{font-size:.78rem;line-height:1.3;letter-spacing:1px;}
+#page-mga .field-group input,
+#page-mga .field-group select,
+#page-mo .field-group input,
+#page-mo .field-group select{height:42px;padding:9px 14px;border-color:#d1ddd6;font-size:.88rem;border-radius:8px;box-shadow:none;}
+#page-mga #etablissement,
+#page-mo #mo-etablissement{width:100%;}
+#page-mga .field-group input:hover,
+#page-mga .field-group select:hover,
+#page-mo .field-group input:hover,
+#page-mo .field-group select:hover{border-color:#a3b8ad;}
+#page-mo #mo-eleve-info{font-size:.927rem!important;line-height:1.5;color:#60736d!important;}
+#page-mga .mat-table thead th,
+#page-mo .mat-table thead th{padding:14px 12px;font-size:.72rem;line-height:1.3;}
+#page-mga .mat-table tbody td,
+#page-mo .mat-table tbody td{padding:14px 10px;vertical-align:middle;}
+#page-mga .mat-label,
+#page-mo .mat-label{font-size:1.147rem;line-height:1.25;}
+#page-mga .note-input,
+#page-mo .note-input{width:90px;padding:8px;border-color:#a9bbb0;background:#f9fbf9;font-size:1.087rem;box-shadow:inset 0 0 0 1px rgba(11,74,53,.025);}
+#page-mga .note-input:hover,
+#page-mo .note-input:hover{border-color:#829b8d;}
+#page-mo #mo-tbody tr:has(.two-notes) td:nth-child(2),
+#page-mo #mo-tbody tr:has(.two-notes) td:nth-child(3){vertical-align:top;}
+#page-mo .two-notes{justify-content:center;}
+#page-mo #mo-tbody tr:has(.two-notes) .note-input{height:42px;box-sizing:border-box;}
+#page-mga .note-input::placeholder,
+#page-mo .note-input::placeholder{font-size:.947rem;}
+#page-mo .note-sub-label{font-size:.827rem;}
+#page-mga .mga-val{font-size:1.167rem;line-height:1.2;}
+#page-mo .computed-val{font-size:1.167rem;line-height:1.2;}
+#page-mo .sum-val{font-size:1.197rem;line-height:1.2;}
+#page-mo .mat-coef{width:35px;height:35px;font-size:1.047rem;}
+#page-mo .result-bar{grid-template-columns:1fr 1.15fr;min-height:160px;}
+#page-mo .result-item{padding:28px;}
+#page-mo .result-label{font-size:.82rem;line-height:1.35;}
+#page-mo .result-value{font-size:2.4rem;}
+#page-mga .btn,
+#page-mo .btn{min-height:45px;padding:10px 20px;font-size:.927rem;line-height:1.2;}
+#page-mga .actions,
+#page-mo .actions{gap:12px;margin-top:2px;}
+
+@media (min-width:701px){
+  #page-mga.page.active,
+  #page-mo.page.active{gap:22px;}
+  #page-mga .card:not(.result-bar),
+  #page-mo .card:not(.result-bar){padding:24px;}
+}
+
+#page-mga > .card:first-child,
+#page-mo > .card:first-child{
+  background:#e9f3ed;
+  border-color:#b8cec1;
+  box-shadow:0 8px 24px rgba(20,61,46,.10),inset 0 1px 0 rgba(255,255,255,.72);
+}
+  .btn-accent:hover,.btn-gold:hover{background:#e3a91f;}
+
+#toast{
+  background:#0b4a35;
+  color:#fff;
+  border-left-color:#f2b632;
+  border-radius:6px;
+  box-shadow:0 10px 28px rgba(11,74,53,.20);
+}
+
+@media (max-width:980px){
+  header:not(.bp-header){
+    grid-template-columns:1fr 1.35fr;
+    min-height:100px;
+  }
+  .header-title{display:none;}
+  nav{top:92px;}
+  #page-mga .card:has(.mat-table),
+  #page-mo .card:has(.mat-table){overflow-x:auto;}
+}
+@media (max-width:700px){
+  header:not(.bp-header){position:relative;grid-template-columns:1fr auto;min-height:88px;padding:18px 18px 13px;}
+  .country-name{font-size:.63rem;letter-spacing:1.2px;}
+  .country-motto{font-size:.62rem;}
+  .header-meta .app-name{font-size:1.15rem;}
+  .header-contact{display:none;}
+  nav{top:0;justify-content:flex-start;overflow-x:auto;padding:0 8px;}
+  .nav-item{padding:0 13px;font-size:.7rem;border-left:none !important;outline:none !important;}
+  .nav-sep{display:none !important;}
+  main{padding:18px 12px 32px;}
+  .page.active{min-width:0;}
+  .card{width:100%;min-width:0;padding:16px;}
+  .field-group{min-width:0;}
+  .field-group input,.field-group select{width:100%;min-width:0;}
+  .eleve-grid{grid-template-columns:1fr!important;}
+  .card:has(.mat-table){overflow-x:auto;}
+  .mat-table{min-width:690px;}
+  .result-bar{grid-template-columns:1fr;overflow:hidden;}
+  .result-item{min-height:118px;border-radius:0 !important;}
+  .result-item.result-total{border-radius:12px 12px 0 0 !important;border-right:none;border-bottom:1px solid #d5e5de;}
+  .result-item.result-mo{border-radius:0 0 12px 12px !important;}
+  .actions{display:grid;grid-template-columns:1fr 1fr;width:100%;}
+  .actions .btn{width:100%;justify-content:center;}
+  .hist-card{grid-template-columns:1fr;gap:12px;padding:14px;}
+  .hist-card-mo{justify-self:start;min-width:110px;}
+  .hist-badge{width:auto;justify-self:start;}
+  .hist-btn-pdf{width:auto;justify-self:start;}
+  .hist-actions{justify-self:start;}
+  .hist-header{flex-direction:column;align-items:flex-start;}
+}
+
+/* Fenêtre native compacte : tout le module reste visible sans défilement. */
+@media (min-width:981px) and (max-height:900px){
+  header:not(.bp-header){min-height:82px;padding:11px 34px 9px;}
+  .header-title span{margin-top:5px;}
+  .header-contact{margin-top:4px;}
+  nav{top:82px;min-height:42px;}
+  .nav-item{min-height:42px;}
+  main{padding:12px 22px 16px;gap:12px;}
+  #page-mga.page.active,
+  #page-mo.page.active{gap:12px;}
+  #page-mga .card:not(.result-bar),
+  #page-mo .card:not(.result-bar){padding:16px;}
+  #page-mga .section-title,
+  #page-mo .section-title{margin-bottom:10px;padding-bottom:7px;}
+  #page-mga .eleve-grid,
+  #page-mo .eleve-grid{gap:12px;}
+  #page-mga .field-group,
+  #page-mo .field-group{gap:5px;}
+  #page-mga .field-group input,
+  #page-mga .field-group select,
+  #page-mo .field-group input,
+  #page-mo .field-group select{min-height:40px;padding:7px 10px;}
+  #page-mo #mo-eleve-info{display:none;}
+  #page-mga .mat-table thead th,
+  #page-mo .mat-table thead th{padding:9px 8px;}
+  #page-mga .mat-table tbody td,
+  #page-mo .mat-table tbody td{padding:7px 8px;}
+  #page-mga .note-input,
+  #page-mo .note-input{width:86px;height:38px;padding:5px 7px;}
+  #page-mo #mo-tbody tr:has(.two-notes) .note-input{height:38px;}
+  #page-mo .result-bar{min-height:108px;}
+  #page-mo .result-item{padding:12px;gap:6px;}
+  #page-mga .btn,
+  #page-mo .btn{min-height:41px;padding:8px 18px;}
+  #page-mga .actions,
+  #page-mo .actions{margin-top:0;}
+}
+
+body.bulletin-preview{display:block!important;min-height:100vh;padding:20px;background:#dfe5e1;}
+body.bulletin-preview>header,body.bulletin-preview>nav,body.bulletin-preview>main,body.bulletin-preview>#toast{display:none!important;}
+body.bulletin-preview #bulletin-print{display:block;width:210mm;min-height:297mm;margin:0 auto;padding:8mm;background:#fff;box-shadow:0 18px 55px rgba(0,0,0,0.25);}
+body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-shadow:none;}
+
+@media print{
+  @page{size:A4 portrait;margin:10mm;@top-left{content:none;}@top-center{content:none;}@top-right{content:none;}@bottom-left{content:none;}@bottom-center{content:none;}@bottom-right{content:none;}}
+  html,body{width:auto!important;min-height:0!important;background:#fff!important;}
+  body{display:block!important;}
+  body>header,body>nav,body>main,body>#toast{display:none!important;}
+  #bulletin-print{display:block!important;}
+  .bulletin-sheet{width:100%;margin:0;box-shadow:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="header-tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="header-meta">
+    <div class="app-name">SAPHIR <span>Pro</span></div>
+    <div class="header-contact">0708109840 / 0152030622</div>
+  </div>
+  <div class="header-title">
+    Calcul de la Moyenne d'Orientation
+    <span>Application d'aide au calcul de la Moyenne d'Orientation</span>
+  </div>
+  <div class="logo-zone">
+    <div class="country-block">
+      <div class="country-name">République de Côte d'Ivoire</div>
+      <div class="country-motto">Union - Discipline - Travail</div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ NAV MENU ══ -->
+<nav>
+  <div class="nav-item" onclick="showPage('mga')" id="nav-mga">
+    <span class="nav-ico">01</span> Calcul MGA
+  </div>
+  <div class="nav-sep"></div>
+  <div class="nav-item" onclick="showPage('mo')" id="nav-mo">
+    <span class="nav-ico">02</span> Calcul MO
+  </div>
+  <div class="nav-sep"></div>
+  <div class="nav-item" onclick="showPage('hist')" id="nav-hist">
+    <span class="nav-ico">03</span> Historique
+  </div>
+</nav>
+
+<!-- ══ MAIN ══ -->
+<main autocomplete="off">
+
+<!-- ════════════════════════════════════════════
+     ACCUEIL : CHOIX DU MODULE
+════════════════════════════════════════════ -->
+<div class="page active" id="page-home">
+
+  <div class="start-intro">Choisissez le mode de calcul adapté à votre situation.</div>
+
+  <div class="start-hero">
+    <div class="start-card start-card--mga">
+      <div class="start-card-head">
+        <div class="start-kicker">Parcours recommandé</div>
+        <strong>Commencer par le calcul MGA</strong>
+      </div>
+      <div class="start-card-body">
+        <p>Saisissez les moyennes trimestrielles de l'élève, laissez le logiciel calculer les MGA, puis transférez automatiquement les résultats vers le module MO.</p>
+      </div>
+      <div class="start-card-foot">
+        <button class="btn" onclick="showPage('mga')"><span class="btn-icon">&#9878;</span> COMMENCER PAR MGA</button>
+      </div>
+    </div>
+
+    <div class="start-card start-card--mo">
+      <div class="start-card-head">
+        <div class="start-kicker">Accès direct</div>
+        <strong>Aller directement au calcul MO</strong>
+      </div>
+      <div class="start-card-body">
+        <p>Utilisez ce mode si les MGA sont déjà connues. Renseignez directement les MGA et les notes BEPC pour obtenir la Moyenne d'Orientation.</p>
+      </div>
+      <div class="start-card-foot">
+        <button class="btn" onclick="showPage('mo')"><span class="btn-icon">&#10132;</span> ALLER DIRECTEMENT À MO</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page-home -->
+
+<!-- ════════════════════════════════════════════
+     PAGE 1 : CALCUL MGA
+════════════════════════════════════════════ -->
+<div class="page" id="page-mga">
+
+  <div class="card">
+    <div class="section-title">Informations de l'élève</div>
+    <div class="eleve-grid">
+      <div class="field-group">
+        <label>NOM ET PRÉNOMS</label>
+        <input type="text" id="nomEleve" placeholder="Ex : KOUAKOU Jean-Paul">
+      </div>
+      <div class="field-group">
+        <label>MATRICULE</label>
+        <input type="text" id="matricule" placeholder="Ex : 24002478U" maxlength="9">
+      </div>
+      <div class="field-group">
+        <label>CLASSE</label>
+        <input type="text" id="classe" placeholder="Ex : 3ème A">
+      </div>
+      <div class="field-group">
+        <label>ANNÉE SCOLAIRE</label>
+        <input type="text" id="annee" value="2025–2026">
+      </div>
+      <div class="field-group">
+        <label>ÉTABLISSEMENT</label>
+        <input type="text" id="etablissement" list="etablissement-list" placeholder="Taper pour rechercher...">
+        <datalist id="etablissement-list">
+          <option>COLLÈGE DÉPARTEMENTAL AGNIBILÉKROU</option>
+          <option>COLLÈGE MODERNE ABENGOUROU</option>
+          <option>COLLÈGE MODERNE ABINAN KOUAKOU PASCAL DE DAME</option>
+          <option>COLLÈGE MODERNE ABRADINOU</option>
+          <option>COLLÈGE MODERNE AFFALIKRO</option>
+          <option>COLLÈGE MODERNE AGNIBILÉKROU</option>
+          <option>COLLÈGE MODERNE AKOBOISSUÉ</option>
+          <option>COLLÈGE MODERNE ALASSANE OUATTARA AGNIBILÉKROU</option>
+          <option>COLLÈGE MODERNE AMELEKIA</option>
+          <option>COLLÈGE MODERNE AMORIAKRO</option>
+          <option>COLLÈGE MODERNE APPROMPRON AFEWA</option>
+          <option>COLLÈGE MODERNE BANGOUA</option>
+          <option>COLLÈGE MODERNE DIAMARAKRO</option>
+          <option>COLLÈGE MODERNE NANAN BOA KOUASSI III ABENGOUROU</option>
+          <option>COLLÈGE MODERNE NANAN N'DRI AHOUSSI DE DUFFREBO</option>
+          <option>COLLÈGE MODERNE SANKADIOKRO</option>
+          <option>COLLÈGE MODERNE SATIKRAN</option>
+          <option>COLLÈGE MODERNE YOBOUAKRO</option>
+          <option>LYCÉE DÉPARTEMENTAL ROI BONZOU II ABENGOUROU</option>
+          <option>LYCÉE MODERNE ABENGOUROU</option>
+          <option>LYCÉE MODERNE AGNIBILÉKROU</option>
+          <option>LYCÉE MODERNE ANIASSUÉ</option>
+          <option>LYCÉE MODERNE D'APPROMPRONOU MIAN KUAO GERMAIN</option>
+          <option>LYCÉE MODERNE DE ZARANOU</option>
+          <option>LYCÉE MODERNE EBILASSOKRO</option>
+          <option>LYCÉE MODERNE HENRI KONAN BÉDIÉ DE TANGUELAN</option>
+          <option>LYCÉE MODERNE YAKASSÉ-FÉYASSÉ ABENGOUROU</option>
+          <option>LYCÉE NANAN ADEPRA DE BETTIÉ</option>
+          <option>LYCÉE NANAN KOUAKOU KUAO NIABLE</option>
+          <option>COLLÈGE AGNITIÉH DE DIAMARAKRO</option>
+          <option>COLLÈGE AL FOURQANE 3 ABENGOUROU</option>
+          <option>COLLÈGE CATHOLIQUE KIRMANN ABENGOUROU</option>
+          <option>COLLÈGE DES ORFÈVRES AGNIBILÉKROU</option>
+          <option>COLLÈGE DES PROFESSEURS NIABLE</option>
+          <option>COLLÈGE EKRA MATHIEU AGNIBILÉKROU</option>
+          <option>COLLÈGE EUGÈNE SANKADIO DE SANKADIOKRO</option>
+          <option>COLLÈGE JEAN MARIE ADIAFFI ABENGOUROU</option>
+          <option>COLLÈGE LA MATRICE AGNIBILÉKROU</option>
+          <option>COLLÈGE LES PALMES ABENGOUROU</option>
+          <option>COLLÈGE MODERNE AMOIKON DIHYE ABENGOUROU</option>
+          <option>COLLÈGE MODERNE PRIVÉ EBIAPA</option>
+          <option>COLLÈGE MUPES AGNIBILÉKROU</option>
+          <option>COLLÈGE NANAN ADOU KOFFI AMELEKIA</option>
+          <option>COLLÈGE NANAN AGNINI BILE 2 AGNIBILÉKROU</option>
+          <option>COLLÈGE NANAN EHOUE AKA YAKASSÉ-FÉYASSÉ</option>
+          <option>COLLÈGE NANAN KOUAO BILE ABDOULAYE AGNIBILÉKROU</option>
+          <option>COLLÈGE NANNAN ANO II ANIASSUÉ</option>
+          <option>COLLÈGE NOTRE DAME DE L'INDENIE ABENGOUROU</option>
+          <option>COLLÈGE NOTRE DAME DE TOUTES GRÂCES AGNIBILÉKROU</option>
+          <option>COLLÈGE PRIVÉ ADIAFFI DE BETTIÉ</option>
+          <option>COLLÈGE PRIVÉ AL HOUDAL AGNIBILÉKROU</option>
+          <option>COLLÈGE PRIVÉ CLASSIQUE AGNIBILÉKROU</option>
+          <option>COLLÈGE PRIVÉ ESPÉRENCE DE TANGUELAN</option>
+          <option>COLLÈGE PRIVÉ GNIRAH APPROMPRONOU</option>
+          <option>COLLÈGE PRIVÉ IFFOUÉ D'ASSIKASSO</option>
+          <option>COLLÈGE PRIVÉ KABLAN KOUADIO YOBOUAKRO</option>
+          <option>COLLÈGE PRIVÉ LA BAIE ABENGOUROU</option>
+          <option>COLLÈGE PRIVÉ LA COURONNE ABENGOUROU</option>
+          <option>COLLÈGE PRIVÉ LA RÉFÉRENCE DE BETTIÉ</option>
+          <option>COLLÈGE PRIVÉ LE BOIS VERT ABENGOUROU</option>
+          <option>COLLÈGE PRIVÉ LE DJUABLIN AGNIBILÉKROU</option>
+          <option>COLLÈGE PRIVÉ LE MANZAN DE BRINDOUKRO</option>
+          <option>COLLÈGE PRIVÉ LE PRESTIGE ACADÉMIQUE ABENGOUROU</option>
+          <option>COLLÈGE PRIVÉ LE PRIVILÈGE DE ZARANOU</option>
+          <option>COLLÈGE PRIVÉ LES ELITES SANKADIOKRO</option>
+          <option>COLLÈGE PRIVÉ LES LEADERS DE DJUABLIN AGNIBILÉKROU</option>
+          <option>COLLÈGE PRIVÉ MÉTHODISTE AGNIBILÉKROU</option>
+          <option>COLLÈGE PRIVÉ MÉTHODISTE LE JOURDAIN ABENGOUROU</option>
+          <option>COLLÈGE PRIVÉ NANAN KONOGO N'DRI DUFFREBO</option>
+          <option>COLLÈGE PRIVÉ NANAN N'GOUAN KPANGNII APPROMPRONOU</option>
+          <option>COLLÈGE PRIVÉ NEI 2000 ABENGOUROU</option>
+          <option>COLLÈGE PRIVÉ PIERRE DE KOUAKOU DRAMAKRO</option>
+          <option>COLLÈGE PRIVÉ SAINT THÉRÈSE ABENGOUROU</option>
+          <option>COLLÈGE REINE NOUFAN ABENGOUROU</option>
+          <option>COLLÈGE SAINT JOSEPH ABENGOUROU</option>
+          <option>COURS SECONDAIRE NANAN ATTA ANO APPOISSO</option>
+        </datalist>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Moyennes trimestrielles par matière — Calcul automatique de la MGA</div>
+    <table class="mat-table">
+      <thead>
+        <tr>
+          <th style="text-align:left;width:160px;">Matière</th>
+          <th>1<sup>er</sup> Trimestre</th>
+          <th>2<sup>e</sup> Trimestre</th>
+          <th>3<sup>e</sup> Trimestre</th>
+          <th>MGA</th>
+        </tr>
+      </thead>
+      <tbody id="mga-tbody"></tbody>
+    </table>
+    <div class="mga-summary" id="mga-summary">
+      <div class="mga-summary-left">
+        <span class="mga-summary-label">Matières renseignées</span>
+        <span class="mga-badge" id="mga-badge-count">0 / 4</span>
+      </div>
+      <div class="mga-summary-right">
+        <span class="mga-summary-msg" id="mga-summary-msg">Prêt pour le transfert vers MO</span>
+        <div class="mga-progress"><div class="mga-progress-fill" id="mga-progress-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-ghost" onclick="resetMGA()">
+      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Réinitialiser
+    </button>
+    <button class="btn btn-success" onclick="exportMGAtoMO()">
+      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      Transférer vers MO
+    </button>
+  </div>
+
+</div><!-- /page-mga -->
+
+
+<!-- ════════════════════════════════════════════
+     PAGE 2 : CALCUL MO
+════════════════════════════════════════════ -->
+<div class="page" id="page-mo">
+
+  <div class="card">
+    <div class="section-title">Informations de l'élève</div>
+    <div id="mo-eleve-info" style="font-size:0.83rem;color:var(--muted);">Renseignez les MGA et les notes BEPC ci-dessous. Les moyennes MGA peuvent être transférées depuis l'onglet 01.</div>
+    <div class="eleve-grid" style="margin-top:12px;">
+      <div class="field-group">
+        <label>NOM ET PRÉNOMS</label>
+        <input type="text" id="mo-nom" placeholder="Ex : KOUAKOU Jean-Paul" autocomplete="off">
+      </div>
+      <div class="field-group">
+        <label>MATRICULE</label>
+        <input type="text" id="mo-matricule" placeholder="Ex : 24002478U" maxlength="9" autocomplete="off">
+      </div>
+      <div class="field-group">
+        <label>CLASSE</label>
+        <input type="text" id="mo-classe" placeholder="Ex : 3ème A">
+      </div>
+      <div class="field-group">
+        <label>ANNÉE SCOLAIRE</label>
+        <input type="text" id="mo-annee" value="2025–2026">
+      </div>
+      <div class="field-group">
+        <label>ÉTABLISSEMENT</label>
+        <input type="text" id="mo-etablissement" list="etablissement-list" placeholder="Taper pour rechercher...">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Saisie MGA et notes au BEPC — Calcul de la Moyenne d'Orientation</div>
+    <table class="mat-table">
+      <thead>
+        <tr>
+          <th style="text-align:left;width:155px;">Matière</th>
+          <th>MGA <span class="mga-injected" id="mga-badge" style="display:none;">✔ injecté</span></th>
+          <th>Note BEPC</th>
+          <th>MGA + BEPC</th>
+          <th>Coeff.</th>
+          <th style="background:#0a6b4e;">TOTAL PONDÉRÉ <span style="font-weight:400;font-size:.62rem;display:block;letter-spacing:.3px;text-transform:none;opacity:.65;margin-top:2px;">(MGA + BEPC) × Coeff.</span></th>
+        </tr>
+      </thead>
+      <tbody id="mo-tbody"></tbody>
+    </table>
+    <div class="mo-progress-bar" id="mo-progress-bar">
+      <div class="mo-progress-left">
+        <span class="mo-progress-label">Matières renseignées</span>
+        <span class="mo-badge" id="mo-badge-count">0 / 4</span>
+      </div>
+      <div class="mo-progress-right">
+        <span class="mo-progress-msg" id="mo-progress-msg">Calcul complet</span>
+        <div class="mo-track"><div class="mo-track-fill" id="mo-track-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card result-bar">
+    <div class="result-item result-total">
+      <div class="result-label">Total pondéré</div>
+      <div class="result-value rv-total" id="r-total">0,00</div>
+    </div>
+    <div class="result-divider"></div>
+    <div class="result-item result-mo">
+      <div class="result-label">Moyenne d'Orientation</div>
+      <div class="result-value rv-mo is-none" id="r-mo">— / 20</div>
+      <div class="mention-badge" id="r-mention">Non calculée</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-ghost" onclick="resetMO()">
+      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Réinitialiser
+    </button>
+    <button class="btn btn-success" onclick="saveToHistory()">
+      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Enregistrer
+    </button>
+    <button class="btn btn-primary" onclick="printBulletin()">
+      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Imprimer
+    </button>
+    <button class="btn btn-accent" onclick="exportPDF()">
+      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Exporter PDF
+    </button>
+  </div>
+
+</div><!-- /page-mo -->
+
+
+<!-- ════════════════════════════════════════════
+     PAGE 3 : HISTORIQUE
+════════════════════════════════════════════ -->
+<div class="page" id="page-hist">
+  <div class="hist-container">
+    <div class="hist-header">
+      <div class="hist-header-left">
+        <div class="hist-header-icon">&#128203;</div>
+        <div>
+          <div class="hist-title">Historique des calculs enregistrés</div>
+          <div class="hist-subtitle" id="hist-count">0 calculs enregistrés</div>
+        </div>
+      </div>
+      <div class="hist-actions-row">
+        <button class="hist-btn-print" onclick="printAllBulletins()" id="btn-print-all" style="display:none;">
+          &#128424; Tout imprimer
+        </button>
+        <button class="hist-btn-clear" onclick="confirmClearHistory()">
+          &#128465; Vider l'historique
+        </button>
+      </div>
+    </div>
+    <div id="hist-list"></div>
+  </div>
+</div>
+
+</main>
+<div id="toast"></div>
+
+<!-- BULLETIN A4 DYNAMIQUE -->
+<section id="bulletin-print" aria-hidden="true">
+  <article class="bulletin-sheet">
+    <div class="bp-tricolor"><span></span><span>SAPHIR <strong>&nbsp;Pro</strong>-Orientation en seconde</span><span></span></div>
+    <header class="bp-header">
+      <div class="bp-header-top">
+        <div class="bp-brand">
+          <div class="bp-brand-name">SAPHIR <span>Pro</span></div>
+          <div class="bp-brand-sub">Système d'Aide à l'Orientation Scolaire</div>
+          <div class="bp-brand-contact">0708109840 / 0152030622</div>
+        </div>
+        <div class="bp-state">
+          <div class="bp-republique">République de Côte d'Ivoire</div>
+          <div class="bp-devise">Union - Discipline - Travail</div>
+        </div>
+      </div>
+      <div class="bp-header-rule"></div>
+      <div class="bp-title-row">
+        <div class="bp-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 10 12 5l10 5-10 5L2 10Z"/>
+            <path d="M6 12.5V17c2.8 2.4 9.2 2.4 12 0v-4.5"/>
+            <path d="M22 10v6"/>
+          </svg>
+        </div>
+        <div>
+          <div class="bp-title">Calcul de la Moyenne d'Orientation</div>
+          <div class="bp-subtitle">Fiche individuelle de calcul de la moyenne d’orientation</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="bp-content">
+      <div class="bp-section-title"><span class="bp-section-num">1</span><span>Informations de l'élève</span><span class="bp-section-line"></span></div>
+      <div class="bp-student">
+        <div class="bp-avatar" id="bp-initials">--</div>
+        <div class="bp-student-info">
+          <div class="bp-student-name" id="bp-name">NON RENSEIGNÉ</div>
+          <div class="bp-student-meta">
+            <span>Classe : <strong id="bp-class">-</strong></span><span class="bp-student-sep">•</span>
+            <span><strong id="bp-school">NON RENSEIGNÉ</strong></span><span class="bp-student-sep">•</span>
+            <span>Année scolaire : <strong id="bp-year">-</strong></span>
+          </div>
+        </div>
+        <div class="bp-matricule"><small>Matricule</small><span id="bp-matricule">-</span></div>
+      </div>
+
+      <div class="bp-section-title"><span class="bp-section-num">2</span><span>Relevé des notes par matière</span><span class="bp-section-line"></span></div>
+      <div class="bp-table-wrap">
+        <table class="bp-grades">
+          <colgroup><col><col><col><col><col><col></colgroup>
+          <thead><tr><th>Matière</th><th>MGA</th><th>Note BEPC</th><th>MGA + BEPC</th><th>Coeff.</th><th>Total pondéré</th></tr></thead>
+          <tbody id="bp-grades-body"></tbody>
+        </table>
+      </div>
+      <div class="bp-table-note">Total pondéré = (MGA + Note BEPC) × Coefficient</div>
+
+      <div class="bp-section-title"><span class="bp-section-num">3</span><span>Synthèse</span><span class="bp-section-line"></span></div>
+      <div class="bp-summary">
+        <div class="bp-summary-box bp-summary-total">
+          <div class="bp-summary-label">Total général pondéré</div>
+          <div class="bp-total-value" id="bp-total">0,00</div>
+          <div class="bp-summary-sub"></div>
+        </div>
+        <div class="bp-summary-box bp-summary-mo">
+          <div class="bp-summary-label">Moyenne d'orientation</div>
+          <div class="bp-mo-value"><span id="bp-mo-rounded">00,00</span> <small>/ 20</small></div>
+          <div class="bp-mention" id="bp-mention"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="bp-footer">
+      <div>Édité via <strong>SAPHIR Pro</strong></div>
+      <div id="bp-filename"></div>
+      <div class="bp-footer-right"><div class="bp-footer-date">Document généré le <span id="bp-date">-</span></div></div>
+    </footer>
+  </article>
+</section>
+
+<script>
+/* ── MATIÈRES ── */
+const MATIERES = [
+  { id:'redaction', label:'Rédaction',      coef:2, anglais:false },
+  { id:'maths',     label:'Mathématiques',  coef:2, anglais:false },
+  { id:'pc',        label:'P.C.',          coef:1, anglais:false },
+  { id:'anglais',   label:'Anglais',        coef:1, anglais:true  },
+];
+const TOTAL_COEF = MATIERES.reduce((s,m)=>s+m.coef,0);
+
+/* ── NAVIGATION ── */
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  window.scrollTo({top:0,left:0,behavior:'auto'});
+  if(id==='hist') loadHistory();
+}
+
+/* ════ PAGE MGA ════ */
+function buildMGATable(){
+  const tb=document.getElementById('mga-tbody');
+  tb.innerHTML='';
+  MATIERES.forEach(m=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><span class="mat-label">${m.label}</span></td>
+      <td><input class="note-input" id="${m.id}_t1" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}')"></td>
+      <td><input class="note-input" id="${m.id}_t2" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}')"></td>
+      <td><input class="note-input" id="${m.id}_t3" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}')"></td>
+      <td><span class="mga-val" id="${m.id}_mga_val">0,00</span></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function calcMGA(mid){
+  const t1=getVal(mid+'_t1'), t2=getVal(mid+'_t2'), t3=getVal(mid+'_t3');
+  const mga=(t1 + 2*t2 + 2*t3)/5;
+  document.getElementById(mid+'_mga_val').textContent=fmtNum(mga,2);
+  updateMGASummary();
+}
+
+function updateMGASummary(){
+  let count=0;
+  MATIERES.forEach(m=>{
+    const t1=document.getElementById(m.id+'_t1');
+    const t2=document.getElementById(m.id+'_t2');
+    const t3=document.getElementById(m.id+'_t3');
+    if((t1&&t1.value!=='')||(t2&&t2.value!=='')||(t3&&t3.value!=='')) count++;
+  });
+  const badge=document.getElementById('mga-badge-count');
+  const msg=document.getElementById('mga-summary-msg');
+  const fill=document.getElementById('mga-progress-fill');
+  if(badge){
+    badge.textContent=count+' / 4';
+    badge.className='mga-badge';
+    if(count===4) badge.classList.add('complete');
+    else if(count>=3) badge.classList.add('almost');
+    else if(count>=2) badge.classList.add('half');
+    else if(count>=1) badge.classList.add('started');
+  }
+  if(fill){
+    fill.style.width=(count/4*100)+'%';
+    fill.className='mga-progress-fill';
+    if(count===4) fill.classList.add('fill-complete');
+    else if(count>=3) fill.classList.add('fill-almost');
+    else if(count>=2) fill.classList.add('fill-half');
+    else if(count>=1) fill.classList.add('fill-started');
+  }
+  if(msg) msg.classList.toggle('show',count===4);
+}
+
+function resetMGA(){
+  MATIERES.forEach(m=>{
+    ['t1','t2','t3'].forEach(t=>{const el=document.getElementById(m.id+'_'+t);if(el)el.value='';});
+    document.getElementById(m.id+'_mga_val').textContent='0,00';
+  });
+  toast('MGA réinitialisée.');
+  updateMGASummary();
+}
+
+function exportMGAtoMO(){
+  // Vérifie que toutes les matières ont T1, T2, T3 renseignés
+  const missing=[];
+  const trimLabel={'t1':'T1','t2':'T2','t3':'T3'};
+  MATIERES.forEach(m=>{
+    ['t1','t2','t3'].forEach(t=>{
+      const el=document.getElementById(m.id+'_'+t);
+      if(!el||el.value==='') missing.push(m.label+' → '+trimLabel[t]);
+    });
+  });
+  if(missing.length>0){
+    toast('Note manquante : '+missing[0],true);return;
+  }
+  // Vide d'abord le tableau MO
+  document.querySelectorAll('#page-mo .note-input').forEach(el=>el.value='');
+  document.querySelectorAll('#mo-tbody .computed-val, #mo-tbody .sum-val').forEach(el=>el.textContent='—');
+  document.getElementById('r-total').textContent='0,00';
+  document.getElementById('r-mo').textContent='0,00 / 20';
+  setMOColor(0);
+  const men=document.getElementById('r-mention');
+  men.textContent='—';men.style.background='rgba(148,163,184,0.15)';men.style.color='var(--muted)';
+  document.getElementById('mga-badge').style.display='none';
+  // Transfère les MGA calculées vers le module MO
+  MATIERES.forEach(m=>{
+    const txt=document.getElementById(m.id+'_mga_val').textContent;
+    const val=parseFloat(txt.replace(',','.'));
+    const inp=document.getElementById(m.id+'_mga');
+    if(inp && val>0){ inp.value=fmtNum(val,2); calcRowMO(m.id); }
+  });
+  // Transfère aussi infos élève
+  const nom=document.getElementById('nomEleve').value;
+  const mat=document.getElementById('matricule')?.value || '';
+  const cls=document.getElementById('classe')?.value || '';
+  const annee=document.getElementById('annee')?.value || '';
+  const etab=document.getElementById('etablissement')?.value || '';
+  if(nom){ document.getElementById('mo-nom').value=nom; }
+  if(mat){ document.getElementById('mo-matricule').value=mat; }
+  if(cls){ document.getElementById('mo-classe').value=cls; }
+  if(annee){ document.getElementById('mo-annee').value=annee; }
+  if(etab){ document.getElementById('mo-etablissement').value=etab; }
+  // Badge
+  document.getElementById('mga-badge').style.display='inline';
+  updateMOInfo();
+  showPage('mo');
+  toast('MGA transférées vers le module MO ✔');
+}
+
+/* ════ PAGE MO ════ */
+function buildMOTable(){
+  const tb=document.getElementById('mo-tbody');
+  tb.innerHTML='';
+  MATIERES.forEach(m=>{
+    const tr=document.createElement('tr');
+    let bepcCell;
+    if(m.anglais){
+      bepcCell=`<div class="two-notes">
+        <input class="note-input" id="${m.id}_bepc_e" type="text" inputmode="decimal" maxlength="5" placeholder="Écrit" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}')">
+        <input class="note-input" id="${m.id}_bepc_o" type="text" inputmode="decimal" maxlength="5" placeholder="Oral" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}')">
+      </div>`;
+    } else {
+      bepcCell=`<input class="note-input" id="${m.id}_bepc" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}')">`;
+    }
+    tr.innerHTML=`
+      <td><span class="mat-label">${m.label}</span></td>
+      <td><input class="note-input" id="${m.id}_mga" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}')"></td>
+      <td>${bepcCell}</td>
+      <td><span class="computed-val" id="${m.id}_sum">—</span></td>
+      <td><span class="mat-coef">${m.coef}</span></td>
+      <td><span class="sum-val" id="${m.id}_prod">—</span></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function calcRowMO(mid){
+  const m=MATIERES.find(x=>x.id===mid);
+  const mga=getVal(mid+'_mga');
+  let bepc=0;
+  if(m.anglais){
+    bepc=(getVal(mid+'_bepc_e')+getVal(mid+'_bepc_o'))/2;
+  } else {
+    bepc=getVal(mid+'_bepc');
+  }
+  const sum=mga+bepc, prod=sum*m.coef;
+  document.getElementById(mid+'_sum').textContent  = sum  ? fmtNum(sum,2)  : '—';
+  document.getElementById(mid+'_prod').textContent = prod ? fmtNum(prod,2) : '—';
+  calcTotalMO();
+}
+
+function calcTotalMO(){
+  let total=0,count=0;
+  MATIERES.forEach(m=>{
+    const mga=getVal(m.id+'_mga');
+    let bepc=0;
+    if(m.anglais){
+      bepc=(getVal(m.id+'_bepc_e')+getVal(m.id+'_bepc_o'))/2;
+    } else {
+      bepc=getVal(m.id+'_bepc');
+    }
+    total+=(mga+bepc)*m.coef;
+    const mgaEl=document.getElementById(m.id+'_mga');
+    const bepcEl=m.anglais?null:document.getElementById(m.id+'_bepc');
+    const bepcE=m.anglais?document.getElementById(m.id+'_bepc_e'):null;
+    const bepcO=m.anglais?document.getElementById(m.id+'_bepc_o'):null;
+    if((mgaEl&&mgaEl.value!=='')||(bepcEl&&bepcEl.value!=='')||(bepcE&&bepcE.value!=='')||(bepcO&&bepcO.value!=='')) count++;
+  });
+  const mo=total/(2*TOTAL_COEF);
+  document.getElementById('r-total').textContent=fmtNum(total,2);
+  const hasInput=Array.from(document.querySelectorAll('#page-mo .note-input')).some(el=>el.value!=='');
+  if(hasInput && mo>0){
+    document.getElementById('r-mo').textContent=fmtMO(mo,2)+' / 20';
+  } else {
+    document.getElementById('r-mo').textContent='— / 20';
+  }
+  setMOColor(hasInput?mo:0);
+  setMention(hasInput?mo:0);
+  updateMOProgress(count);
+}
+
+function updateMOProgress(count){
+  const badge=document.getElementById('mo-badge-count');
+  const msg=document.getElementById('mo-progress-msg');
+  const fill=document.getElementById('mo-track-fill');
+  if(badge){
+    badge.textContent=count+' / 4';
+    badge.className='mo-badge';
+    if(count===4) badge.classList.add('complete');
+    else if(count>=3) badge.classList.add('almost');
+    else if(count>=2) badge.classList.add('half');
+    else if(count>=1) badge.classList.add('started');
+  }
+  if(fill){
+    fill.style.width=(count/4*100)+'%';
+    fill.className='mo-track-fill';
+    if(count===4) fill.classList.add('fill-complete');
+    else if(count>=3) fill.classList.add('fill-almost');
+    else if(count>=2) fill.classList.add('fill-half');
+    else if(count>=1) fill.classList.add('fill-started');
+  }
+  if(msg) msg.classList.toggle('show',count===4);
+}
+
+function setMOColor(mo){
+  const el=document.getElementById('r-mo');
+  el.classList.remove('is-passing','is-failing','is-none');
+  if(mo===0) el.classList.add('is-none');
+  else if(mo>=10) el.classList.add('is-passing');
+  else el.classList.add('is-failing');
+}
+
+function setMention(mo){
+  const el=document.getElementById('r-mention');
+  let lbl='Non calculée',bg='rgba(255,255,255,.12)',col='rgba(255,255,255,.55)';
+  if(mo>=16){lbl='Félicitations';bg='rgba(134,239,172,.2);color:#86efac';col='#86efac';}
+  else if(mo>=14){lbl='Très bien';bg='rgba(134,239,172,.16)';col='#86efac';}
+  else if(mo>=12){lbl='Bien';bg='rgba(74,222,128,.14)';col:'#4ade80';}
+  else if(mo>=10){lbl='Passable';bg='rgba(251,191,36,.15)';col='#fbbf24';}
+  else if(mo>=8){lbl='Insuffisant';bg='rgba(252,165,165,.15)';col='#fca5a5';}
+  else if(mo>0){lbl='Très insuffisant';bg='rgba(248,113,113,.18)';col='#f87171';}
+  el.textContent=lbl;el.style.background=bg;el.style.color=col;
+}
+
+function resetMO(){
+  document.querySelectorAll('#page-mo .note-input').forEach(el=>el.value='');
+  document.querySelectorAll('#mo-tbody .computed-val, #mo-tbody .sum-val').forEach(el=>el.textContent='—');
+  document.getElementById('r-total').textContent='0,00';
+  document.getElementById('r-mo').textContent='— / 20';
+  setMOColor(0);
+  const m=document.getElementById('r-mention');
+  m.textContent='Non calculée';m.style.background='rgba(255,255,255,.12)';m.style.color='rgba(255,255,255,.55)';
+  document.getElementById('mga-badge').style.display='none';
+  updateMOProgress(0);
+  toast('Module MO réinitialisé.');
+}
+
+function updateMOInfo(){
+  const nom=document.getElementById('mo-nom').value;
+  const mat=document.getElementById('mo-matricule').value;
+  const cls=document.getElementById('mo-classe').value;
+  const etab=document.getElementById('mo-etablissement').value;
+  const info=document.getElementById('mo-eleve-info');
+  if(nom||mat||cls||etab){
+    info.innerHTML=`<span style="color:var(--gold);font-weight:600;">${nom||'—'}</span>
+    <span style="color:var(--muted);margin-left:12px;">${mat||'—'}</span>
+    <span style="color:var(--muted);margin-left:12px;">${cls||'—'}</span>
+    <span style="color:var(--muted);margin-left:12px;">${etab||'—'}</span>`;
+  }
+}
+
+/* ════ HISTORIQUE (SQLite via API) ════ */
+let histData=[];
+
+const API='http://127.0.0.1:'+location.port;
+
+async function loadHistory(){
+  try{
+    const r=await fetch(API+'/api/eleves');
+    if(!r.ok) throw 0;
+    histData=await r.json();
+  }catch(e){histData=[];}
+  renderHistory();
+}
+
+async function saveToHistory(){
+  const nom=(document.getElementById('mo-nom').value||document.getElementById('nomEleve').value).trim();
+  if(!nom){toast('Veuillez remplir les informations de l\'élève avant d\'enregistrer.',true);return;}
+  const matricule=(document.getElementById('mo-matricule').value||document.getElementById('matricule')?.value||'').trim();
+  const classe=(document.getElementById('mo-classe').value||document.getElementById('classe')?.value||'').trim();
+  const annee=(document.getElementById('mo-annee')?.value||document.getElementById('annee')?.value||'').trim();
+  if(!matricule||!classe||!annee){
+    const manquants=[];
+    if(!matricule) manquants.push('Matricule');
+    if(!classe) manquants.push('Classe');
+    if(!annee) manquants.push('Année');
+    toast('Champs manquants : '+manquants.join(', '),true);return;
+  }
+  const total=document.getElementById('r-total').textContent;
+  const mo=document.getElementById('r-mo').textContent;
+  const mention=document.getElementById('r-mention').textContent;
+  const etab=(document.getElementById('mo-etablissement').value||document.getElementById('etablissement')?.value||'').trim();
+  const matieres={};
+  MATIERES.forEach(m=>{
+    const d={mga:parseFloat(document.getElementById(m.id+'_mga')?.value)||null};
+    if(m.anglais){d.bepc_ecrit=parseFloat(document.getElementById(m.id+'_bepc_e')?.value)||null;d.bepc_oral=parseFloat(document.getElementById(m.id+'_bepc_o')?.value)||null;}
+    else{d.bepc=parseFloat(document.getElementById(m.id+'_bepc')?.value)||null;}
+    matieres[m.id]=d;
+  });
+  try{
+    await fetch(API+'/api/eleves',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({nom,matricule,classe,etablissement:etab,annee,total:parseFloat(total.replace(',','.'))||0,mo:parseFloat(mo.replace(',','.'))||0,mention,matieres})
+    });
+    await loadHistory();
+    toast('Enregistré : '+nom);
+  }catch(e){toast('Erreur lors de l\'enregistrement.',true);}
+}
+
+async function delHistory(id){
+  try{
+    await fetch(API+'/api/eleves/'+id,{method:'DELETE'});
+    await loadHistory();
+  }catch(e){}
+}
+
+function confirmDelHistory(id){
+  if(!confirm('Supprimer ce calcul ?')) return;
+  delHistory(id);
+}
+
+async function clearHistory(){
+  try{
+    await fetch(API+'/api/eleves/clear',{method:'DELETE'});
+    await loadHistory();
+    toast('Historique vidé.');
+  }catch(e){}
+}
+
+function confirmClearHistory(){
+  if(!confirm('Voulez-vous vraiment vider tout l\'historique ? Cette action est irréversible.')) return;
+  clearHistory();
+}
+
+function renderHistory(){
+  const div=document.getElementById('hist-list');
+  const countEl=document.getElementById('hist-count');
+  const n=histData.length;
+  if(countEl) countEl.textContent=n+(n<=1?' calcul enregistré':' calculs enregistrés');
+  const btnAll=document.getElementById('btn-print-all');
+  if(btnAll) btnAll.style.display=n>1?'inline-flex':'none';
+  if(!n){
+    div.innerHTML='<div class="hist-empty-state"><div class="hist-empty-icon">&#128196;</div><div class="hist-empty-text">Aucun calcul enregistré</div><div class="hist-empty-sub">Les calculs sauvegardés apparaîtront ici.</div></div>';
+    return;
+  }
+  div.innerHTML=histData.map(h=>{
+    const moVal=h.mo!=null?Number(h.mo):null;
+    const moDisplay=moVal!=null?moVal.toFixed(2).replace('.',',')+' / 20':'—';
+    const mention=h.mention||'—';
+    let badgeClass='hist-badge-none';
+    if(mention==='Très bien'||mention==='Bien'||mention==='Félicitations') badgeClass='hist-badge-pass';
+    else if(mention==='Passable'||mention==='Assez bien') badgeClass='hist-badge-warn';
+    else if(mention.includes('Insuffisant')) badgeClass='hist-badge-fail';
+    const dateStr=h.date_calc||h.created_at||'';
+    return `
+    <div class="hist-card">
+      <div class="hist-card-info">
+        <div class="hist-card-name">${h.nom||'—'}</div>
+        <div class="hist-card-meta">${h.matricule||'—'} &middot; ${h.classe||'—'} &middot; ${h.etablissement||'—'} &middot; ${dateStr}</div>
+      </div>
+      <div class="hist-card-mo">
+        <div class="mo-value">${moDisplay}</div>
+        <div class="mo-label">Moyenne</div>
+      </div>
+      <span class="hist-badge ${badgeClass}">${mention}</span>
+      <div class="hist-actions">
+        <button class="hist-btn-pdf" onclick="downloadBulletinPDF(${h.id})" title="Télécharger le bulletin en PDF">
+          <svg class="hist-btn-pdf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Télécharger
+        </button>
+        <button class="hist-btn-del" onclick="confirmDelHistory(${h.id})" title="Supprimer ce calcul">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ════ TÉLÉCHARGEMENT PDF DEPUIS HISTORIQUE ════ */
+async function downloadBulletinPDF(id){
+  let h=histData.find(x=>x.id===id);
+  if(!h){
+    try{const r=await fetch(API+'/api/eleves/'+id);if(r.ok)h=await r.json();}catch(e){}
+  }
+  if(!h||!h.matieres){toast('Données indisponibles.',true);return;}
+  const m=h.matieres;
+  const setVal=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val;};
+  setVal('mo-nom',h.nom||'');
+  setVal('mo-matricule',h.matricule||'');
+  setVal('mo-classe',h.classe||'');
+  setVal('mo-etablissement',h.etablissement||'');
+  setVal('mo-annee',h.annee||'');
+  MATIERES.forEach(mat=>{
+    const d=m[mat.id]||{};
+    setVal(mat.id+'_mga',d.mga!=null?d.mga:'');
+    if(mat.anglais){
+      setVal(mat.id+'_bepc_e',d.bepc_ecrit!=null?d.bepc_ecrit:'');
+      setVal(mat.id+'_bepc_o',d.bepc_oral!=null?d.bepc_oral:'');
+    }else{
+      setVal(mat.id+'_bepc',d.bepc!=null?d.bepc:'');
+    }
+  });
+  buildBulletin();
+  setTimeout(()=>window.print(),100);
+}
+
+/* ════ IMPRESSION MULTIPLE ════ */
+function buildBulletinHTML(h){
+  const name=(h.nom||'NON RENSEIGNÉ').toUpperCase();
+  const initials=(()=>{
+    const parts=name.trim().split(/\s+/).filter(Boolean);
+    const f=parts[0]?.[0]||'';const l=parts.length>1?parts[parts.length-1][0]:'';
+    return(f+l).toUpperCase()||'--';
+  })();
+  const classe=h.classe||'-';
+  const school=h.etablissement||'NON RENSEIGNÉ';
+  const year=h.annee||'-';
+  const matricule=h.matricule||'-';
+  const today=new Date().toLocaleDateString('fr-FR');
+  let totalWeighted=0;
+  const rows=MATIERES.map(m=>{
+    const d=(h.matieres||{})[m.id]||{};
+    const mgaVal=d.mga!=null?d.mga:null;
+    const mga=mgaVal!=null?Number(mgaVal).toFixed(3).replace('.',',').replace(/,?0+$/,''):'—';
+    let bepc,bepcDisplay,bepcSum;
+    if(m.anglais){
+      const ecrit=d.bepc_ecrit!=null?Number(d.bepc_ecrit):null;
+      const oral=d.bepc_oral!=null?Number(d.bepc_oral):null;
+      bepc=ecrit!=null&&oral!=null?(ecrit+oral)/2:0;
+      const ecritS=ecrit!=null?ecrit.toFixed(3).replace('.',',').replace(/,?0+$/,''):'—';
+      const oralS=oral!=null?oral.toFixed(3).replace('.',',').replace(/,?0+$/,''):'—';
+      bepcDisplay=`<div class="bp-dual"><span class="bp-dual-item">${ecritS}<small>Écrit</small></span><span class="bp-dual-link"></span><span class="bp-dual-item">${oralS}<small>Oral</small></span></div>`;
+    }else{
+      const b=d.bepc!=null?Number(d.bepc):null;
+      bepc=b!=null?b:0;
+      bepcDisplay=`<span class="bp-pill bp-pill-bepc">${b!=null?b.toFixed(3).replace('.',',').replace(/,?0+$/,''):'—'}</span>`;
+    }
+    const sum=mgaVal!=null?Number(mgaVal)+bepc:bepc;
+    const prod=sum*m.coef;
+    totalWeighted+=prod;
+    const sumS=sum?sum.toFixed(2).replace('.',','):'—';
+    const prodS=prod?prod.toFixed(2).replace('.',','):'—';
+    return `<tr><td class="bp-matiere">${m.label}</td><td><span class="bp-pill">${mga}</span></td><td>${bepcDisplay}</td><td class="bp-sum">${sumS}</td><td><span class="bp-coef">${m.coef}</span></td><td class="bp-result">${prodS}</td></tr>`;
+  }).join('');
+  const mo=totalWeighted/(2*TOTAL_COEF);
+  const moDisplay=fmtMO(mo,2);
+  const totalDisplay=totalWeighted.toFixed(2).replace('.',',');
+  const moClass=mo>=10?'is-passing':'is-failing';
+  let mention='',mCls='';
+  if(mo>=16){mention='Très bien';mCls='mention-pass';}
+  else if(mo>=14){mention='Bien';mCls='mention-pass';}
+  else if(mo>=12){mention='Assez bien';mCls='mention-warn';}
+  else if(mo>=10){mention='Passable';mCls='mention-warn';}
+  else if(mo>=8){mention='Insuffisant';mCls='mention-fail';}
+  else if(mo>0){mention='Très insuffisant';mCls='mention-fail';}
+  return `<article class="bulletin-sheet">
+<div class="bp-tricolor"><span></span><span>SAPHIR <strong>&nbsp;Pro</strong>-Orientation en seconde</span><span></span></div>
+<header class="bp-header"><div class="bp-header-top"><div class="bp-brand"><div class="bp-brand-name">SAPHIR <span>Pro</span></div><div class="bp-brand-sub">Système d'Aide à l'Orientation Scolaire</div><div class="bp-brand-contact">0708109840 / 0152030622</div></div><div class="bp-state"><div class="bp-republique">République de Côte d'Ivoire</div><div class="bp-devise">Union - Discipline - Travail</div></div></div>
+<div class="bp-header-rule"></div>
+<div class="bp-title-row"><div class="bp-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10 12 5l10 5-10 5L2 10Z"/><path d="M6 12.5V17c2.8 2.4 9.2 2.4 12 0v-4.5"/><path d="M22 10v6"/></svg></div><div><div class="bp-title">Calcul de la Moyenne d'Orientation</div><div class="bp-subtitle">Fiche individuelle de calcul de la moyenne d'orientation</div></div></div>
+</header>
+<div class="bp-content">
+<div class="bp-section-title"><span class="bp-section-num">1</span><span>Informations de l'élève</span><span class="bp-section-line"></span></div>
+<div class="bp-student"><div class="bp-avatar">${initials}</div><div class="bp-student-info"><div class="bp-student-name">${name}</div><div class="bp-student-meta"><span>Classe : <strong>${classe}</strong></span><span class="bp-student-sep">•</span><span><strong>${school}</strong></span><span class="bp-student-sep">•</span><span>Année scolaire : <strong>${year}</strong></span></div></div><div class="bp-matricule"><small>Matricule</small><span>${matricule}</span></div></div>
+<div class="bp-section-title"><span class="bp-section-num">2</span><span>Relevé des notes par matière</span><span class="bp-section-line"></span></div>
+<div class="bp-table-wrap"><table class="bp-grades"><colgroup><col><col><col><col><col><col></colgroup><thead><tr><th>Matière</th><th>MGA</th><th>Note BEPC</th><th>MGA + BEPC</th><th>Coeff.</th><th>Total pondéré</th></tr></thead><tbody>${rows}</tbody></table></div>
+<div class="bp-table-note">Total pondéré = (MGA + Note BEPC) × Coefficient</div>
+<div class="bp-section-title"><span class="bp-section-num">3</span><span>Synthèse</span><span class="bp-section-line"></span></div>
+<div class="bp-summary"><div class="bp-summary-box bp-summary-total"><div class="bp-summary-label">Total général pondéré</div><div class="bp-total-value">${totalDisplay}</div><div class="bp-summary-sub"></div></div><div class="bp-summary-box bp-summary-mo ${moClass}"><div class="bp-summary-label">Moyenne d'orientation</div><div class="bp-mo-value"><span>${moDisplay}</span> <small>/ 20</small></div><div class="bp-mention ${mCls}">${mention}</div></div></div>
+</div>
+<footer class="bp-footer"><div>Édité via <strong>SAPHIR Pro</strong></div><div></div><div class="bp-footer-right"><div class="bp-footer-date">Document généré le <span>${today}</span></div></div></footer>
+</article>`;
+}
+
+async function printAllBulletins(){
+  if(!histData.length){toast('Aucun élève enregistré.',true);return;}
+  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+  const pages=histData.filter(h=>h.matieres).map(h=>buildBulletinHTML(h)).join('');
+  if(!pages){toast('Aucune donnée bulletin trouvée.',true);return;}
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Bulletins - SAPHIR Pro</title>
+${styles}
+<style>
+  body{margin:0;padding:0;background:#fff;}
+  .bulletin-sheet{page-break-after:always;margin:0;padding:0;}
+  .bulletin-sheet:last-child{page-break-after:auto;}
+  @page{size:A4 portrait;margin:8mm 10mm;}
+</style></head><body>${pages}</body></html>`);
+  win.document.close();
+  setTimeout(()=>{win.print();},600);
+  toast('Impression de '+histData.filter(h=>h.matieres).length+' bulletins...');
+}
+
+/* ════ BULLETIN A4 ════ */
+function bulletinField(id,fallback='-'){
+  const value=(document.getElementById(id)?.value||'').trim();
+  return value||fallback;
+}
+
+function bulletinEntry(id){
+  const raw=document.getElementById(id)?.value;
+  const value=parseFloat(raw);
+  if(!Number.isFinite(value)) return '—';
+  return value.toFixed(3).replace('.',',').replace(/,?0+$/,'');
+}
+
+function bulletinInitials(name){
+  const parts=name.trim().split(/\s+/).filter(Boolean);
+  if(!parts.length) return '--';
+  const first=parts[0][0]||'';
+  const last=parts.length>1?(parts[parts.length-1][0]||''):'';
+  return (first+last).toUpperCase();
+}
+
+function buildBulletin(){
+  const name=bulletinField('mo-nom','NON RENSEIGNÉ');
+  document.getElementById('bp-name').textContent=name.toUpperCase();
+  document.getElementById('bp-initials').textContent=bulletinInitials(name);
+  document.getElementById('bp-class').textContent=bulletinField('mo-classe');
+  document.getElementById('bp-school').textContent=bulletinField('mo-etablissement','NON RENSEIGNÉ');
+  document.getElementById('bp-year').textContent=bulletinField('mo-annee');
+  document.getElementById('bp-matricule').textContent=bulletinField('mo-matricule');
+
+  document.getElementById('bp-grades-body').innerHTML=MATIERES.map(m=>{
+    let bepc;
+    if(m.anglais){
+      bepc=`<div class="bp-dual">
+        <span class="bp-dual-item">${bulletinEntry(m.id+'_bepc_e')}<small>Écrit</small></span>
+        <span class="bp-dual-link" aria-hidden="true"></span>
+        <span class="bp-dual-item">${bulletinEntry(m.id+'_bepc_o')}<small>Oral</small></span>
+      </div>`;
+    }else{
+      bepc=`<span class="bp-pill bp-pill-bepc">${bulletinEntry(m.id+'_bepc')}</span>`;
+    }
+    const sum=document.getElementById(m.id+'_sum')?.textContent||'—';
+    const prod=document.getElementById(m.id+'_prod')?.textContent||'—';
+    return `<tr>
+      <td class="bp-matiere">${m.label}</td>
+      <td><span class="bp-pill">${bulletinEntry(m.id+'_mga')}</span></td>
+      <td>${bepc}</td>
+      <td class="bp-sum">${sum}</td>
+      <td><span class="bp-coef">${m.coef}</span></td>
+      <td class="bp-result">${prod}</td>
+    </tr>`;
+  }).join('');
+
+  const total=document.getElementById('r-total').textContent;
+  const moExact=document.getElementById('r-mo').textContent;
+  const moValue=parseFloat(moExact.replace(',','.'))||0;
+  document.getElementById('bp-total').textContent=total;
+  document.getElementById('bp-mo-rounded').textContent=fmtMO(moValue,2);
+  const moSummary=document.querySelector('.bp-summary-mo');
+  moSummary.classList.toggle('is-passing',moValue>=10);
+  moSummary.classList.toggle('is-failing',moValue<10);
+
+  const mentionEl=document.getElementById('bp-mention');
+  let lbl='',cls='';
+  if(moValue>=16){lbl='Très bien';cls='mention-pass';}
+  else if(moValue>=14){lbl='Bien';cls='mention-pass';}
+  else if(moValue>=12){lbl='Assez bien';cls='mention-warn';}
+  else if(moValue>=10){lbl='Passable';cls='mention-warn';}
+  else if(moValue>=8){lbl='Insuffisant';cls='mention-fail';}
+  else if(moValue>0){lbl='Très insuffisant';cls='mention-fail';}
+  mentionEl.textContent=lbl;
+  mentionEl.className='bp-mention '+cls;
+
+  document.getElementById('bp-date').textContent=new Date().toLocaleDateString('fr-FR');
+}
+
+function printBulletin(){
+  buildBulletin();
+  setTimeout(()=>window.print(),60);
+}
+
+function loadBulletinPreview(){
+  const sample={
+    'mo-nom':'YAO LIESSOU ALEXANDRE','mo-matricule':'240101245U','mo-classe':'3ème 2',
+    'mo-annee':'2025-2026','mo-etablissement':'Lycée Moderne Abengourou',
+    'redaction_mga':'10','redaction_bepc':'10','maths_mga':'15','maths_bepc':'14',
+    'pc_mga':'10','pc_bepc':'11','anglais_mga':'11','anglais_bepc_e':'8','anglais_bepc_o':'12'
+  };
+  Object.entries(sample).forEach(([id,value])=>{const el=document.getElementById(id);if(el)el.value=value;});
+  MATIERES.forEach(m=>calcRowMO(m.id));
+  buildBulletin();
+  document.body.classList.add('bulletin-preview');
+}
+
+/* ── UTILITAIRES ── */
+function parseNoteValue(value){
+  const normalized=String(value??'').trim().replace(/\s+/g,'').replace(',','.');
+  const number=Number.parseFloat(normalized);
+  return Number.isFinite(number)?number:NaN;
+}
+
+function normalizeNoteInput(el){
+  const raw=String(el.value??'').replace(/[^0-9,.]/g,'').replace('.',',');
+  const separatorIndex=raw.indexOf(',');
+  let integerPart=(separatorIndex>=0?raw.slice(0,separatorIndex):raw).replace(/\D/g,'').slice(0,2);
+  const decimalPart=separatorIndex>=0?raw.slice(separatorIndex+1).replace(/\D/g,'').slice(0,2):'';
+  if(!integerPart && separatorIndex>=0) integerPart='0';
+  el.value=integerPart+(separatorIndex>=0?','+decimalPart:'');
+}
+
+function limitNote(el){
+  const value=parseNoteValue(el.value);
+  if(!Number.isFinite(value)) return;
+  let message='';
+  if(value>20){
+    el.value='20,00';
+    message='Attention : la note maximale autorisée est 20.';
+  }else if(value<0){
+    el.value='0,00';
+    message='Attention : une note ne peut pas être inférieure à 0.';
+  }
+  if(!message) return;
+  el.classList.remove('note-limit-warning');
+  void el.offsetWidth;
+  el.classList.add('note-limit-warning');
+  toast(message,true);
+  setTimeout(()=>el.classList.remove('note-limit-warning'),1400);
+}
+
+function formatNoteInput(el){
+  if(!String(el.value??'').trim()) return;
+  limitNote(el);
+  const value=parseNoteValue(el.value);
+  if(Number.isFinite(value)) el.value=fmtNum(Math.min(20,Math.max(0,value)),2);
+}
+
+function getVal(id){
+  const el=document.getElementById(id);
+  const value=el?parseNoteValue(el.value):NaN;
+  return Number.isFinite(value)?value:0;
+}
+function fmtNum(n,dec){return n.toFixed(dec).replace('.',',');}
+function fmtMO(n,dec){
+  const [integer,decimal]=n.toFixed(dec).split('.');
+  return `${integer},${decimal}`;
+}
+function exportPDF(){
+  // Vérifie que toutes les matières ont MGA + BEPC renseignés dans MO
+  const missing=[];
+  MATIERES.forEach(m=>{
+    const mgaEl=document.getElementById(m.id+'_mga');
+    if(!mgaEl||mgaEl.value==='') missing.push(m.label+' → MGA');
+    if(m.anglais){
+      const be=document.getElementById(m.id+'_bepc_e');
+      const bo=document.getElementById(m.id+'_bepc_o');
+      if(!be||be.value==='') missing.push(m.label+' → BEPC Écrit');
+      if(!bo||bo.value==='') missing.push(m.label+' → BEPC Oral');
+    } else {
+      const bepcEl=document.getElementById(m.id+'_bepc');
+      if(!bepcEl||bepcEl.value==='') missing.push(m.label+' → BEPC');
+    }
+  });
+  if(missing.length>0){
+    toast('Note manquante : '+missing[0],true);return;
+  }
+  buildBulletin();saveToHistory();window.print();toast('PDF exporté et enregistré ✔');
+}
+
+function toast(msg,isErr=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.borderLeftColor=isErr?'var(--red)':'var(--cyan)';
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),isErr?5000:3200);
+}
+
+/* ── INIT ── */
+buildMGATable();
+updateMGASummary();
+buildMOTable();
+document.querySelectorAll('#page-mo .field-group input').forEach(el=>el.addEventListener('input',updateMOInfo));
+document.querySelectorAll('input').forEach(el=>{el.setAttribute('autocomplete','off');el.setAttribute('data-lpignore','true');});
+loadHistory();
+window.addEventListener('beforeprint',buildBulletin);
+if(new URLSearchParams(window.location.search).get('bulletin-preview')==='demo') loadBulletinPreview();
+</script>
+</body>
+</html>

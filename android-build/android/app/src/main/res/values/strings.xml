@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SAPHIR Pro</string>
+    <string name="title_activity_main">SAPHIR Pro</string>
+    <string name="package_name">com.calcmo.saphirpro</string>
+    <string name="custom_url_scheme">com.calcmo.saphirpro</string>
+</resources>
