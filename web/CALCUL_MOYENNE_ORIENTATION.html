@@ -2112,7 +2112,7 @@ function bulletinEntry(id){
   const raw=document.getElementById(id)?.value;
   const value=parseFloat(raw);
   if(!Number.isFinite(value)) return '—';
-  return truncate(value,3).replace('.',',').replace(/,?0+$/,'');
+  return fmtNum(value,2);
 }
 
 function bulletinInitials(name){
