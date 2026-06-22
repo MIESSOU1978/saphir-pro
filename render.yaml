@@ -10,6 +10,8 @@ services:
       - key: TURSO_URL
         value: "libsql://saphir-pro-miessou1978.aws-ap-northeast-1.turso.io"
       - key: TURSO_TOKEN
-        sync: false
+        value: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJQdHdWUW02UEVmR0VhTjRGMjFvc1NBIiwib3JnX2lkIjoxMDAwMTg2NjIxfQ.etwnYsSSxhQyw1-PCJnjCH9ZuxiIMGP4NjUA-KAJFW1XdBSgMvjUE8Q6jP7SZycqEVLF4lX5vNNMfH7AU7S9Dg"
+      - key: STUDENT_PASSWORD
+        value: "RECEPTIOn8@2025"
       - key: APP_PASSWORD
         value: "RECEPTIOn8@2024"
