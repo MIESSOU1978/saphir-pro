@@ -2110,9 +2110,8 @@ async function supprimerCalculHistorique(id,btn){
       try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}
       throw new Error(msg);
     }
-    histData=histData.filter(h=>h.id!==id);
     selectedIds=selectedIds.filter(x=>x!==id);
-    renderHistory();
+    await loadHistory();
     toast('Calcul supprimé définitivement.');
   }catch(e){
     toast(e.message||'Erreur lors de la suppression.',true);
@@ -2185,9 +2184,8 @@ async function deleteSelection(){
       try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}
       throw new Error(msg);
     }
-    histData=histData.filter(h=>!selectedIds.includes(h.id));
     selectedIds=[];
-    renderHistory();
+    await loadHistory();
     toast(n+' calcul(s) supprimé(s) définitivement.');
   }catch(e){toast(e.message||'Erreur lors de la suppression.',true);}
 }

@@ -240,6 +240,8 @@ class _Handler(BaseHTTPRequestHandler):
         if not self._require_auth():
             return
 
+        role = self._get_role()
+
         if path == "/api/eleves":
             body = self._read_body()
             nom = (body.get("nom") or "").strip()
