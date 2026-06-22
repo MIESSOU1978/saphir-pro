@@ -258,6 +258,32 @@ class _Handler(BaseHTTPRequestHandler):
             )
             return self._json(result, 201)
 
+        if path == "/api/eleves/delete-multiple":
+            body = self._read_body()
+            ids = body.get("ids", [])
+            if not ids:
+                return self._json({"error": "Aucun ID fourni"}, 400)
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                count = db.delete_multiple_eleves(ids)
+            except Exception as exc:
+                return self._json({"error": str(exc)}, 500)
+            return self._json({"ok": True, "deleted": count})
+
+        if path.startswith("/api/eleves/") and path.endswith("/duplicate"):
+            try:
+                eid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            try:
+                result = db.duplicate_eleve(eid)
+            except Exception as exc:
+                return self._json({"error": str(exc)}, 500)
+            if result is None:
+                return self._json({"error": "Calcul introuvable"}, 404)
+            return self._json(result, 201)
+
         self.send_error(404)
 
     def do_DELETE(self) -> None:
@@ -296,9 +322,45 @@ class _Handler(BaseHTTPRequestHandler):
     def do_OPTIONS(self) -> None:
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
+
+    def do_PUT(self) -> None:
+        if not self._require_auth():
+            return
+        parsed = urlparse(self.path)
+        path = parsed.path.rstrip("/")
+
+        if path.startswith("/api/eleves/"):
+            try:
+                eid = int(path.split("/")[-1])
+            except ValueError:
+                return self._json({"error": "id invalide"}, 400)
+            body = self._read_body()
+            nom = (body.get("nom") or "").strip()
+            if not nom:
+                return self._json({"error": "Le nom est obligatoire."}, 400)
+            try:
+                result = db.update_eleve(
+                    eid,
+                    nom=nom,
+                    matricule=body.get("matricule", ""),
+                    classe=body.get("classe", ""),
+                    etablissement=body.get("etablissement", ""),
+                    annee=body.get("annee", ""),
+                    total=body.get("total", 0),
+                    mo=body.get("mo", 0),
+                    mention=body.get("mention", ""),
+                    matieres=body.get("matieres"),
+                )
+            except Exception as exc:
+                return self._json({"error": str(exc)}, 500)
+            if result is None:
+                return self._json({"error": "Calcul introuvable"}, 404)
+            return self._json(result)
+
+        self.send_error(404)
 
 
 def start_server(html_path: Path, port: int = 0, host: str = "127.0.0.1",

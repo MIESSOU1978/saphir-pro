@@ -454,7 +454,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-card{
   background:#fff;border:1px solid #e5ece8;border-radius:12px;
   padding:16px 18px;margin-bottom:10px;transition:all .2s ease;
-  display:grid;grid-template-columns:1fr 155px 150px auto;align-items:center;gap:18px;
+  display:grid;grid-template-columns:auto 1fr 155px 150px auto;align-items:center;gap:14px;
 }
 .hist-card:last-child{margin-bottom:0;}
 .hist-card:hover{border-color:#b8d4c7;box-shadow:0 4px 16px rgba(6,78,59,.1);transform:translateY(-1px);}
@@ -500,6 +500,62 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
   color:#4a6b5a;cursor:pointer;font-size:.78rem;font-weight:600;transition:all .2s;
 }
 .hist-btn-del:hover{background:#FDECEA;border-color:#E7A6A0;color:#B42318;}
+.hist-btn-edit{
+  display:inline-flex;align-items:center;gap:5px;padding:7px 14px;
+  border-radius:8px;border:1px solid #b8d4c7;background:#fff;
+  color:#4a6b5a;cursor:pointer;font-size:.78rem;font-weight:600;transition:all .2s;
+}
+.hist-btn-edit:hover{background:#F0F7F3;border-color:#064E3B;color:#064E3B;}
+.hist-btn-dup{
+  display:inline-flex;align-items:center;gap:5px;padding:7px 14px;
+  border-radius:8px;border:1px solid #b8d4c7;background:#fff;
+  color:#4a6b5a;cursor:pointer;font-size:.78rem;font-weight:600;transition:all .2s;
+}
+.hist-btn-dup:hover{background:#F0F7F3;border-color:#064E3B;color:#064E3B;}
+.hist-select{width:18px;height:18px;cursor:pointer;accent-color:#064E3B;flex-shrink:0;}
+.hist-sel-bar{
+  display:none;align-items:center;justify-content:space-between;gap:14px;
+  background:#F0F7F3;border:1px solid #D5E5DE;border-radius:10px;
+  padding:10px 18px;margin-bottom:12px;flex-wrap:wrap;
+}
+.hist-sel-bar.show{display:flex;}
+.hist-sel-count{font-size:.82rem;font-weight:700;color:#003b32;}
+.hist-sel-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.hist-sel-btn{
+  display:inline-flex;align-items:center;gap:5px;padding:6px 14px;
+  border-radius:8px;font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s;
+  border:1px solid #D5E5DE;background:#fff;color:#064E3B;font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+}
+.hist-sel-btn:hover{background:#F0F7F3;border-color:#064E3B;}
+.hist-sel-btn.danger{color:#B42318;border-color:#E7A6A0;}
+.hist-sel-btn.danger:hover{background:#FDECEA;border-color:#B42318;}
+.edit-indicator{
+  display:none;align-items:center;gap:8px;padding:10px 18px;
+  background:#FFF7ED;border:1px solid #FDBA74;border-radius:10px;
+  margin-bottom:16px;font-size:.82rem;font-weight:600;color:#B45309;
+}
+.edit-indicator.show{display:flex;}
+.edit-indicator button{
+  margin-left:auto;padding:5px 14px;border-radius:6px;border:1px solid #FCD34D;
+  background:#fff;color:#B45309;cursor:pointer;font-size:.76rem;font-weight:600;
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+}
+.edit-indicator button:hover{background:#FEF3C7;}
+.draft-toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  background:#064E3B;color:#fff;padding:14px 24px;border-radius:12px;
+  box-shadow:0 10px 40px rgba(0,0,0,.25);z-index:999;
+  display:none;align-items:center;gap:14px;font-size:.85rem;max-width:520px;
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+}
+.draft-toast.show{display:flex;}
+.draft-toast-btn{
+  padding:7px 18px;border-radius:8px;font-size:.78rem;font-weight:700;
+  cursor:pointer;border:none;font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  white-space:nowrap;
+}
+.draft-toast-btn.yes{background:#fff;color:#064E3B;}
+.draft-toast-btn.no{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);}
 
 .hist-empty-state{text-align:center;padding:48px 20px;}
 .hist-empty-icon{
@@ -1105,12 +1161,14 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
   .result-item.result-mo{border-radius:0 0 12px 12px !important;}
   .actions{display:grid;grid-template-columns:1fr 1fr;width:100%;}
   .actions .btn{width:100%;justify-content:center;}
-  .hist-card{grid-template-columns:1fr;gap:12px;padding:14px;}
+  .hist-card{grid-template-columns:auto 1fr;gap:10px;padding:14px;}
   .hist-card-mo{justify-self:start;min-width:110px;}
   .hist-badge{width:auto;justify-self:start;}
   .hist-btn-pdf{width:auto;justify-self:start;}
-  .hist-actions{justify-self:start;}
+  .hist-actions{justify-self:start;grid-column:1/-1;flex-wrap:wrap;}
   .hist-header{flex-direction:column;align-items:flex-start;}
+  .hist-sel-bar{flex-direction:column;align-items:flex-start;}
+  .hist-sel-actions{width:100%;}
 }
 
 /* Fenêtre native compacte : tout le module reste visible sans défilement. */
@@ -1400,6 +1458,11 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 ════════════════════════════════════════════ -->
 <div class="page" id="page-mo">
 
+  <div class="edit-indicator" id="edit-indicator">
+    &#9998; Modification du calcul enregistré
+    <button onclick="cancelEdit()">Annuler la modification</button>
+  </div>
+
   <div class="card">
     <div class="section-title">Informations de l'élève</div>
     <div id="mo-eleve-info" style="font-size:0.83rem;color:var(--muted);">Renseignez les MA et les notes BEPC ci-dessous. Les moyennes MA peuvent être transférées depuis l'onglet 01.</div>
@@ -1514,12 +1577,26 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         </button>
       </div>
     </div>
+    <div class="hist-sel-bar" id="hist-sel-bar">
+      <div class="hist-sel-count"><span id="hist-sel-count-num">0</span> calcul(s) sélectionné(s)</div>
+      <div class="hist-sel-actions">
+        <button class="hist-sel-btn" onclick="printSelection()" title="Imprimer la sélection">&#128424; Imprimer</button>
+        <button class="hist-sel-btn" onclick="exportSelection()" title="Exporter la sélection en PDF">&#128196; Exporter PDF</button>
+        <button class="hist-sel-btn danger" onclick="deleteSelection()" title="Supprimer la sélection">&#128465; Supprimer</button>
+        <button class="hist-sel-btn" onclick="deselectAll()" title="Tout désélectionner">&#10005; Tout désélectionner</button>
+      </div>
+    </div>
     <div id="hist-list"></div>
   </div>
 </div>
 
 </main>
 <div id="toast"></div>
+<div class="draft-toast" id="draft-toast">
+  <span>&#128196; Une saisie non enregistrée a été retrouvée. Voulez-vous la reprendre ?</span>
+  <button class="draft-toast-btn yes" onclick="restoreDraft()">Reprendre</button>
+  <button class="draft-toast-btn no" onclick="dismissDraft()">Ignorer</button>
+</div>
 
 <!-- BULLETIN A4 DYNAMIQUE -->
 <section id="bulletin-print" aria-hidden="true">
@@ -1852,10 +1929,19 @@ function setMention(mo){
 }
 
 function resetMO(){
+  if(!editingId){
+    const draft=loadDraft();
+    if(draft&&(draft.nom||draft.matricule||Object.values(draft.matieres||{}).some(v=>v.mga||v.bepc||v.bepc_ecrit||v.bepc_oral))){
+      if(!confirm('Une saisie non enregistrée existe. Voulez-vous réinitialiser et perdre ce brouillon ?')) return;
+      dismissDraft();
+    }
+  }
+  editingId=null;
+  document.getElementById('edit-indicator').classList.remove('show');
   document.getElementById('mo-nom').value='';
   document.getElementById('mo-matricule').value='';
   document.getElementById('mo-classe').value='';
-  document.getElementById('mo-annee').value='';
+  document.getElementById('mo-annee').value='2025–2026';
   document.getElementById('mo-etablissement').value='';
   document.querySelectorAll('#page-mo .note-input').forEach(el=>el.value='');
   document.querySelectorAll('#mo-tbody .computed-val, #mo-tbody .sum-val').forEach(el=>el.textContent='—');
@@ -1885,15 +1971,93 @@ function updateMOInfo(){
 
 /* ════ HISTORIQUE (SQLite via API) ════ */
 let histData=[];
+let editingId=null;
+let selectedIds=[];
 
 const API='http://127.0.0.1:'+location.port;
 
+/* ── MODE BROUILLON ── */
+function saveDraft(){
+  try{
+    const d={
+      nom:document.getElementById('mo-nom')?.value||'',
+      matricule:document.getElementById('mo-matricule')?.value||'',
+      classe:document.getElementById('mo-classe')?.value||'',
+      annee:document.getElementById('mo-annee')?.value||'',
+      etablissement:document.getElementById('mo-etablissement')?.value||'',
+      tab:document.querySelector('.page.active')?.id||'',
+      matieres:{}
+    };
+    MATIERES.forEach(m=>{
+      const vals={};
+      const mgaEl=document.getElementById(m.id+'_mga');
+      if(mgaEl) vals.mga=mgaEl.value;
+      if(m.anglais){
+        const be=document.getElementById(m.id+'_bepc_e');
+        const bo=document.getElementById(m.id+'_bepc_o');
+        if(be) vals.bepc_ecrit=be.value;
+        if(bo) vals.bepc_oral=bo.value;
+      } else {
+        const b=document.getElementById(m.id+'_bepc');
+        if(b) vals.bepc=b.value;
+      }
+      d.matieres[m.id]=vals;
+    });
+    localStorage.setItem('saphir_draft',JSON.stringify(d));
+  }catch(e){}
+}
+function loadDraft(){
+  try{
+    const raw=localStorage.getItem('saphir_draft');
+    return raw?JSON.parse(raw):null;
+  }catch(e){return null;}
+}
+function restoreDraft(){
+  const d=loadDraft();
+  if(!d){dismissDraft();return;}
+  if(d.nom) document.getElementById('mo-nom').value=d.nom;
+  if(d.matricule) document.getElementById('mo-matricule').value=d.matricule;
+  if(d.classe) document.getElementById('mo-classe').value=d.classe;
+  if(d.annee) document.getElementById('mo-annee').value=d.annee;
+  if(d.etablissement) document.getElementById('mo-etablissement').value=d.etablissement;
+  if(d.matieres){
+    MATIERES.forEach(m=>{
+      const v=d.matieres[m.id]||{};
+      if(v.mga!=null){const el=document.getElementById(m.id+'_mga');if(el) el.value=v.mga;}
+      if(m.anglais){
+        if(v.bepc_ecrit!=null){const el=document.getElementById(m.id+'_bepc_e');if(el) el.value=v.bepc_ecrit;}
+        if(v.bepc_oral!=null){const el=document.getElementById(m.id+'_bepc_o');if(el) el.value=v.bepc_oral;}
+      } else {
+        if(v.bepc!=null){const el=document.getElementById(m.id+'_bepc');if(el) el.value=v.bepc;}
+      }
+    });
+    MATIERES.forEach(m=>calcRowMO(m.id));
+  }
+  if(d.tab){
+    showPage(d.tab==='page-mga'?'mga':d.tab==='page-mo'?'mo':'home');
+  }
+  document.getElementById('draft-toast').classList.remove('show');
+  toast('Brouillon restauré ✔');
+}
+function dismissDraft(){
+  localStorage.removeItem('saphir_draft');
+  document.getElementById('draft-toast').classList.remove('show');
+}
+function checkDraft(){
+  const d=loadDraft();
+  if(!d) return;
+  const hasData=d.nom||d.matricule||Object.values(d.matieres||{}).some(v=>v.mga||v.bepc||v.bepc_ecrit||v.bepc_oral);
+  if(hasData) document.getElementById('draft-toast').classList.add('show');
+}
+
+/* ── HISTORIQUE: LOAD / SAVE / DELETE ── */
 async function loadHistory(){
   try{
     const r=await fetch(API+'/api/eleves');
     if(!r.ok) throw 0;
     histData=await r.json();
   }catch(e){histData=[];}
+  selectedIds=[];
   renderHistory();
 }
 
@@ -1921,12 +2085,18 @@ async function saveToHistory(){
     else{d.bepc=parseNoteValue(document.getElementById(m.id+'_bepc')?.value);}
     matieres[m.id]=d;
   });
+  const payload={nom,matricule,classe,etablissement:etab,annee,total:parseFloat(String(total).replace(',','.'))||0,mo:parseFloat(String(mo).replace(',','.'))||0,mention,matieres};
   try{
-    await fetch(API+'/api/eleves',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({nom,matricule,classe,etablissement:etab,annee,total:parseFloat(total.replace(',','.'))||0,mo:parseFloat(mo.replace(',','.'))||0,mention,matieres})
-    });
+    if(editingId){
+      await fetch(API+'/api/eleves/'+editingId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      toast('Calcul mis à jour avec succès ✔');
+      cancelEdit();
+    } else {
+      await fetch(API+'/api/eleves',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      toast('Enregistré : '+nom);
+    }
+    localStorage.removeItem('saphir_draft');
     await loadHistory();
-    toast('Enregistré : '+nom);
   }catch(e){toast('Erreur lors de l\'enregistrement.',true);}
 }
 
@@ -1935,21 +2105,22 @@ async function supprimerCalculHistorique(id,btn){
   try{
     const r=await fetch(API+'/api/eleves/'+id,{method:'DELETE',credentials:'same-origin'});
     if(!r.ok){
-      let msg='Erreur lors de la suppression du calcul.';
+      let msg='Erreur lors de la suppression.';
       try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}
       throw new Error(msg);
     }
     histData=histData.filter(h=>h.id!==id);
+    selectedIds=selectedIds.filter(x=>x!==id);
     renderHistory();
-    toast('Calcul supprimé avec succès.');
+    toast('Calcul supprimé définitivement.');
   }catch(e){
-    toast(e.message||'Erreur lors de la suppression du calcul.',true);
+    toast(e.message||'Erreur lors de la suppression.',true);
     btn.disabled=false;btn.innerHTML='&#128465; Supprimer';
   }
 }
 
 function confirmDelHistory(id,btn){
-  if(!confirm('Voulez-vous vraiment supprimer ce calcul de l\'historique ?')) return;
+  if(!confirm('Voulez-vous vraiment supprimer ce calcul ? Cette action est irréversible.')) return;
   supprimerCalculHistorique(id,btn);
 }
 
@@ -1964,16 +2135,130 @@ async function clearHistory(){
   }catch(e){
     toast(e.message||'Erreur lors de la suppression.',true);return;
   }
-  histData=[];
+  histData=[];selectedIds=[];
   renderHistory();
   toast('Historique vidé.');
 }
 
 function confirmClearHistory(){
-  if(!confirm('Voulez-vous vraiment vider tout l\'historique ? Cette action est irréversible.')) return;
+  const msg='Voulez-vous vraiment vider tout l\'historique ?\n\nTous les calculs enregistrés seront supprimés définitivement de la base de données.\nCette action est irréversible.';
+  if(!confirm(msg)) return;
   clearHistory();
 }
 
+/* ── SÉLECTION MULTIPLE ── */
+function toggleSelect(id,cb){
+  if(cb.checked){if(!selectedIds.includes(id)) selectedIds.push(id);}
+  else{selectedIds=selectedIds.filter(x=>x!==id);}
+  updateSelBar();
+}
+function selectAll(){
+  selectedIds=histData.map(h=>h.id);
+  document.querySelectorAll('.hist-select').forEach(cb=>cb.checked=true);
+  updateSelBar();
+}
+function deselectAll(){
+  selectedIds=[];
+  document.querySelectorAll('.hist-select').forEach(cb=>cb.checked=false);
+  updateSelBar();
+}
+function toggleSelectAll(master){
+  if(master.checked){selectAll();}
+  else{deselectAll();}
+}
+function updateSelBar(){
+  const bar=document.getElementById('hist-sel-bar');
+  const num=document.getElementById('hist-sel-count-num');
+  const n=selectedIds.length;
+  if(bar) bar.classList.toggle('show',n>0);
+  if(num) num.textContent=n;
+}
+async function deleteSelection(){
+  if(!selectedIds.length) return;
+  const n=selectedIds.length;
+  if(!confirm('Voulez-vous vraiment supprimer les '+n+' calcul(s) sélectionné(s) ?\nCette action est irréversible.')) return;
+  try{
+    const r=await fetch(API+'/api/eleves/delete-multiple',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({ids:selectedIds})});
+    if(!r.ok){
+      let msg='Erreur lors de la suppression.';
+      try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}
+      throw new Error(msg);
+    }
+    histData=histData.filter(h=>!selectedIds.includes(h.id));
+    selectedIds=[];
+    renderHistory();
+    toast(n+' calcul(s) supprimé(s) définitivement.');
+  }catch(e){toast(e.message||'Erreur lors de la suppression.',true);}
+}
+function printSelection(){
+  const items=histData.filter(h=>selectedIds.includes(h.id)&&h.matieres);
+  if(!items.length){toast('Aucun bulletin sélectionné.',true);return;}
+  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+  const pages=items.map(h=>buildBulletinHTML(h)).join('');
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm;}</style></head><body>${pages}</body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),600);
+}
+function exportSelection(){
+  const items=histData.filter(h=>selectedIds.includes(h.id)&&h.matieres);
+  if(!items.length){toast('Aucun bulletin sélectionné.',true);return;}
+  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+  const pages=items.map(h=>buildBulletinHTML(h)).join('');
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm;}</style></head><body>${pages}</body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),600);
+}
+
+/* ── MODIFIER / DUPLIQUER ── */
+function editCalc(id){
+  const h=histData.find(x=>x.id===id);
+  if(!h||!h.matieres){toast('Données indisponibles.',true);return;}
+  editingId=id;
+  loadCalcToMO(h);
+  document.getElementById('edit-indicator').classList.add('show');
+  showPage('mo');
+  toast('Modification du calcul enregistré');
+}
+function duplicateCalc(id){
+  const h=histData.find(x=>x.id===id);
+  if(!h||!h.matieres){toast('Données indisponibles.',true);return;}
+  editingId=null;
+  loadCalcToMO(h);
+  document.getElementById('edit-indicator').classList.remove('show');
+  showPage('mo');
+  toast('Calcul dupliqué. Vous pouvez le modifier puis l\'enregistrer comme nouveau calcul.');
+}
+function loadCalcToMO(h){
+  document.getElementById('mo-nom').value=h.nom||'';
+  document.getElementById('mo-matricule').value=h.matricule||'';
+  document.getElementById('mo-classe').value=h.classe||'';
+  document.getElementById('mo-annee').value=h.annee||'';
+  document.getElementById('mo-etablissement').value=h.etablissement||'';
+  document.querySelectorAll('#page-mo .note-input').forEach(el=>el.value='');
+  MATIERES.forEach(m=>{
+    const d=(h.matieres||{})[m.id]||{};
+    if(d.mga!=null&&d.mga!==''){const el=document.getElementById(m.id+'_mga');if(el) el.value=fmtNum(Number(d.mga),2);}
+    if(m.anglais){
+      if(d.bepc_ecrit!=null&&d.bepc_ecrit!==''){const el=document.getElementById(m.id+'_bepc_e');if(el) el.value=fmtNum(Number(d.bepc_ecrit),2);}
+      if(d.bepc_oral!=null&&d.bepc_oral!==''){const el=document.getElementById(m.id+'_bepc_o');if(el) el.value=fmtNum(Number(d.bepc_oral),2);}
+    } else {
+      if(d.bepc!=null&&d.bepc!==''){const el=document.getElementById(m.id+'_bepc');if(el) el.value=fmtNum(Number(d.bepc),2);}
+    }
+    calcRowMO(m.id);
+  });
+  updateMOInfo();
+}
+function cancelEdit(){
+  editingId=null;
+  document.getElementById('edit-indicator').classList.remove('show');
+  resetMO();
+}
+
+/* ── RENDU DES CARTES HISTORIQUE ── */
 function renderHistory(){
   const div=document.getElementById('hist-list');
   const countEl=document.getElementById('hist-count');
@@ -1983,37 +2268,22 @@ function renderHistory(){
   if(btnAll) btnAll.style.display=n>1?'inline-flex':'none';
   if(!n){
     div.innerHTML='<div class="hist-empty-state"><div class="hist-empty-icon">&#128196;</div><div class="hist-empty-text">Aucun calcul enregistré</div><div class="hist-empty-sub">Les calculs sauvegardés apparaîtront ici.</div></div>';
+    selectedIds=[];updateSelBar();
     return;
   }
-  div.innerHTML=histData.map(h=>{
+  div.innerHTML='<div style="margin-bottom:10px;display:flex;align-items:center;gap:8px;"><input type="checkbox" class="hist-select" onchange="toggleSelectAll(this)" title="Tout sélectionner" '+(selectedIds.length===n?'checked':'')+'><span style="font-size:.78rem;color:#60736D;">Tout sélectionner</span></div>'+histData.map(h=>{
     const moVal=h.mo!=null?Number(h.mo):null;
-    const moDisplay=moVal!=null?truncate(moVal,2).replace('.',',')+' / 20':'—';
-    const mention=h.mention||'—';
+    const moDisplay=moVal!=null?truncate(moVal,2).replace('.',',')+' / 20':'\u2014';
+    const mention=h.mention||'\u2014';
     let badgeClass='hist-badge-none';
     if(mention==='Très bien'||mention==='Bien'||mention==='Félicitations') badgeClass='hist-badge-pass';
     else if(mention==='Passable'||mention==='Assez bien') badgeClass='hist-badge-warn';
     else if(mention.includes('Insuffisant')) badgeClass='hist-badge-fail';
     const dateStr=h.date_calc||h.created_at||'';
-    return `
-    <div class="hist-card">
-      <div class="hist-card-info">
-        <div class="hist-card-name" title="${h.nom||'—'}">${h.nom||'—'}</div>
-        <div class="hist-card-meta" title="${h.matricule||'—'} · ${h.classe||'—'} · ${h.etablissement||'—'} · ${dateStr}">${h.matricule||'—'} &middot; ${h.classe||'—'} &middot; ${h.etablissement||'—'} &middot; ${dateStr}</div>
-      </div>
-      <div class="hist-card-mo">
-        <div class="mo-value">${moDisplay}</div>
-        <div class="mo-label">Moyenne</div>
-      </div>
-      <span class="hist-badge ${badgeClass}">${mention}</span>
-      <div class="hist-actions">
-        <button class="hist-btn-pdf" onclick="downloadBulletinPDF(${h.id})" title="Télécharger le bulletin en PDF">
-          <svg class="hist-btn-pdf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Télécharger
-        </button>
-        <button class="hist-btn-del" onclick="confirmDelHistory(${h.id},this)" title="Supprimer ce calcul">&#128465; Supprimer</button>
-      </div>
-    </div>`;
+    const checked=selectedIds.includes(h.id)?'checked':'';
+    return '<div class="hist-card"><input type="checkbox" class="hist-select" '+checked+' onchange="toggleSelect('+h.id+',this)" title="Sélectionner"><div class="hist-card-info"><div class="hist-card-name" title="'+(h.nom||'\u2014')+'">'+(h.nom||'\u2014')+'</div><div class="hist-card-meta" title="'+(h.matricule||'\u2014')+' · '+(h.classe||'\u2014')+' · '+(h.etablissement||'\u2014')+' · '+dateStr+'">'+(h.matricule||'\u2014')+' &middot; '+(h.classe||'\u2014')+' &middot; '+(h.etablissement||'\u2014')+' &middot; '+dateStr+'</div></div><div class="hist-card-mo"><div class="mo-value">'+moDisplay+'</div><div class="mo-label">Moyenne</div></div><span class="hist-badge '+badgeClass+'">'+mention+'</span><div class="hist-actions"><button class="hist-btn-edit" onclick="editCalc('+h.id+')" title="Modifier ce calcul">&#9998; Modifier</button><button class="hist-btn-dup" onclick="duplicateCalc('+h.id+')" title="Dupliquer ce calcul">&#128203; Dupliquer</button><button class="hist-btn-pdf" onclick="downloadBulletinPDF('+h.id+')" title="Télécharger le bulletin en PDF"><svg class="hist-btn-pdf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> T\u00e9l\u00e9charger</button><button class="hist-btn-del" onclick="confirmDelHistory('+h.id+',this)" title="Supprimer ce calcul">&#128465; Supprimer</button></div></div>';
   }).join('');
+  updateSelBar();
 }
 
 /* ════ TÉLÉCHARGEMENT PDF DEPUIS HISTORIQUE ════ */
@@ -2339,8 +2609,10 @@ updateMGASummary();
 buildMOTable();
 document.querySelectorAll('#page-mo .field-group input').forEach(el=>el.addEventListener('input',updateMOInfo));
 document.querySelectorAll('input').forEach(el=>{el.setAttribute('autocomplete','off');el.setAttribute('data-lpignore','true');});
+document.querySelectorAll('#page-mo .note-input, #page-mo .field-group input').forEach(el=>el.addEventListener('input',saveDraft));
 applyRole();
 loadHistory();
+checkDraft();
 window.addEventListener('beforeprint',buildBulletin);
 if(new URLSearchParams(window.location.search).get('bulletin-preview')==='demo') loadBulletinPreview();
 </script>

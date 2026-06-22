@@ -293,6 +293,62 @@ def get_eleve(eleve_id: int) -> dict[str, Any] | None:
     return result
 
 
+def update_eleve(eleve_id: int, nom: str, matricule: str = "", classe: str = "",
+                 etablissement: str = "", annee: str = "",
+                 total: float = 0, mo: float = 0, mention: str = "",
+                 matieres: dict | None = None) -> dict[str, Any] | None:
+    matieres_json = json.dumps(matieres or {}, ensure_ascii=False)
+
+    if _turso_enabled():
+        _turso_exec_write(
+            "UPDATE eleves SET nom=?, matricule=?, classe=?, etablissement=?, annee=? WHERE id=?",
+            [nom, matricule, classe, etablissement, annee, eleve_id],
+        )
+        _turso_exec_write(
+            "DELETE FROM resultats WHERE eleve_id=?", [eleve_id]
+        )
+        _turso_exec_write(
+            "INSERT INTO resultats (eleve_id, total, mo, mention, matieres) VALUES (?, ?, ?, ?, ?)",
+            [eleve_id, total, mo, mention, matieres_json],
+        )
+        return get_eleve(eleve_id)
+
+    conn = _connect()
+    conn.execute(
+        "UPDATE eleves SET nom=?, matricule=?, classe=?, etablissement=?, annee=? WHERE id=?",
+        (nom, matricule, classe, etablissement, annee, eleve_id),
+    )
+    conn.execute("DELETE FROM resultats WHERE eleve_id=?", (eleve_id,))
+    conn.execute(
+        "INSERT INTO resultats (eleve_id, total, mo, mention, matieres) VALUES (?, ?, ?, ?, ?)",
+        (eleve_id, total, mo, mention, matieres_json),
+    )
+    conn.commit()
+    row = conn.execute("SELECT * FROM eleves WHERE id=?", (eleve_id,)).fetchone()
+    res = conn.execute("SELECT * FROM resultats WHERE eleve_id=?", (eleve_id,)).fetchone()
+    conn.close()
+    if row is None:
+        return None
+    return {"eleve": dict(row), "resultat": dict(res)}
+
+
+def duplicate_eleve(eleve_id: int) -> dict[str, Any] | None:
+    src = get_eleve(eleve_id)
+    if not src:
+        return None
+    return save_eleve(
+        nom=src.get("nom", ""),
+        matricule=src.get("matricule", ""),
+        classe=src.get("classe", ""),
+        etablissement=src.get("etablissement", ""),
+        annee=src.get("annee", ""),
+        total=src.get("total", 0),
+        mo=src.get("mo", 0),
+        mention=src.get("mention", ""),
+        matieres=src.get("matieres") or {},
+    )
+
+
 def delete_eleve(eleve_id: int) -> bool:
     if _turso_enabled():
         _turso_exec_write("DELETE FROM resultats WHERE eleve_id=?", [eleve_id])
@@ -304,6 +360,23 @@ def delete_eleve(eleve_id: int) -> bool:
     conn.commit()
     conn.close()
     return True
+
+
+def delete_multiple_eleves(ids: list[int]) -> int:
+    if not ids:
+        return 0
+    if _turso_enabled():
+        placeholders = ",".join("?" * len(ids))
+        _turso_exec_write(f"DELETE FROM resultats WHERE eleve_id IN ({placeholders})", ids)
+        _turso_exec_write(f"DELETE FROM eleves WHERE id IN ({placeholders})", ids)
+        return len(ids)
+    conn = _connect()
+    placeholders = ",".join("?" * len(ids))
+    conn.execute(f"DELETE FROM resultats WHERE eleve_id IN ({placeholders})", ids)
+    conn.execute(f"DELETE FROM eleves WHERE id IN ({placeholders})", ids)
+    conn.commit()
+    conn.close()
+    return len(ids)
 
 
 def clear_all() -> int:
