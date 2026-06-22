@@ -1906,9 +1906,9 @@ async function saveToHistory(){
   const etab=(document.getElementById('mo-etablissement').value||document.getElementById('etablissement')?.value||'').trim();
   const matieres={};
   MATIERES.forEach(m=>{
-    const d={mga:parseFloat(document.getElementById(m.id+'_mga')?.value)||null};
-    if(m.anglais){d.bepc_ecrit=parseFloat(document.getElementById(m.id+'_bepc_e')?.value)||null;d.bepc_oral=parseFloat(document.getElementById(m.id+'_bepc_o')?.value)||null;}
-    else{d.bepc=parseFloat(document.getElementById(m.id+'_bepc')?.value)||null;}
+    const d={mga:parseNoteValue(document.getElementById(m.id+'_mga')?.value)};
+    if(m.anglais){d.bepc_ecrit=parseNoteValue(document.getElementById(m.id+'_bepc_e')?.value);d.bepc_oral=parseNoteValue(document.getElementById(m.id+'_bepc_o')?.value);}
+    else{d.bepc=parseNoteValue(document.getElementById(m.id+'_bepc')?.value);}
     matieres[m.id]=d;
   });
   try{
