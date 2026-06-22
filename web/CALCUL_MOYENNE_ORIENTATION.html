@@ -598,22 +598,23 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .bp-result{border-left:1px solid #e0e8e3;background:#fff!important;color:#0b4a35;font-size:11.5pt!important;font-weight:900;font-variant-numeric:tabular-nums;}
 .bp-table-note{margin-top:1.5mm;color:#87958d;font-size:7.5pt;font-style:italic;text-align:right;}
 .bp-summary{display:grid;grid-template-columns:1fr 1.35fr;gap:4mm;margin-bottom:5mm;}
-.bp-summary-box{min-height:28mm;padding:4mm 7mm;border-radius:2.5mm;display:flex;flex-direction:column;justify-content:center;}
-.bp-summary-total{border:1px solid #dfe7e2;background:#f4f8f5;}
-.bp-summary-mo{align-items:center;border:1px solid #b8cfc2;background:#fff;color:#0b3d2e;text-align:center;box-shadow:inset 0 0 0 .3mm #eef4f0;}
-.bp-summary-label{color:#6b7a70;font-size:8.5pt;font-weight:900;text-transform:uppercase;}
+.bp-summary-box{min-height:30mm;padding:5mm 7mm;border-radius:3mm;display:flex;flex-direction:column;justify-content:center;border:1px solid #dfe7e2;background:#f4f8f5;}
+.bp-summary-total{align-items:flex-start;}
+.bp-summary-mo{align-items:center;background:#fff;color:#0b3d2e;text-align:center;box-shadow:inset 0 0 0 .3mm #eef4f0;}
+.bp-summary-label{color:#6b7a70;font-size:8pt;font-weight:900;text-transform:uppercase;letter-spacing:.4px;}
 .bp-summary-mo .bp-summary-label{color:#4f675a;}
-.bp-total-value{margin-top:2mm;color:#0b3d2e;font-size:28pt;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;}
-.bp-mo-value{margin-top:1.5mm;font-size:34pt;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;}
+.bp-total-value{margin-top:2mm;color:#0b3d2e;font-size:20pt;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;}
+.bp-mo-value{margin-top:1.5mm;font-size:34pt;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:1.5mm;}
+.bp-mo-value span{font-size:34pt;}
 .bp-summary-mo.is-passing .bp-mo-value{color:#087443;}
 .bp-summary-mo.is-failing .bp-mo-value{color:#b42318;}
-.bp-mo-value small{font-size:15pt;}
+.bp-mo-value small{font-size:13pt;font-weight:600;opacity:.7;align-self:baseline;}
 .bp-summary-sub{margin-top:2mm;color:#87958d;font-size:8.5pt;}
 .bp-summary-mo .bp-summary-sub{color:#f2b632;font-weight:800;}
 .bp-mention{display:inline-block;margin-top:2.5mm;padding:1.5mm 5mm;border-radius:99px;font-size:8pt;font-weight:800;letter-spacing:.3px;}
 .bp-mention.mention-pass{background:rgba(8,116,67,.12);color:#087443;}
 .bp-mention.mention-warn{background:rgba(217,154,19,.15);color:#92710a;}
-.bp-mention.mention-fail{background:rgba(180,35,24,.1);color:#b42318;}
+.bp-mention.mention-fail{background:#FDECEA;color:#B42318;}
 .bp-footer{padding-top:3.5mm;border-top:.4mm solid #0b3d2e;display:flex;justify-content:space-between;align-items:flex-end;color:#87958d;font-size:8pt;}
 #bp-filename{color:#0b3d2e;font-size:8pt;font-weight:700;text-align:center;align-self:center;display:none;}
 .bp-footer strong{color:#0b3d2e;}
@@ -1580,7 +1581,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         </div>
         <div class="bp-summary-box bp-summary-mo">
           <div class="bp-summary-label">Moyenne d'orientation</div>
-          <div class="bp-mo-value"><span id="bp-mo-rounded">00,00</span> <small>/ 20</small></div>
+          <div class="bp-mo-value"><span id="bp-mo-rounded">00,00</span><small>/ 20</small></div>
           <div class="bp-mention" id="bp-mention"></div>
         </div>
       </div>
@@ -2094,7 +2095,7 @@ function buildBulletinHTML(h){
 <div class="bp-table-wrap"><table class="bp-grades"><colgroup><col><col><col><col><col><col></colgroup><thead><tr><th>Matière</th><th>MA</th><th>Note BEPC</th><th>MA + BEPC</th><th>Coeff.</th><th>Total pondéré</th></tr></thead><tbody>${rows}</tbody></table></div>
 <div class="bp-table-note">Total pondéré = (MA + Note BEPC) × Coefficient</div>
 <div class="bp-section-title"><span class="bp-section-num">3</span><span>Synthèse</span><span class="bp-section-line"></span></div>
-<div class="bp-summary"><div class="bp-summary-box bp-summary-total"><div class="bp-summary-label">Total général pondéré</div><div class="bp-total-value">${totalDisplay}</div><div class="bp-summary-sub"></div></div><div class="bp-summary-box bp-summary-mo ${moClass}"><div class="bp-summary-label">Moyenne d'orientation</div><div class="bp-mo-value"><span>${moDisplay}</span> <small>/ 20</small></div><div class="bp-mention ${mCls}">${mention}</div></div></div>
+<div class="bp-summary"><div class="bp-summary-box bp-summary-total"><div class="bp-summary-label">Total général pondéré</div><div class="bp-total-value">${totalDisplay}</div><div class="bp-summary-sub"></div></div><div class="bp-summary-box bp-summary-mo ${moClass}"><div class="bp-summary-label">Moyenne d'orientation</div><div class="bp-mo-value"><span>${moDisplay}</span><small>/ 20</small></div><div class="bp-mention ${mCls}">${mention}</div></div></div>
 </div>
 <footer class="bp-footer"><div>Édité via <strong>SAPHIR Pro</strong></div><div></div><div class="bp-footer-right"><div class="bp-footer-date">Document généré le <span>${today}</span></div></div></footer>
 </article>`;
