@@ -11,15 +11,15 @@ import webbrowser
 from pathlib import Path
 from tkinter import messagebox
 
+# Desktop passwords — MUST be set BEFORE importing api_server
+os.environ.setdefault("APP_PASSWORD", "RECEPTIOn8@2024")
+os.environ.setdefault("STUDENT_PASSWORD", "RECEPTIOn8@2025")
+
 from calcmopro.api_server import start_server
 
 
 HTML_NAME = "CALCUL_MOYENNE_ORIENTATION.html"
 LOGIN_NAME = "login.html"
-
-# Desktop passwords
-os.environ.setdefault("APP_PASSWORD", "RECEPTIOn8@2024")
-os.environ.setdefault("STUDENT_PASSWORD", "RECEPTIOn8@2025")
 
 
 def resource_root() -> Path:
