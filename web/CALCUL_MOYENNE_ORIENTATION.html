@@ -2029,19 +2029,19 @@ function buildBulletinHTML(h){
   const rows=MATIERES.map(m=>{
     const d=(h.matieres||{})[m.id]||{};
     const mgaVal=d.mga!=null?d.mga:null;
-    const mga=mgaVal!=null?truncate(Number(mgaVal),3).replace('.',',').replace(/,?0+$/,''):'—';
+    const mga=mgaVal!=null?fmtNum(Number(mgaVal),2):'—';
     let bepc,bepcDisplay,bepcSum;
     if(m.anglais){
       const ecrit=d.bepc_ecrit!=null?Number(d.bepc_ecrit):null;
       const oral=d.bepc_oral!=null?Number(d.bepc_oral):null;
       bepc=ecrit!=null&&oral!=null?(ecrit+oral)/2:0;
-      const ecritS=ecrit!=null?truncate(ecrit,3).replace('.',',').replace(/,?0+$/,''):'—';
-      const oralS=oral!=null?truncate(oral,3).replace('.',',').replace(/,?0+$/,''):'—';
+      const ecritS=ecrit!=null?fmtNum(ecrit,2):'—';
+      const oralS=oral!=null?fmtNum(oral,2):'—';
       bepcDisplay=`<div class="bp-dual"><span class="bp-dual-item">${ecritS}<small>Écrit</small></span><span class="bp-dual-link"></span><span class="bp-dual-item">${oralS}<small>Oral</small></span></div>`;
     }else{
       const b=d.bepc!=null?Number(d.bepc):null;
       bepc=b!=null?b:0;
-      bepcDisplay=`<span class="bp-pill bp-pill-bepc">${b!=null?truncate(b,3).replace('.',',').replace(/,?0+$/,''):'—'}</span>`;
+      bepcDisplay=`<span class="bp-pill bp-pill-bepc">${b!=null?fmtNum(b,2):'—'}</span>`;
     }
     const sum=mgaVal!=null?Number(mgaVal)+bepc:bepc;
     const prod=sum*m.coef;
