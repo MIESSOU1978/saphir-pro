@@ -1,8 +1,7 @@
 /* api.js — Intercepts fetch() calls and routes them to localStorage.
    Include this script BEFORE the main HTML script.
-   Usage in HTML: <script type="module" src="api.js"></script>
-*/
-import { initDB, saveEleve, listEleves, getEleve, deleteEleve, clearAll } from './db.js';
+   Usage in HTML: <script type="module" src="api.js"></script> */
+import { initDB, saveEleve, updateEleve, listEleves, getEleve, deleteEleve, deleteMultipleEleves, clearAll } from './db.js';
 
 let dbReady = false;
 
@@ -40,7 +39,14 @@ export async function bootAPI() {
 
       if (path === '/api/eleves/clear' && method === 'DELETE') {
         const count = await clearAll();
-        return jsonResponse({ cleared: count });
+        return jsonResponse({ ok: true, cleared: count });
+      }
+
+      if (path === '/api/eleves/delete-multiple' && method === 'POST') {
+        const body = JSON.parse(opts.body || '{}');
+        const ids = body.ids || [];
+        const count = await deleteMultipleEleves(ids);
+        return jsonResponse({ ok: true, deleted: count });
       }
 
       const idMatch = path.match(/^\/api\/eleves\/(\d+)$/);
@@ -53,8 +59,39 @@ export async function bootAPI() {
         }
         if (method === 'DELETE') {
           await deleteEleve(id);
-          return jsonResponse({ deleted: true });
+          return jsonResponse({ ok: true });
         }
+      }
+
+      if (method === 'PUT') {
+        const putMatch = path.match(/^\/api\/eleves\/(\d+)$/);
+        if (putMatch) {
+          const id = parseInt(putMatch[1]);
+          const body = JSON.parse(opts.body || '{}');
+          const result = await updateEleve(
+            id,
+            body.nom || '', body.matricule || '', body.classe || '',
+            body.etablissement || '', body.annee || '',
+            body.total || 0, body.mo || 0, body.mention || '',
+            body.matieres || {}
+          );
+          if (!result) return jsonError('Not found', 404);
+          return jsonResponse(result);
+        }
+      }
+
+      const dupMatch = path.match(/^\/api\/eleves\/(\d+)$/);
+      if (dupMatch && method === 'POST' && path.endsWith('/duplicate')) {
+        const srcId = parseInt(dupMatch[1]);
+        const src = await getEleve(srcId);
+        if (!src) return jsonError('Not found', 404);
+        const result = await saveEleve(
+          src.nom || '', src.matricule || '', src.classe || '',
+          src.etablissement || '', src.annee || '',
+          src.total || 0, src.mo || 0, src.mention || '',
+          src.matieres || {}
+        );
+        return jsonResponse(result, 201);
       }
 
       return jsonError('Not found', 404);
@@ -64,7 +101,7 @@ export async function bootAPI() {
     }
   };
 
-  console.log('[SAPHIR Pro] API intercepteur actif (SQLite natif)');
+  console.log('[SAPHIR Pro] API intercepteur actif (localStorage)');
 }
 
 function waitForDB() {
@@ -76,9 +113,9 @@ function waitForDB() {
   });
 }
 
-function jsonResponse(data) {
+function jsonResponse(data, status) {
   return new Response(JSON.stringify(data), {
-    status: 200,
+    status: status || 200,
     headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
   });
 }

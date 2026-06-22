@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=overlays-content">
+<meta name="google-site-verification" content="YZf2o0U5chCswRvGy9i2XFqozxTBtVfAy2wnlYH-Yj0" />
 <title></title>
 <style>
 :root {
@@ -35,6 +36,7 @@ html::-webkit-scrollbar{width:12px;}
 html::-webkit-scrollbar-track{background:#e7eee9;}
 html::-webkit-scrollbar-thumb{background:#7f9f8d;border:3px solid #e7eee9;border-radius:999px;}
 html::-webkit-scrollbar-thumb:hover{background:#557a65;}
+*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 body{
   font-family:'Ebrima','Segoe UI',Arial,sans-serif;
   background:var(--navy);
@@ -274,19 +276,19 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .btn-success:hover .btn-icon{transform:translateX(3px);}
 
 #page-mga .btn-ghost{
-  background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);
-  border:1px solid rgba(255,255,255,.12);border-radius:8px;
+  background:#fff;color:#60736d;
+  border:1px solid #d1ddd6;border-radius:8px;
 }
 #page-mga .btn-ghost:hover{
-  background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.25);
+  background:#f0fdf4;color:#064e3b;border-color:#064e3b;
 }
 #page-mga .btn-success{
-  background:linear-gradient(135deg,#064e3b,#0d7a56);
+  background:linear-gradient(135deg,#15803d,var(--green));
   color:#fff;border-radius:8px;
   box-shadow:0 2px 10px rgba(6,78,59,.3);
 }
 #page-mga .btn-success:hover{
-  background:linear-gradient(135deg,#0d7a56,#10b981);
+  background:linear-gradient(135deg,#16a34a,#22c55e);
   transform:translateY(-2px);box-shadow:0 4px 16px rgba(6,78,59,.4);
 }
 
@@ -422,7 +424,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 }
 .hist-title{font-size:.95rem;font-weight:700;color:#003b32;letter-spacing:.2px;}
 .hist-subtitle{font-size:.74rem;color:#60736d;margin-top:2px;}
-.hist-btn-print,.hist-btn-clear{
+.hist-btn-print,.hist-btn-clear,.hist-btn-refresh{
   display:inline-flex;align-items:center;gap:6px;
   padding:8px 18px;border-radius:8px;
   font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;
@@ -435,6 +437,12 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-btn-print:hover{
   background:#053d2e;box-shadow:0 3px 10px rgba(6,78,59,.25);
 }
+.hist-btn-refresh{
+  background:#fff;color:#064E3B;border:1px solid #a3c4b5;
+}
+.hist-btn-refresh:hover{
+  background:#F4FAF7;border-color:#064E3B;color:#053d2e;box-shadow:0 2px 8px rgba(6,78,59,.1);
+}
 .hist-btn-clear{
   background:#FFF8F6;color:#B42318;border:1px solid #E7A6A0;
 }
@@ -445,11 +453,11 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 
 .hist-card{
   background:#fff;border:1px solid #e5ece8;border-radius:12px;
-  padding:16px 18px;margin-bottom:10px;transition:all .2s;
-  display:grid;grid-template-columns:1fr 155px 150px auto;align-items:center;gap:18px;
+  padding:16px 18px;margin-bottom:10px;transition:all .2s ease;
+  display:grid;grid-template-columns:auto 1fr 155px 150px auto;align-items:center;gap:14px;
 }
 .hist-card:last-child{margin-bottom:0;}
-.hist-card:hover{border-color:#a3c4b5;box-shadow:0 3px 14px rgba(6,78,59,.09);background:#f6faf8;}
+.hist-card:hover{border-color:#b8d4c7;box-shadow:0 4px 16px rgba(6,78,59,.1);transform:translateY(-1px);}
 
 .hist-card-info{min-width:0;}
 .hist-card-name{font-size:.9rem;font-weight:700;color:#003b32;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -487,11 +495,67 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-btn-pdf:hover{background:#0d7a56;box-shadow:0 2px 8px rgba(6,78,59,.2);}
 .hist-btn-pdf-icon{font-size:.82rem;color:#fff;}
 .hist-btn-del{
-  display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;
-  border-radius:8px;border:1px solid #e5ece8;background:transparent;
-  color:#9fb0a6;cursor:pointer;font-size:.85rem;transition:all .2s;
+  display:inline-flex;align-items:center;gap:5px;padding:7px 14px;
+  border-radius:8px;border:1px solid #b8d4c7;background:#fff;
+  color:#4a6b5a;cursor:pointer;font-size:.78rem;font-weight:600;transition:all .2s;
 }
 .hist-btn-del:hover{background:#FDECEA;border-color:#E7A6A0;color:#B42318;}
+.hist-btn-edit{
+  display:inline-flex;align-items:center;gap:5px;padding:7px 14px;
+  border-radius:8px;border:1px solid #b8d4c7;background:#fff;
+  color:#4a6b5a;cursor:pointer;font-size:.78rem;font-weight:600;transition:all .2s;
+}
+.hist-btn-edit:hover{background:#F0F7F3;border-color:#064E3B;color:#064E3B;}
+.hist-btn-dup{
+  display:inline-flex;align-items:center;gap:5px;padding:7px 14px;
+  border-radius:8px;border:1px solid #b8d4c7;background:#fff;
+  color:#4a6b5a;cursor:pointer;font-size:.78rem;font-weight:600;transition:all .2s;
+}
+.hist-btn-dup:hover{background:#F0F7F3;border-color:#064E3B;color:#064E3B;}
+.hist-select{width:18px;height:18px;cursor:pointer;accent-color:#064E3B;flex-shrink:0;}
+.hist-sel-bar{
+  display:none;align-items:center;justify-content:space-between;gap:14px;
+  background:#F0F7F3;border:1px solid #D5E5DE;border-radius:10px;
+  padding:10px 18px;margin-bottom:12px;flex-wrap:wrap;
+}
+.hist-sel-bar.show{display:flex;}
+.hist-sel-count{font-size:.82rem;font-weight:700;color:#003b32;}
+.hist-sel-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.hist-sel-btn{
+  display:inline-flex;align-items:center;gap:5px;padding:6px 14px;
+  border-radius:8px;font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s;
+  border:1px solid #D5E5DE;background:#fff;color:#064E3B;font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+}
+.hist-sel-btn:hover{background:#F0F7F3;border-color:#064E3B;}
+.hist-sel-btn.danger{color:#B42318;border-color:#E7A6A0;}
+.hist-sel-btn.danger:hover{background:#FDECEA;border-color:#B42318;}
+.edit-indicator{
+  display:none;align-items:center;gap:8px;padding:10px 18px;
+  background:#FFF7ED;border:1px solid #FDBA74;border-radius:10px;
+  margin-bottom:16px;font-size:.82rem;font-weight:600;color:#B45309;
+}
+.edit-indicator.show{display:flex;}
+.edit-indicator button{
+  margin-left:auto;padding:5px 14px;border-radius:6px;border:1px solid #FCD34D;
+  background:#fff;color:#B45309;cursor:pointer;font-size:.76rem;font-weight:600;
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+}
+.edit-indicator button:hover{background:#FEF3C7;}
+.draft-toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+  background:#064E3B;color:#fff;padding:14px 24px;border-radius:12px;
+  box-shadow:0 10px 40px rgba(0,0,0,.25);z-index:999;
+  display:none;align-items:center;gap:14px;font-size:.85rem;max-width:520px;
+  font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+}
+.draft-toast.show{display:flex;}
+.draft-toast-btn{
+  padding:7px 18px;border-radius:8px;font-size:.78rem;font-weight:700;
+  cursor:pointer;border:none;font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  white-space:nowrap;
+}
+.draft-toast-btn.yes{background:#fff;color:#064E3B;}
+.draft-toast-btn.no{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);}
 
 .hist-empty-state{text-align:center;padding:48px 20px;}
 .hist-empty-icon{
@@ -533,6 +597,9 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
   font-size:11pt;
   line-height:1.35;
   letter-spacing:0;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
   -webkit-print-color-adjust:exact;
   print-color-adjust:exact;
 }
@@ -593,22 +660,24 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .bp-result{border-left:1px solid #e0e8e3;background:#fff!important;color:#0b4a35;font-size:11.5pt!important;font-weight:900;font-variant-numeric:tabular-nums;}
 .bp-table-note{margin-top:1.5mm;color:#87958d;font-size:7.5pt;font-style:italic;text-align:right;}
 .bp-summary{display:grid;grid-template-columns:1fr 1.35fr;gap:4mm;margin-bottom:5mm;}
-.bp-summary-box{min-height:28mm;padding:4mm 7mm;border-radius:2.5mm;display:flex;flex-direction:column;justify-content:center;}
-.bp-summary-total{border:1px solid #dfe7e2;background:#f4f8f5;}
-.bp-summary-mo{align-items:center;border:1px solid #b8cfc2;background:#fff;color:#0b3d2e;text-align:center;box-shadow:inset 0 0 0 .3mm #eef4f0;}
-.bp-summary-label{color:#6b7a70;font-size:8.5pt;font-weight:900;text-transform:uppercase;}
+.bp-summary-box{min-height:30mm;padding:5mm 7mm;border-radius:3mm;display:flex;flex-direction:column;justify-content:center;border:1px solid #dfe7e2;background:#f4f8f5;}
+.bp-summary-total{align-items:center;text-align:center;background:linear-gradient(180deg,#f8faf9 0%,#eef4f0 100%);border:1.2px solid #d5e5de;}
+.bp-summary-mo{align-items:center;background:#fff;color:#0b3d2e;text-align:center;box-shadow:inset 0 0 0 .3mm #eef4f0;}
+.bp-summary-label{color:#6b7a70;font-size:8pt;font-weight:900;text-transform:uppercase;letter-spacing:.4px;}
 .bp-summary-mo .bp-summary-label{color:#4f675a;}
-.bp-total-value{margin-top:2mm;color:#0b3d2e;font-size:28pt;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;}
-.bp-mo-value{margin-top:1.5mm;font-size:34pt;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;}
+.bp-summary-total .bp-summary-label{color:#4f675a;font-size:9pt;letter-spacing:.8px;}
+.bp-total-value{margin-top:2mm;color:#0b3d2e;font-size:28pt;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.5px;}
+.bp-mo-value{margin-top:1.5mm;font-size:34pt;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:1.5mm;}
+.bp-mo-value span{font-size:34pt;}
 .bp-summary-mo.is-passing .bp-mo-value{color:#087443;}
 .bp-summary-mo.is-failing .bp-mo-value{color:#b42318;}
-.bp-mo-value small{font-size:15pt;}
+.bp-mo-value small{font-size:13pt;font-weight:600;opacity:.7;align-self:baseline;}
 .bp-summary-sub{margin-top:2mm;color:#87958d;font-size:8.5pt;}
 .bp-summary-mo .bp-summary-sub{color:#f2b632;font-weight:800;}
 .bp-mention{display:inline-block;margin-top:2.5mm;padding:1.5mm 5mm;border-radius:99px;font-size:8pt;font-weight:800;letter-spacing:.3px;}
 .bp-mention.mention-pass{background:rgba(8,116,67,.12);color:#087443;}
 .bp-mention.mention-warn{background:rgba(217,154,19,.15);color:#92710a;}
-.bp-mention.mention-fail{background:rgba(180,35,24,.1);color:#b42318;}
+.bp-mention.mention-fail{background:#FDECEA;color:#B42318;}
 .bp-footer{padding-top:3.5mm;border-top:.4mm solid #0b3d2e;display:flex;justify-content:space-between;align-items:flex-end;color:#87958d;font-size:8pt;}
 #bp-filename{color:#0b3d2e;font-size:8pt;font-weight:700;text-align:center;align-self:center;display:none;}
 .bp-footer strong{color:#0b3d2e;}
@@ -1093,12 +1162,14 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
   .result-item.result-mo{border-radius:0 0 12px 12px !important;}
   .actions{display:grid;grid-template-columns:1fr 1fr;width:100%;}
   .actions .btn{width:100%;justify-content:center;}
-  .hist-card{grid-template-columns:1fr;gap:12px;padding:14px;}
+  .hist-card{grid-template-columns:auto 1fr;gap:10px;padding:14px;}
   .hist-card-mo{justify-self:start;min-width:110px;}
   .hist-badge{width:auto;justify-self:start;}
   .hist-btn-pdf{width:auto;justify-self:start;}
-  .hist-actions{justify-self:start;}
+  .hist-actions{justify-self:start;grid-column:1/-1;flex-wrap:wrap;}
   .hist-header{flex-direction:column;align-items:flex-start;}
+  .hist-sel-bar{flex-direction:column;align-items:flex-start;}
+  .hist-sel-actions{width:100%;}
 }
 
 /* Fenêtre native compacte : tout le module reste visible sans défilement. */
@@ -1146,11 +1217,11 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 
 @media print{
   @page{size:A4 portrait;margin:10mm;@top-left{content:none;}@top-center{content:none;}@top-right{content:none;}@bottom-left{content:none;}@bottom-center{content:none;}@bottom-right{content:none;}}
-  html,body{width:auto!important;min-height:0!important;background:#fff!important;}
+  html,body{width:auto!important;min-height:0!important;background:#fff!important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
   body{display:block!important;}
   body>header,body>nav,body>main,body>#toast{display:none!important;}
   #bulletin-print{display:block!important;}
-  .bulletin-sheet{width:100%;margin:0;box-shadow:none;}
+  .bulletin-sheet{width:100%;margin:0;box-shadow:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
 }
 </style>
 </head>
@@ -1388,6 +1459,11 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 ════════════════════════════════════════════ -->
 <div class="page" id="page-mo">
 
+  <div class="edit-indicator" id="edit-indicator">
+    &#9998; Modification du calcul enregistré
+    <button onclick="cancelEdit()">Annuler la modification</button>
+  </div>
+
   <div class="card">
     <div class="section-title">Informations de l'élève</div>
     <div id="mo-eleve-info" style="font-size:0.83rem;color:var(--muted);">Renseignez les MA et les notes BEPC ci-dessous. Les moyennes MA peuvent être transférées depuis l'onglet 01.</div>
@@ -1491,6 +1567,9 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         </div>
       </div>
       <div class="hist-actions-row">
+        <button class="hist-btn-refresh" onclick="loadHistory()" title="Rafraîchir">
+          &#8635; Rafraîchir
+        </button>
         <button class="hist-btn-print" onclick="printAllBulletins()" id="btn-print-all" style="display:none;">
           &#128424; Tout imprimer
         </button>
@@ -1499,12 +1578,26 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         </button>
       </div>
     </div>
+    <div class="hist-sel-bar" id="hist-sel-bar">
+      <div class="hist-sel-count"><span id="hist-sel-count-num">0</span> calcul(s) sélectionné(s)</div>
+      <div class="hist-sel-actions">
+        <button class="hist-sel-btn" onclick="printSelection()" title="Imprimer la sélection">&#128424; Imprimer</button>
+        <button class="hist-sel-btn" onclick="exportSelection()" title="Exporter la sélection en PDF">&#128196; Exporter PDF</button>
+        <button class="hist-sel-btn danger" onclick="deleteSelection()" title="Supprimer la sélection">&#128465; Supprimer</button>
+        <button class="hist-sel-btn" onclick="deselectAll()" title="Tout désélectionner">&#10005; Tout désélectionner</button>
+      </div>
+    </div>
     <div id="hist-list"></div>
   </div>
 </div>
 
 </main>
 <div id="toast"></div>
+<div class="draft-toast" id="draft-toast">
+  <span>&#128196; Une saisie non enregistrée a été retrouvée. Voulez-vous la reprendre ?</span>
+  <button class="draft-toast-btn yes" onclick="restoreDraft()">Reprendre</button>
+  <button class="draft-toast-btn no" onclick="dismissDraft()">Ignorer</button>
+</div>
 
 <!-- BULLETIN A4 DYNAMIQUE -->
 <section id="bulletin-print" aria-hidden="true">
@@ -1572,7 +1665,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         </div>
         <div class="bp-summary-box bp-summary-mo">
           <div class="bp-summary-label">Moyenne d'orientation</div>
-          <div class="bp-mo-value"><span id="bp-mo-rounded">00,00</span> <small>/ 20</small></div>
+          <div class="bp-mo-value"><span id="bp-mo-rounded">00,00</span><small>/ 20</small></div>
           <div class="bp-mention" id="bp-mention"></div>
         </div>
       </div>
@@ -1837,10 +1930,19 @@ function setMention(mo){
 }
 
 function resetMO(){
+  if(!editingId){
+    const draft=loadDraft();
+    if(draft&&(draft.nom||draft.matricule||Object.values(draft.matieres||{}).some(v=>v.mga||v.bepc||v.bepc_ecrit||v.bepc_oral))){
+      if(!confirm('Une saisie non enregistrée existe. Voulez-vous réinitialiser et perdre ce brouillon ?')) return;
+      dismissDraft();
+    }
+  }
+  editingId=null;
+  document.getElementById('edit-indicator').classList.remove('show');
   document.getElementById('mo-nom').value='';
   document.getElementById('mo-matricule').value='';
   document.getElementById('mo-classe').value='';
-  document.getElementById('mo-annee').value='';
+  document.getElementById('mo-annee').value='2025–2026';
   document.getElementById('mo-etablissement').value='';
   document.querySelectorAll('#page-mo .note-input').forEach(el=>el.value='');
   document.querySelectorAll('#mo-tbody .computed-val, #mo-tbody .sum-val').forEach(el=>el.textContent='—');
@@ -1870,15 +1972,93 @@ function updateMOInfo(){
 
 /* ════ HISTORIQUE (SQLite via API) ════ */
 let histData=[];
+let editingId=null;
+let selectedIds=[];
 
-const API='';
+const API='http://127.0.0.1:'+location.port;
 
+/* ── MODE BROUILLON ── */
+function saveDraft(){
+  try{
+    const d={
+      nom:document.getElementById('mo-nom')?.value||'',
+      matricule:document.getElementById('mo-matricule')?.value||'',
+      classe:document.getElementById('mo-classe')?.value||'',
+      annee:document.getElementById('mo-annee')?.value||'',
+      etablissement:document.getElementById('mo-etablissement')?.value||'',
+      tab:document.querySelector('.page.active')?.id||'',
+      matieres:{}
+    };
+    MATIERES.forEach(m=>{
+      const vals={};
+      const mgaEl=document.getElementById(m.id+'_mga');
+      if(mgaEl) vals.mga=mgaEl.value;
+      if(m.anglais){
+        const be=document.getElementById(m.id+'_bepc_e');
+        const bo=document.getElementById(m.id+'_bepc_o');
+        if(be) vals.bepc_ecrit=be.value;
+        if(bo) vals.bepc_oral=bo.value;
+      } else {
+        const b=document.getElementById(m.id+'_bepc');
+        if(b) vals.bepc=b.value;
+      }
+      d.matieres[m.id]=vals;
+    });
+    localStorage.setItem('saphir_draft',JSON.stringify(d));
+  }catch(e){}
+}
+function loadDraft(){
+  try{
+    const raw=localStorage.getItem('saphir_draft');
+    return raw?JSON.parse(raw):null;
+  }catch(e){return null;}
+}
+function restoreDraft(){
+  const d=loadDraft();
+  if(!d){dismissDraft();return;}
+  if(d.nom) document.getElementById('mo-nom').value=d.nom;
+  if(d.matricule) document.getElementById('mo-matricule').value=d.matricule;
+  if(d.classe) document.getElementById('mo-classe').value=d.classe;
+  if(d.annee) document.getElementById('mo-annee').value=d.annee;
+  if(d.etablissement) document.getElementById('mo-etablissement').value=d.etablissement;
+  if(d.matieres){
+    MATIERES.forEach(m=>{
+      const v=d.matieres[m.id]||{};
+      if(v.mga!=null){const el=document.getElementById(m.id+'_mga');if(el) el.value=v.mga;}
+      if(m.anglais){
+        if(v.bepc_ecrit!=null){const el=document.getElementById(m.id+'_bepc_e');if(el) el.value=v.bepc_ecrit;}
+        if(v.bepc_oral!=null){const el=document.getElementById(m.id+'_bepc_o');if(el) el.value=v.bepc_oral;}
+      } else {
+        if(v.bepc!=null){const el=document.getElementById(m.id+'_bepc');if(el) el.value=v.bepc;}
+      }
+    });
+    MATIERES.forEach(m=>calcRowMO(m.id));
+  }
+  if(d.tab){
+    showPage(d.tab==='page-mga'?'mga':d.tab==='page-mo'?'mo':'home');
+  }
+  document.getElementById('draft-toast').classList.remove('show');
+  toast('Brouillon restauré ✔');
+}
+function dismissDraft(){
+  localStorage.removeItem('saphir_draft');
+  document.getElementById('draft-toast').classList.remove('show');
+}
+function checkDraft(){
+  const d=loadDraft();
+  if(!d) return;
+  const hasData=d.nom||d.matricule||Object.values(d.matieres||{}).some(v=>v.mga||v.bepc||v.bepc_ecrit||v.bepc_oral);
+  if(hasData) document.getElementById('draft-toast').classList.add('show');
+}
+
+/* ── HISTORIQUE: LOAD / SAVE / DELETE ── */
 async function loadHistory(){
   try{
     const r=await fetch(API+'/api/eleves');
     if(!r.ok) throw 0;
     histData=await r.json();
   }catch(e){histData=[];}
+  selectedIds=[];
   renderHistory();
 }
 
@@ -1901,45 +2081,183 @@ async function saveToHistory(){
   const etab=(document.getElementById('mo-etablissement').value||document.getElementById('etablissement')?.value||'').trim();
   const matieres={};
   MATIERES.forEach(m=>{
-    const d={mga:parseFloat(document.getElementById(m.id+'_mga')?.value)||null};
-    if(m.anglais){d.bepc_ecrit=parseFloat(document.getElementById(m.id+'_bepc_e')?.value)||null;d.bepc_oral=parseFloat(document.getElementById(m.id+'_bepc_o')?.value)||null;}
-    else{d.bepc=parseFloat(document.getElementById(m.id+'_bepc')?.value)||null;}
+    const d={mga:parseNoteValue(document.getElementById(m.id+'_mga')?.value)};
+    if(m.anglais){d.bepc_ecrit=parseNoteValue(document.getElementById(m.id+'_bepc_e')?.value);d.bepc_oral=parseNoteValue(document.getElementById(m.id+'_bepc_o')?.value);}
+    else{d.bepc=parseNoteValue(document.getElementById(m.id+'_bepc')?.value);}
     matieres[m.id]=d;
   });
+  const payload={nom,matricule,classe,etablissement:etab,annee,total:parseFloat(String(total).replace(',','.'))||0,mo:parseFloat(String(mo).replace(',','.'))||0,mention,matieres};
   try{
-    await fetch(API+'/api/eleves',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({nom,matricule,classe,etablissement:etab,annee,total:parseFloat(total.replace(',','.'))||0,mo:parseFloat(mo.replace(',','.'))||0,mention,matieres})
-    });
+    if(editingId){
+      await fetch(API+'/api/eleves/'+editingId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      toast('Calcul mis à jour avec succès ✔');
+      cancelEdit();
+    } else {
+      await fetch(API+'/api/eleves',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      toast('Enregistré : '+nom);
+    }
+    localStorage.removeItem('saphir_draft');
     await loadHistory();
-    toast('Enregistré : '+nom);
   }catch(e){toast('Erreur lors de l\'enregistrement.',true);}
 }
 
-async function delHistory(id){
+async function supprimerCalculHistorique(id,btn){
+  btn.disabled=true;btn.textContent='Suppression...';
   try{
-    await fetch(API+'/api/eleves/'+id,{method:'DELETE'});
+    const r=await fetch(API+'/api/eleves/'+id,{method:'DELETE',credentials:'same-origin'});
+    if(!r.ok){
+      let msg='Erreur lors de la suppression.';
+      try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}
+      throw new Error(msg);
+    }
+    selectedIds=selectedIds.filter(x=>x!==id);
     await loadHistory();
-  }catch(e){}
+    toast('Calcul supprimé définitivement.');
+  }catch(e){
+    toast(e.message||'Erreur lors de la suppression.',true);
+    btn.disabled=false;btn.innerHTML='&#128465; Supprimer';
+  }
 }
 
-function confirmDelHistory(id){
-  if(!confirm('Supprimer ce calcul ?')) return;
-  delHistory(id);
+function confirmDelHistory(id,btn){
+  if(!confirm('Voulez-vous vraiment supprimer ce calcul ? Cette action est irréversible.')) return;
+  supprimerCalculHistorique(id,btn);
 }
 
 async function clearHistory(){
   try{
-    await fetch(API+'/api/eleves/clear',{method:'DELETE'});
-    await loadHistory();
-    toast('Historique vidé.');
-  }catch(e){}
+    const r=await fetch(API+'/api/eleves/clear',{method:'DELETE',credentials:'same-origin'});
+    if(!r.ok){
+      let msg='Erreur lors de la suppression.';
+      try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}
+      throw new Error(msg);
+    }
+  }catch(e){
+    toast(e.message||'Erreur lors de la suppression.',true);return;
+  }
+  histData=[];selectedIds=[];
+  renderHistory();
+  toast('Historique vidé.');
 }
 
 function confirmClearHistory(){
-  if(!confirm('Voulez-vous vraiment vider tout l\'historique ? Cette action est irréversible.')) return;
+  const msg='Voulez-vous vraiment vider tout l\'historique ?\n\nTous les calculs enregistrés seront supprimés définitivement de la base de données.\nCette action est irréversible.';
+  if(!confirm(msg)) return;
   clearHistory();
 }
 
+/* ── SÉLECTION MULTIPLE ── */
+function toggleSelect(id,cb){
+  if(cb.checked){if(!selectedIds.includes(id)) selectedIds.push(id);}
+  else{selectedIds=selectedIds.filter(x=>x!==id);}
+  updateSelBar();
+}
+function selectAll(){
+  selectedIds=histData.map(h=>h.id);
+  document.querySelectorAll('.hist-select').forEach(cb=>cb.checked=true);
+  updateSelBar();
+}
+function deselectAll(){
+  selectedIds=[];
+  document.querySelectorAll('.hist-select').forEach(cb=>cb.checked=false);
+  updateSelBar();
+}
+function toggleSelectAll(master){
+  if(master.checked){selectAll();}
+  else{deselectAll();}
+}
+function updateSelBar(){
+  const bar=document.getElementById('hist-sel-bar');
+  const num=document.getElementById('hist-sel-count-num');
+  const n=selectedIds.length;
+  if(bar) bar.classList.toggle('show',n>0);
+  if(num) num.textContent=n;
+}
+async function deleteSelection(){
+  if(!selectedIds.length) return;
+  const n=selectedIds.length;
+  if(!confirm('Voulez-vous vraiment supprimer les '+n+' calcul(s) sélectionné(s) ?\nCette action est irréversible.')) return;
+  try{
+    const r=await fetch(API+'/api/eleves/delete-multiple',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({ids:selectedIds})});
+    if(!r.ok){
+      let msg='Erreur lors de la suppression.';
+      try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}
+      throw new Error(msg);
+    }
+    selectedIds=[];
+    await loadHistory();
+    toast(n+' calcul(s) supprimé(s) définitivement.');
+  }catch(e){toast(e.message||'Erreur lors de la suppression.',true);}
+}
+function printSelection(){
+  const items=histData.filter(h=>selectedIds.includes(h.id)&&h.matieres);
+  if(!items.length){toast('Aucun bulletin sélectionné.',true);return;}
+  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+  const pages=items.map(h=>buildBulletinHTML(h)).join('');
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm;}</style></head><body>${pages}</body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),600);
+}
+function exportSelection(){
+  const items=histData.filter(h=>selectedIds.includes(h.id)&&h.matieres);
+  if(!items.length){toast('Aucun bulletin sélectionné.',true);return;}
+  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+  const pages=items.map(h=>buildBulletinHTML(h)).join('');
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm;}</style></head><body>${pages}</body></html>`);
+  win.document.close();
+  setTimeout(()=>win.print(),600);
+}
+
+/* ── MODIFIER / DUPLIQUER ── */
+function editCalc(id){
+  const h=histData.find(x=>x.id===id);
+  if(!h||!h.matieres){toast('Données indisponibles.',true);return;}
+  editingId=id;
+  loadCalcToMO(h);
+  document.getElementById('edit-indicator').classList.add('show');
+  showPage('mo');
+  toast('Modification du calcul enregistré');
+}
+function duplicateCalc(id){
+  const h=histData.find(x=>x.id===id);
+  if(!h||!h.matieres){toast('Données indisponibles.',true);return;}
+  editingId=null;
+  loadCalcToMO(h);
+  document.getElementById('edit-indicator').classList.remove('show');
+  showPage('mo');
+  toast('Calcul dupliqué. Vous pouvez le modifier puis l\'enregistrer comme nouveau calcul.');
+}
+function loadCalcToMO(h){
+  document.getElementById('mo-nom').value=h.nom||'';
+  document.getElementById('mo-matricule').value=h.matricule||'';
+  document.getElementById('mo-classe').value=h.classe||'';
+  document.getElementById('mo-annee').value=h.annee||'';
+  document.getElementById('mo-etablissement').value=h.etablissement||'';
+  document.querySelectorAll('#page-mo .note-input').forEach(el=>el.value='');
+  MATIERES.forEach(m=>{
+    const d=(h.matieres||{})[m.id]||{};
+    if(d.mga!=null&&d.mga!==''){const el=document.getElementById(m.id+'_mga');if(el) el.value=fmtNum(Number(d.mga),2);}
+    if(m.anglais){
+      if(d.bepc_ecrit!=null&&d.bepc_ecrit!==''){const el=document.getElementById(m.id+'_bepc_e');if(el) el.value=fmtNum(Number(d.bepc_ecrit),2);}
+      if(d.bepc_oral!=null&&d.bepc_oral!==''){const el=document.getElementById(m.id+'_bepc_o');if(el) el.value=fmtNum(Number(d.bepc_oral),2);}
+    } else {
+      if(d.bepc!=null&&d.bepc!==''){const el=document.getElementById(m.id+'_bepc');if(el) el.value=fmtNum(Number(d.bepc),2);}
+    }
+    calcRowMO(m.id);
+  });
+  updateMOInfo();
+}
+function cancelEdit(){
+  editingId=null;
+  document.getElementById('edit-indicator').classList.remove('show');
+  resetMO();
+}
+
+/* ── RENDU DES CARTES HISTORIQUE ── */
 function renderHistory(){
   const div=document.getElementById('hist-list');
   const countEl=document.getElementById('hist-count');
@@ -1949,37 +2267,22 @@ function renderHistory(){
   if(btnAll) btnAll.style.display=n>1?'inline-flex':'none';
   if(!n){
     div.innerHTML='<div class="hist-empty-state"><div class="hist-empty-icon">&#128196;</div><div class="hist-empty-text">Aucun calcul enregistré</div><div class="hist-empty-sub">Les calculs sauvegardés apparaîtront ici.</div></div>';
+    selectedIds=[];updateSelBar();
     return;
   }
-  div.innerHTML=histData.map(h=>{
+  div.innerHTML='<div style="margin-bottom:10px;display:flex;align-items:center;gap:8px;"><input type="checkbox" class="hist-select" onchange="toggleSelectAll(this)" title="Tout sélectionner" '+(selectedIds.length===n?'checked':'')+'><span style="font-size:.78rem;color:#60736D;">Tout sélectionner</span></div>'+histData.map(h=>{
     const moVal=h.mo!=null?Number(h.mo):null;
-    const moDisplay=moVal!=null?moVal.toFixed(2).replace('.',',')+' / 20':'—';
-    const mention=h.mention||'—';
+    const moDisplay=moVal!=null?truncate(moVal,2).replace('.',',')+' / 20':'\u2014';
+    const mention=h.mention||'\u2014';
     let badgeClass='hist-badge-none';
     if(mention==='Très bien'||mention==='Bien'||mention==='Félicitations') badgeClass='hist-badge-pass';
     else if(mention==='Passable'||mention==='Assez bien') badgeClass='hist-badge-warn';
     else if(mention.includes('Insuffisant')) badgeClass='hist-badge-fail';
     const dateStr=h.date_calc||h.created_at||'';
-    return `
-    <div class="hist-card">
-      <div class="hist-card-info">
-        <div class="hist-card-name">${h.nom||'—'}</div>
-        <div class="hist-card-meta">${h.matricule||'—'} &middot; ${h.classe||'—'} &middot; ${h.etablissement||'—'} &middot; ${dateStr}</div>
-      </div>
-      <div class="hist-card-mo">
-        <div class="mo-value">${moDisplay}</div>
-        <div class="mo-label">Moyenne</div>
-      </div>
-      <span class="hist-badge ${badgeClass}">${mention}</span>
-      <div class="hist-actions">
-        <button class="hist-btn-pdf" onclick="downloadBulletinPDF(${h.id})" title="Télécharger le bulletin en PDF">
-          <svg class="hist-btn-pdf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Télécharger
-        </button>
-        <button class="hist-btn-del" onclick="confirmDelHistory(${h.id})" title="Supprimer ce calcul">🗑</button>
-      </div>
-    </div>`;
+    const checked=selectedIds.includes(h.id)?'checked':'';
+    return '<div class="hist-card"><input type="checkbox" class="hist-select" '+checked+' onchange="toggleSelect('+h.id+',this)" title="Sélectionner"><div class="hist-card-info"><div class="hist-card-name" title="'+(h.nom||'\u2014')+'">'+(h.nom||'\u2014')+'</div><div class="hist-card-meta" title="'+(h.matricule||'\u2014')+' · '+(h.classe||'\u2014')+' · '+(h.etablissement||'\u2014')+' · '+dateStr+'">'+(h.matricule||'\u2014')+' &middot; '+(h.classe||'\u2014')+' &middot; '+(h.etablissement||'\u2014')+' &middot; '+dateStr+'</div></div><div class="hist-card-mo"><div class="mo-value">'+moDisplay+'</div><div class="mo-label">Moyenne</div></div><span class="hist-badge '+badgeClass+'">'+mention+'</span><div class="hist-actions"><button class="hist-btn-edit" onclick="editCalc('+h.id+')" title="Modifier ce calcul">&#9998; Modifier</button><button class="hist-btn-dup" onclick="duplicateCalc('+h.id+')" title="Dupliquer ce calcul">&#128203; Dupliquer</button><button class="hist-btn-pdf" onclick="downloadBulletinPDF('+h.id+')" title="Télécharger le bulletin en PDF"><svg class="hist-btn-pdf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> T\u00e9l\u00e9charger</button><button class="hist-btn-del" onclick="confirmDelHistory('+h.id+',this)" title="Supprimer ce calcul">&#128465; Supprimer</button></div></div>';
   }).join('');
+  updateSelBar();
 }
 
 /* ════ TÉLÉCHARGEMENT PDF DEPUIS HISTORIQUE ════ */
@@ -2022,35 +2325,35 @@ function buildBulletinHTML(h){
   const rows=MATIERES.map(m=>{
     const d=(h.matieres||{})[m.id]||{};
     const mgaVal=d.mga!=null?d.mga:null;
-    const mga=mgaVal!=null?Number(mgaVal).toFixed(3).replace('.',',').replace(/,?0+$/,''):'—';
+    const mga=mgaVal!=null?fmtNum(Number(mgaVal),2):'—';
     let bepc,bepcDisplay,bepcSum;
     if(m.anglais){
       const ecrit=d.bepc_ecrit!=null?Number(d.bepc_ecrit):null;
       const oral=d.bepc_oral!=null?Number(d.bepc_oral):null;
       bepc=ecrit!=null&&oral!=null?(ecrit+oral)/2:0;
-      const ecritS=ecrit!=null?ecrit.toFixed(3).replace('.',',').replace(/,?0+$/,''):'—';
-      const oralS=oral!=null?oral.toFixed(3).replace('.',',').replace(/,?0+$/,''):'—';
+      const ecritS=ecrit!=null?fmtNum(ecrit,2):'—';
+      const oralS=oral!=null?fmtNum(oral,2):'—';
       bepcDisplay=`<div class="bp-dual"><span class="bp-dual-item">${ecritS}<small>Écrit</small></span><span class="bp-dual-link"></span><span class="bp-dual-item">${oralS}<small>Oral</small></span></div>`;
     }else{
       const b=d.bepc!=null?Number(d.bepc):null;
       bepc=b!=null?b:0;
-      bepcDisplay=`<span class="bp-pill bp-pill-bepc">${b!=null?b.toFixed(3).replace('.',',').replace(/,?0+$/,''):'—'}</span>`;
+      bepcDisplay=`<span class="bp-pill bp-pill-bepc">${b!=null?fmtNum(b,2):'—'}</span>`;
     }
     const sum=mgaVal!=null?Number(mgaVal)+bepc:bepc;
     const prod=sum*m.coef;
     totalWeighted+=prod;
-    const sumS=sum?sum.toFixed(2).replace('.',','):'—';
-    const prodS=prod?prod.toFixed(2).replace('.',','):'—';
+    const sumS=sum?fmtNum(sum,2):'—';
+    const prodS=prod?fmtNum(prod,2):'—';
     return `<tr><td class="bp-matiere">${m.label}</td><td><span class="bp-pill">${mga}</span></td><td>${bepcDisplay}</td><td class="bp-sum">${sumS}</td><td><span class="bp-coef">${m.coef}</span></td><td class="bp-result">${prodS}</td></tr>`;
   }).join('');
   const mo=totalWeighted/(2*TOTAL_COEF);
   const moDisplay=fmtMO(mo,2);
-  const totalDisplay=totalWeighted.toFixed(2).replace('.',',');
+  const totalDisplay=fmtNum(totalWeighted,2);
   const moClass=mo>=10?'is-passing':'is-failing';
   let mention='',mCls='';
-  if(mo>=16){mention='Très bien';mCls='mention-pass';}
-  else if(mo>=14){mention='Bien';mCls='mention-pass';}
-  else if(mo>=12){mention='Assez bien';mCls='mention-warn';}
+  if(mo>=16){mention='Félicitations';mCls='mention-pass';}
+  else if(mo>=14){mention='Très bien';mCls='mention-pass';}
+  else if(mo>=12){mention='Bien';mCls='mention-pass';}
   else if(mo>=10){mention='Passable';mCls='mention-warn';}
   else if(mo>=8){mention='Insuffisant';mCls='mention-fail';}
   else if(mo>0){mention='Très insuffisant';mCls='mention-fail';}
@@ -2067,7 +2370,7 @@ function buildBulletinHTML(h){
 <div class="bp-table-wrap"><table class="bp-grades"><colgroup><col><col><col><col><col><col></colgroup><thead><tr><th>Matière</th><th>MA</th><th>Note BEPC</th><th>MA + BEPC</th><th>Coeff.</th><th>Total pondéré</th></tr></thead><tbody>${rows}</tbody></table></div>
 <div class="bp-table-note">Total pondéré = (MA + Note BEPC) × Coefficient</div>
 <div class="bp-section-title"><span class="bp-section-num">3</span><span>Synthèse</span><span class="bp-section-line"></span></div>
-<div class="bp-summary"><div class="bp-summary-box bp-summary-total"><div class="bp-summary-label">Total général pondéré</div><div class="bp-total-value">${totalDisplay}</div><div class="bp-summary-sub"></div></div><div class="bp-summary-box bp-summary-mo ${moClass}"><div class="bp-summary-label">Moyenne d'orientation</div><div class="bp-mo-value"><span>${moDisplay}</span> <small>/ 20</small></div><div class="bp-mention ${mCls}">${mention}</div></div></div>
+<div class="bp-summary"><div class="bp-summary-box bp-summary-total"><div class="bp-summary-label">Total général pondéré</div><div class="bp-total-value">${totalDisplay}</div><div class="bp-summary-sub"></div></div><div class="bp-summary-box bp-summary-mo ${moClass}"><div class="bp-summary-label">Moyenne d'orientation</div><div class="bp-mo-value"><span>${moDisplay}</span><small>/ 20</small></div><div class="bp-mention ${mCls}">${mention}</div></div></div>
 </div>
 <footer class="bp-footer"><div>Édité via <strong>SAPHIR Pro</strong></div><div></div><div class="bp-footer-right"><div class="bp-footer-date">Document généré le <span>${today}</span></div></div></footer>
 </article>`;
@@ -2084,7 +2387,8 @@ async function printAllBulletins(){
 <title>Bulletins - SAPHIR Pro</title>
 ${styles}
 <style>
-  body{margin:0;padding:0;background:#fff;}
+  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+  body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
   .bulletin-sheet{page-break-after:always;margin:0;padding:0;}
   .bulletin-sheet:last-child{page-break-after:auto;}
   @page{size:A4 portrait;margin:8mm 10mm;}
@@ -2102,9 +2406,9 @@ function bulletinField(id,fallback='-'){
 
 function bulletinEntry(id){
   const raw=document.getElementById(id)?.value;
-  const value=parseFloat(raw);
-  if(!Number.isFinite(value)) return '—';
-  return value.toFixed(3).replace('.',',').replace(/,?0+$/,'');
+  const value=parseNoteValue(raw);
+  if(!Number.isFinite(value)||value===0) return '0,00';
+  return fmtNum(value,2);
 }
 
 function bulletinInitials(name){
@@ -2158,9 +2462,9 @@ function buildBulletin(){
 
   const mentionEl=document.getElementById('bp-mention');
   let lbl='',cls='';
-  if(moValue>=16){lbl='Très bien';cls='mention-pass';}
-  else if(moValue>=14){lbl='Bien';cls='mention-pass';}
-  else if(moValue>=12){lbl='Assez bien';cls='mention-warn';}
+  if(moValue>=16){lbl='Félicitations';cls='mention-pass';}
+  else if(moValue>=14){lbl='Très bien';cls='mention-pass';}
+  else if(moValue>=12){lbl='Bien';cls='mention-pass';}
   else if(moValue>=10){lbl='Passable';cls='mention-warn';}
   else if(moValue>=8){lbl='Insuffisant';cls='mention-fail';}
   else if(moValue>0){lbl='Très insuffisant';cls='mention-fail';}
@@ -2235,9 +2539,11 @@ function getVal(id){
   const value=el?parseNoteValue(el.value):NaN;
   return Number.isFinite(value)?value:0;
 }
-function fmtNum(n,dec){return n.toFixed(dec).replace('.',',');}
+function truncate(n,dec){const f=Math.pow(10,dec);const v=Math.floor(n*f+1e-9)/f;const s=String(v);const i=s.indexOf('.');if(i===-1)return s+'.'+'0'.repeat(dec);return s+(s.length-i-1<dec?'0'.repeat(dec-(s.length-i-1)):'');}
+function fmtNum(n,dec){return truncate(n,dec).replace('.',',');}
 function fmtMO(n,dec){
-  const [integer,decimal]=n.toFixed(dec).split('.');
+  const t=truncate(n,dec);
+  const [integer,decimal]=t.split('.');
   return `${integer},${decimal}`;
 }
 function exportPDF(){
@@ -2302,8 +2608,10 @@ updateMGASummary();
 buildMOTable();
 document.querySelectorAll('#page-mo .field-group input').forEach(el=>el.addEventListener('input',updateMOInfo));
 document.querySelectorAll('input').forEach(el=>{el.setAttribute('autocomplete','off');el.setAttribute('data-lpignore','true');});
+document.querySelectorAll('#page-mo .note-input, #page-mo .field-group input').forEach(el=>el.addEventListener('input',saveDraft));
 applyRole();
 loadHistory();
+checkDraft();
 window.addEventListener('beforeprint',buildBulletin);
 if(new URLSearchParams(window.location.search).get('bulletin-preview')==='demo') loadBulletinPreview();
 </script>

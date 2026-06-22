@@ -35,6 +35,16 @@ export function saveEleve(nom, matricule, classe, etablissement, annee, total, m
   return Promise.resolve({ eleve, resultat });
 }
 
+export function updateEleve(id, nom, matricule, classe, etablissement, annee, total, mo, mention, matieres) {
+  const all = loadAll();
+  const idx = all.findIndex(e => e.id === id);
+  if (idx === -1) return Promise.resolve(null);
+  const now = new Date().toISOString().slice(0, 10);
+  all[idx] = { ...all[idx], nom, matricule, classe, etablissement, annee, total, mo, mention, matieres, date_calc: now };
+  saveAll(all);
+  return Promise.resolve(all[idx]);
+}
+
 export function listEleves() {
   const all = loadAll();
   all.sort((a, b) => b.id - a.id);
@@ -52,6 +62,14 @@ export function deleteEleve(id) {
   all = all.filter(e => e.id !== id);
   saveAll(all);
   return Promise.resolve(true);
+}
+
+export function deleteMultipleEleves(ids) {
+  let all = loadAll();
+  const idSet = new Set(ids);
+  all = all.filter(e => !idSet.has(e.id));
+  saveAll(all);
+  return Promise.resolve(ids.length);
 }
 
 export function clearAll() {
