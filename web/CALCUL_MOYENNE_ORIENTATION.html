@@ -2075,9 +2075,9 @@ function buildBulletinHTML(h){
   const totalDisplay=fmtNum(totalWeighted,2);
   const moClass=mo>=10?'is-passing':'is-failing';
   let mention='',mCls='';
-  if(mo>=16){mention='Très bien';mCls='mention-pass';}
-  else if(mo>=14){mention='Bien';mCls='mention-pass';}
-  else if(mo>=12){mention='Assez bien';mCls='mention-warn';}
+  if(mo>=16){mention='Félicitations';mCls='mention-pass';}
+  else if(mo>=14){mention='Très bien';mCls='mention-pass';}
+  else if(mo>=12){mention='Bien';mCls='mention-pass';}
   else if(mo>=10){mention='Passable';mCls='mention-warn';}
   else if(mo>=8){mention='Insuffisant';mCls='mention-fail';}
   else if(mo>0){mention='Très insuffisant';mCls='mention-fail';}
@@ -2130,8 +2130,8 @@ function bulletinField(id,fallback='-'){
 
 function bulletinEntry(id){
   const raw=document.getElementById(id)?.value;
-  const value=parseFloat(raw);
-  if(!Number.isFinite(value)) return '—';
+  const value=parseNoteValue(raw);
+  if(!Number.isFinite(value)||value===0) return '0,00';
   return fmtNum(value,2);
 }
 
@@ -2186,9 +2186,9 @@ function buildBulletin(){
 
   const mentionEl=document.getElementById('bp-mention');
   let lbl='',cls='';
-  if(moValue>=16){lbl='Très bien';cls='mention-pass';}
-  else if(moValue>=14){lbl='Bien';cls='mention-pass';}
-  else if(moValue>=12){lbl='Assez bien';cls='mention-warn';}
+  if(moValue>=16){lbl='Félicitations';cls='mention-pass';}
+  else if(moValue>=14){lbl='Très bien';cls='mention-pass';}
+  else if(moValue>=12){lbl='Bien';cls='mention-pass';}
   else if(moValue>=10){lbl='Passable';cls='mention-warn';}
   else if(moValue>=8){lbl='Insuffisant';cls='mention-fail';}
   else if(moValue>0){lbl='Très insuffisant';cls='mention-fail';}
