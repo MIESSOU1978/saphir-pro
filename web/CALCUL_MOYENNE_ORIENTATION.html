@@ -2046,13 +2046,13 @@ function buildBulletinHTML(h){
     const sum=mgaVal!=null?Number(mgaVal)+bepc:bepc;
     const prod=sum*m.coef;
     totalWeighted+=prod;
-    const sumS=sum?truncate(sum,2).replace('.',','):'—';
-    const prodS=prod?truncate(prod,2).replace('.',','):'—';
+    const sumS=sum?fmtNum(sum,2):'—';
+    const prodS=prod?fmtNum(prod,2):'—';
     return `<tr><td class="bp-matiere">${m.label}</td><td><span class="bp-pill">${mga}</span></td><td>${bepcDisplay}</td><td class="bp-sum">${sumS}</td><td><span class="bp-coef">${m.coef}</span></td><td class="bp-result">${prodS}</td></tr>`;
   }).join('');
   const mo=totalWeighted/(2*TOTAL_COEF);
   const moDisplay=fmtMO(mo,2);
-  const totalDisplay=truncate(totalWeighted,2).replace('.',',');
+  const totalDisplay=fmtNum(totalWeighted,2);
   const moClass=mo>=10?'is-passing':'is-failing';
   let mention='',mCls='';
   if(mo>=16){mention='Très bien';mCls='mention-pass';}
