@@ -2029,30 +2029,30 @@ function buildBulletinHTML(h){
   const rows=MATIERES.map(m=>{
     const d=(h.matieres||{})[m.id]||{};
     const mgaVal=d.mga!=null?d.mga:null;
-    const mga=mgaVal!=null?Number(mgaVal).toFixed(3).replace('.',',').replace(/,?0+$/,''):'—';
+    const mga=mgaVal!=null?truncate(Number(mgaVal),3).replace('.',',').replace(/,?0+$/,''):'—';
     let bepc,bepcDisplay,bepcSum;
     if(m.anglais){
       const ecrit=d.bepc_ecrit!=null?Number(d.bepc_ecrit):null;
       const oral=d.bepc_oral!=null?Number(d.bepc_oral):null;
       bepc=ecrit!=null&&oral!=null?(ecrit+oral)/2:0;
-      const ecritS=ecrit!=null?ecrit.toFixed(3).replace('.',',').replace(/,?0+$/,''):'—';
-      const oralS=oral!=null?oral.toFixed(3).replace('.',',').replace(/,?0+$/,''):'—';
+      const ecritS=ecrit!=null?truncate(ecrit,3).replace('.',',').replace(/,?0+$/,''):'—';
+      const oralS=oral!=null?truncate(oral,3).replace('.',',').replace(/,?0+$/,''):'—';
       bepcDisplay=`<div class="bp-dual"><span class="bp-dual-item">${ecritS}<small>Écrit</small></span><span class="bp-dual-link"></span><span class="bp-dual-item">${oralS}<small>Oral</small></span></div>`;
     }else{
       const b=d.bepc!=null?Number(d.bepc):null;
       bepc=b!=null?b:0;
-      bepcDisplay=`<span class="bp-pill bp-pill-bepc">${b!=null?b.toFixed(3).replace('.',',').replace(/,?0+$/,''):'—'}</span>`;
+      bepcDisplay=`<span class="bp-pill bp-pill-bepc">${b!=null?truncate(b,3).replace('.',',').replace(/,?0+$/,''):'—'}</span>`;
     }
     const sum=mgaVal!=null?Number(mgaVal)+bepc:bepc;
     const prod=sum*m.coef;
     totalWeighted+=prod;
-    const sumS=sum?sum.toFixed(2).replace('.',','):'—';
-    const prodS=prod?prod.toFixed(2).replace('.',','):'—';
+    const sumS=sum?truncate(sum,2).replace('.',','):'—';
+    const prodS=prod?truncate(prod,2).replace('.',','):'—';
     return `<tr><td class="bp-matiere">${m.label}</td><td><span class="bp-pill">${mga}</span></td><td>${bepcDisplay}</td><td class="bp-sum">${sumS}</td><td><span class="bp-coef">${m.coef}</span></td><td class="bp-result">${prodS}</td></tr>`;
   }).join('');
   const mo=totalWeighted/(2*TOTAL_COEF);
   const moDisplay=fmtMO(mo,2);
-  const totalDisplay=totalWeighted.toFixed(2).replace('.',',');
+  const totalDisplay=truncate(totalWeighted,2).replace('.',',');
   const moClass=mo>=10?'is-passing':'is-failing';
   let mention='',mCls='';
   if(mo>=16){mention='Très bien';mCls='mention-pass';}
@@ -2112,7 +2112,7 @@ function bulletinEntry(id){
   const raw=document.getElementById(id)?.value;
   const value=parseFloat(raw);
   if(!Number.isFinite(value)) return '—';
-  return value.toFixed(3).replace('.',',').replace(/,?0+$/,'');
+  return truncate(value,3).replace('.',',').replace(/,?0+$/,'');
 }
 
 function bulletinInitials(name){
