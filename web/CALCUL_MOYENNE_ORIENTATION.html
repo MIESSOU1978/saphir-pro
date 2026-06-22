@@ -489,9 +489,9 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-btn-pdf:hover{background:#0d7a56;box-shadow:0 2px 8px rgba(6,78,59,.2);}
 .hist-btn-pdf-icon{font-size:.82rem;color:#fff;}
 .hist-btn-del{
-  display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;
+  display:inline-flex;align-items:center;gap:5px;padding:6px 14px;
   border-radius:8px;border:1px solid #e5ece8;background:transparent;
-  color:#9fb0a6;cursor:pointer;font-size:.85rem;transition:all .2s;
+  color:#9fb0a6;cursor:pointer;font-size:.78rem;font-weight:600;transition:all .2s;
 }
 .hist-btn-del:hover{background:#FDECEA;border-color:#E7A6A0;color:#B42318;}
 
@@ -1986,7 +1986,7 @@ function renderHistory(){
           <svg class="hist-btn-pdf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Télécharger
         </button>
-        <button class="hist-btn-del" onclick="confirmDelHistory(${h.id})" title="Supprimer ce calcul">🗑</button>
+        <button class="hist-btn-del" onclick="confirmDelHistory(${h.id})" title="Supprimer ce calcul">&#128465; Supprimer</button>
       </div>
     </div>`;
   }).join('');
