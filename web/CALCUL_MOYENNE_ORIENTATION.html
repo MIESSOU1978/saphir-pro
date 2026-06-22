@@ -424,7 +424,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 }
 .hist-title{font-size:.95rem;font-weight:700;color:#003b32;letter-spacing:.2px;}
 .hist-subtitle{font-size:.74rem;color:#60736d;margin-top:2px;}
-.hist-btn-print,.hist-btn-clear{
+.hist-btn-print,.hist-btn-clear,.hist-btn-refresh{
   display:inline-flex;align-items:center;gap:6px;
   padding:8px 18px;border-radius:8px;
   font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;
@@ -437,6 +437,12 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-btn-print:hover{
   background:#053d2e;box-shadow:0 3px 10px rgba(6,78,59,.25);
 }
+.hist-btn-refresh{
+  background:#fff;color:#064E3B;border:1px solid #a3c4b5;
+}
+.hist-btn-refresh:hover{
+  background:#F4FAF7;border-color:#064E3B;color:#053d2e;box-shadow:0 2px 8px rgba(6,78,59,.1);
+}
 .hist-btn-clear{
   background:#FFF8F6;color:#B42318;border:1px solid #E7A6A0;
 }
@@ -447,11 +453,11 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 
 .hist-card{
   background:#fff;border:1px solid #e5ece8;border-radius:12px;
-  padding:16px 18px;margin-bottom:10px;transition:all .2s;
+  padding:16px 18px;margin-bottom:10px;transition:all .2s ease;
   display:grid;grid-template-columns:1fr 155px 150px auto;align-items:center;gap:18px;
 }
 .hist-card:last-child{margin-bottom:0;}
-.hist-card:hover{border-color:#a3c4b5;box-shadow:0 3px 14px rgba(6,78,59,.09);background:#f6faf8;}
+.hist-card:hover{border-color:#b8d4c7;box-shadow:0 4px 16px rgba(6,78,59,.1);transform:translateY(-1px);}
 
 .hist-card-info{min-width:0;}
 .hist-card-name{font-size:.9rem;font-weight:700;color:#003b32;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -489,9 +495,9 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-btn-pdf:hover{background:#0d7a56;box-shadow:0 2px 8px rgba(6,78,59,.2);}
 .hist-btn-pdf-icon{font-size:.82rem;color:#fff;}
 .hist-btn-del{
-  display:inline-flex;align-items:center;gap:5px;padding:6px 14px;
-  border-radius:8px;border:1px solid #e5ece8;background:transparent;
-  color:#9fb0a6;cursor:pointer;font-size:.78rem;font-weight:600;transition:all .2s;
+  display:inline-flex;align-items:center;gap:5px;padding:7px 14px;
+  border-radius:8px;border:1px solid #b8d4c7;background:#fff;
+  color:#4a6b5a;cursor:pointer;font-size:.78rem;font-weight:600;transition:all .2s;
 }
 .hist-btn-del:hover{background:#FDECEA;border-color:#E7A6A0;color:#B42318;}
 
@@ -1497,7 +1503,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         </div>
       </div>
       <div class="hist-actions-row">
-        <button class="hist-btn-clear" onclick="loadHistory()" title="Rafraîchir">
+        <button class="hist-btn-refresh" onclick="loadHistory()" title="Rafraîchir">
           &#8635; Rafraîchir
         </button>
         <button class="hist-btn-print" onclick="printAllBulletins()" id="btn-print-all" style="display:none;">
@@ -1991,8 +1997,8 @@ function renderHistory(){
     return `
     <div class="hist-card">
       <div class="hist-card-info">
-        <div class="hist-card-name">${h.nom||'—'}</div>
-        <div class="hist-card-meta">${h.matricule||'—'} &middot; ${h.classe||'—'} &middot; ${h.etablissement||'—'} &middot; ${dateStr}</div>
+        <div class="hist-card-name" title="${h.nom||'—'}">${h.nom||'—'}</div>
+        <div class="hist-card-meta" title="${h.matricule||'—'} · ${h.classe||'—'} · ${h.etablissement||'—'} · ${dateStr}">${h.matricule||'—'} &middot; ${h.classe||'—'} &middot; ${h.etablissement||'—'} &middot; ${dateStr}</div>
       </div>
       <div class="hist-card-mo">
         <div class="mo-value">${moDisplay}</div>
