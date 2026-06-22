@@ -2243,7 +2243,7 @@ function getVal(id){
   const value=el?parseNoteValue(el.value):NaN;
   return Number.isFinite(value)?value:0;
 }
-function truncate(n,dec){const f=Math.pow(10,dec);return String(Math.floor(n*f+1e-9)/f);}
+function truncate(n,dec){const f=Math.pow(10,dec);const v=Math.floor(n*f+1e-9)/f;const s=String(v);const i=s.indexOf('.');if(i===-1)return s+'.'+'0'.repeat(dec);return s+(s.length-i-1<dec?'0'.repeat(dec-(s.length-i-1)):'');}
 function fmtNum(n,dec){return truncate(n,dec).replace('.',',');}
 function fmtMO(n,dec){
   const t=truncate(n,dec);
