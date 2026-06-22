@@ -295,14 +295,15 @@ def get_eleve(eleve_id: int) -> dict[str, Any] | None:
 
 def delete_eleve(eleve_id: int) -> bool:
     if _turso_enabled():
+        _turso_exec_write("DELETE FROM resultats WHERE eleve_id=?", [eleve_id])
         _turso_exec_write("DELETE FROM eleves WHERE id=?", [eleve_id])
         return True
     conn = _connect()
+    conn.execute("DELETE FROM resultats WHERE eleve_id=?", (eleve_id,))
     conn.execute("DELETE FROM eleves WHERE id=?", (eleve_id,))
     conn.commit()
-    deleted = conn.total_changes > 0
     conn.close()
-    return deleted
+    return True
 
 
 def clear_all() -> int:

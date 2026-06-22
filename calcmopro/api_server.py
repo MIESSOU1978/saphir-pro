@@ -272,7 +272,10 @@ class _Handler(BaseHTTPRequestHandler):
         if path == "/api/eleves/clear":
             if role != "admin":
                 return self._json({"error": "Accès refusé"}, 403)
-            db.clear_all()
+            try:
+                db.clear_all()
+            except Exception as exc:
+                return self._json({"error": str(exc)}, 500)
             return self._json({"ok": True})
 
         if path.startswith("/api/eleves/"):
@@ -282,7 +285,10 @@ class _Handler(BaseHTTPRequestHandler):
                 eid = int(path.split("/")[-1])
             except ValueError:
                 return self._json({"error": "id invalide"}, 400)
-            db.delete_eleve(eid)
+            try:
+                db.delete_eleve(eid)
+            except Exception as exc:
+                return self._json({"error": str(exc)}, 500)
             return self._json({"ok": True})
 
         self.send_error(404)

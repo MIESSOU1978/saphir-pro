@@ -1926,13 +1926,17 @@ async function saveToHistory(){
 async function supprimerCalculHistorique(id,btn){
   btn.disabled=true;btn.textContent='Suppression...';
   try{
-    const r=await fetch(API+'/api/eleves/'+id,{method:'DELETE'});
-    if(!r.ok) throw 0;
+    const r=await fetch(API+'/api/eleves/'+id,{method:'DELETE',credentials:'same-origin'});
+    if(!r.ok){
+      let msg='Erreur lors de la suppression du calcul.';
+      try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}
+      throw new Error(msg);
+    }
     histData=histData.filter(h=>h.id!==id);
     renderHistory();
     toast('Calcul supprimé avec succès.');
   }catch(e){
-    toast('Erreur lors de la suppression du calcul.',true);
+    toast(e.message||'Erreur lors de la suppression du calcul.',true);
     btn.disabled=false;btn.innerHTML='&#128465; Supprimer';
   }
 }
@@ -1944,9 +1948,15 @@ function confirmDelHistory(id,btn){
 
 async function clearHistory(){
   try{
-    const r=await fetch(API+'/api/eleves/clear',{method:'DELETE'});
-    if(!r.ok) throw 0;
-  }catch(e){}
+    const r=await fetch(API+'/api/eleves/clear',{method:'DELETE',credentials:'same-origin'});
+    if(!r.ok){
+      let msg='Erreur lors de la suppression.';
+      try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}
+      throw new Error(msg);
+    }
+  }catch(e){
+    toast(e.message||'Erreur lors de la suppression.',true);return;
+  }
   histData=[];
   renderHistory();
   toast('Historique vidé.');
