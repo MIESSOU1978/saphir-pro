@@ -90,7 +90,7 @@ def _turso_exec_write(sql: str, args: list | None = None) -> int:
 
 
 def _turso_exec_insert(sql: str, args: list | None = None) -> int:
-    """Execute INSERT via Turso and return last_insert_rowid."""
+    """Execute INSERT via Turso and return last_insert_rowid using SELECT."""
     url = f"https://{_TURSO_URL}/v2/pipeline"
     stmt = {"sql": sql}
     if args:
@@ -98,6 +98,7 @@ def _turso_exec_insert(sql: str, args: list | None = None) -> int:
     payload = json.dumps({
         "requests": [
             {"type": "execute", "stmt": stmt},
+            {"type": "execute", "stmt": {"sql": "SELECT last_insert_rowid() as id"}},
             {"type": "close"},
         ]
     }).encode()
@@ -112,9 +113,12 @@ def _turso_exec_insert(sql: str, args: list | None = None) -> int:
         return 0
 
     results = data.get("results", [])
-    if results and results[0].get("type") == "ok":
-        resp_data = results[0].get("response", {})
-        return resp_data.get("result", {}).get("last_insert_rowid", 0)
+    if len(results) >= 2 and results[1].get("type") == "ok":
+        resp_data = results[1].get("response", {})
+        result = resp_data.get("result", {})
+        rows = result.get("rows", [])
+        if rows and rows[0]:
+            return rows[0][0]
     return 0
 
 

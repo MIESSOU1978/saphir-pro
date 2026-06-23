@@ -2103,14 +2103,19 @@ async function saveToHistory(){
   });
   const payload={nom,matricule,classe,etablissement:etab,annee,total:parseFloat(String(total).replace(',','.'))||0,mo:parseFloat(String(mo).replace(',','.'))||0,mention,matieres};
   try{
+    let r;
     if(editingId){
-      await fetch(API+'/api/eleves/'+editingId,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-      toast('Calcul mis à jour avec succès ✔');
-      cancelEdit();
+      r=await fetch(API+'/api/eleves/'+editingId,{method:'PUT',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify(payload)});
     } else {
-      await fetch(API+'/api/eleves',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-      toast('Enregistré : '+nom);
+      r=await fetch(API+'/api/eleves',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify(payload)});
     }
+    if(!r.ok){
+      const err=await r.json().catch(()=>({}));
+      if(r.status===401||r.status===302){toast('Session expirée. Reconnectez-vous.',true);return;}
+      toast(err.error||'Erreur serveur ('+r.status+')',true);return;
+    }
+    if(editingId){toast('Calcul mis à jour avec succès ✔');cancelEdit();}
+    else{toast('Enregistré : '+nom);}
     localStorage.removeItem('saphir_draft');
     await loadHistory();
   }catch(e){toast('Erreur lors de l\'enregistrement.',true);}
