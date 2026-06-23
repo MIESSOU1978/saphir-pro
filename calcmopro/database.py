@@ -113,18 +113,12 @@ def _turso_exec_insert(sql: str, args: list | None = None) -> int:
         return 0
 
     results = data.get("results", [])
-    print(f"[Turso Debug] insert results count={len(results)}")
-    for i, r in enumerate(results):
-        print(f"[Turso Debug] result[{i}]: type={r.get('type')} response_type={r.get('response', {}).get('type', 'N/A')}")
     if len(results) >= 2 and results[1].get("type") == "ok":
         resp_data = results[1].get("response", {})
         result = resp_data.get("result", {})
         rows = result.get("rows", [])
         if rows and rows[0]:
-            rowid = rows[0][0]
-            print(f"[Turso Debug] last_insert_rowid={rowid}")
-            return rowid
-    print(f"[Turso Debug] insert failed, returning 0")
+            return rows[0][0]
     return 0
 
 
@@ -196,14 +190,12 @@ def save_eleve(nom: str, matricule: str = "", classe: str = "",
                total: float = 0, mo: float = 0, mention: str = "",
                matieres: dict | None = None) -> dict[str, Any]:
     matieres_json = json.dumps(matieres or {}, ensure_ascii=False)
-    print(f"[DB] save_eleve turso={_turso_enabled()} nom={nom}")
 
     if _turso_enabled():
         eid = _turso_exec_insert(
             "INSERT INTO eleves (nom, matricule, classe, etablissement, annee) VALUES (?, ?, ?, ?, ?)",
             [nom, matricule, classe, etablissement, annee],
         )
-        print(f"[DB] save_eleve eid={eid}")
         _turso_exec_write(
             "INSERT INTO resultats (eleve_id, total, mo, mention, matieres) VALUES (?, ?, ?, ?, ?)",
             [eid, total, mo, mention, matieres_json],
