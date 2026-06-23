@@ -662,7 +662,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .bp-summary{display:grid;grid-template-columns:1fr 1.35fr;gap:4mm;margin-bottom:5mm;}
 .bp-summary-box{min-height:30mm;padding:5mm 7mm;border-radius:3mm;display:flex;flex-direction:column;justify-content:center;border:1px solid #dfe7e2;background:#f4f8f5;}
 .bp-summary-total{align-items:center;text-align:center;background:linear-gradient(180deg,#f8faf9 0%,#eef4f0 100%);border:1.2px solid #d5e5de;}
-.bp-summary-mo{align-items:center;background:#fff;color:#0b3d2e;text-align:center;box-shadow:inset 0 0 0 .3mm #eef4f0;}
+.bp-summary-mo{align-items:center;background:linear-gradient(180deg,#f6f9f5 0%,#eaf3eb 100%);color:#0b3d2e;text-align:center;border:1.2px solid #d5e5de;}
 .bp-summary-label{color:#6b7a70;font-size:8pt;font-weight:900;text-transform:uppercase;letter-spacing:.4px;}
 .bp-summary-mo .bp-summary-label{color:#4f675a;}
 .bp-summary-total .bp-summary-label{color:#4f675a;font-size:9pt;letter-spacing:.8px;}
@@ -1216,7 +1216,7 @@ body.bulletin-preview #bulletin-print{display:block;width:210mm;min-height:297mm
 body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-shadow:none;}
 
 @media print{
-  @page{size:A4 portrait;margin:10mm;@top-left{content:none;}@top-center{content:none;}@top-right{content:none;}@bottom-left{content:none;}@bottom-center{content:none;}@bottom-right{content:none;}}
+  @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;@top-left{content:none;}@top-center{content:none;}@top-right{content:none;}@bottom-left{content:none;}@bottom-center{content:none;}@bottom-right{content:none;}}
   html,body{width:auto!important;min-height:0!important;background:#fff!important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
   body{display:block!important;}
   body>header,body>nav,body>main,body>#toast{display:none!important;}
@@ -1680,6 +1680,108 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 </section>
 
 <script>
+/* ══ ANDROID API INTERCEPTOR ══ */
+(function(){
+  var STORE_KEY='saphirpro_eleves';
+  var _nextId=1;
+  function loadAll(){try{var r=localStorage.getItem(STORE_KEY);return r?JSON.parse(r):[];}catch(e){return[];}}
+  function saveAll(l){localStorage.setItem(STORE_KEY,JSON.stringify(l));}
+  var all=loadAll();if(all.length)_nextId=Math.max.apply(null,all.map(function(e){return e.id;}))+1;
+
+  var origFetch=window.fetch;
+  window.fetch=function(url,opts){
+    opts=opts||{};
+    var method=(opts.method||'GET').toUpperCase();
+    var path=typeof url==='string'?url:(url.url||'');
+    if(!path.startsWith('/api/'))return origFetch(url,opts);
+
+    return new Promise(function(resolve){
+      try{
+        if(path==='/api/eleves'&&method==='GET'){
+          var d=loadAll();d.sort(function(a,b){return b.id-a.id;});
+          resolve(jsonResp(d));return;
+        }
+        if(path==='/api/eleves'&&method==='POST'){
+          var body=JSON.parse(opts.body||'{}');
+          var all2=loadAll();var id=_nextId++;
+          var now=new Date().toISOString().slice(0,10);
+          var eleve={id:id,nom:body.nom||'',matricule:body.matricule||'',classe:body.classe||'',etablissement:body.etablissement||'',annee:body.annee||'',created_at:now};
+          var resultat={eleve_id:id,total:body.total||0,mo:body.mo||0,mention:body.mention||'',matieres:body.matieres||{},date_calc:now};
+          all2.push(Object.assign({},eleve,resultat));
+          saveAll(all2);
+          resolve(jsonResp({eleve:eleve,resultat:resultat}));return;
+        }
+        if(path==='/api/eleves/clear'&&method==='DELETE'){
+          localStorage.removeItem(STORE_KEY);_nextId=1;
+          resolve(jsonResp({ok:true}));return;
+        }
+        if(path==='/api/eleves/delete-multiple'&&method==='POST'){
+          var b=JSON.parse(opts.body||'{}');var ids=b.ids||[];
+          var all3=loadAll();var idSet={};ids.forEach(function(i){idSet[i]=true;});
+          all3=all3.filter(function(e){return !idSet[e.id];});
+          saveAll(all3);
+          resolve(jsonResp({ok:true,deleted:ids.length}));return;
+        }
+        var idMatch=path.match(/^\/api\/eleves\/(\d+)$/);
+        if(idMatch&&method==='GET'){
+          var eid=parseInt(idMatch[1]);var all4=loadAll();
+          var found=null;for(var i=0;i<all4.length;i++){if(all4[i].id===eid){found=all4[i];break;}}
+          if(!found){resolve(jsonErr('Not found',404));return;}
+          resolve(jsonResp(found));return;
+        }
+        if(idMatch&&method==='DELETE'){
+          var did=parseInt(idMatch[1]);var all5=loadAll();
+          all5=all5.filter(function(e){return e.id!==did;});
+          saveAll(all5);
+          resolve(jsonResp({ok:true}));return;
+        }
+        if(method==='PUT'){
+          var puMatch=path.match(/^\/api\/eleves\/(\d+)$/);
+          if(puMatch){
+            var pid=parseInt(puMatch[1]);var pb=JSON.parse(opts.body||'{}');
+            var all6=loadAll();var now2=new Date().toISOString().slice(0,10);
+            for(var j=0;j<all6.length;j++){
+              if(all6[j].id===pid){
+                all6[j]=Object.assign({},all6[j],{nom:pb.nom||'',matricule:pb.matricule||'',classe:pb.classe||'',etablissement:pb.etablissement||'',annee:pb.annee||'',total:pb.total||0,mo:pb.mo||0,mention:pb.mention||'',matieres:pb.matieres||{},date_calc:now2});
+                saveAll(all6);resolve(jsonResp(all6[j]));return;
+              }
+            }
+            resolve(jsonErr('Not found',404));return;
+          }
+        }
+        if(method==='POST'&&path.match(/\/duplicate$/)){
+          var duMatch=path.match(/^\/api\/eleves\/(\d+)/);
+          if(duMatch){
+            var srcId=parseInt(duMatch[1]);var all7=loadAll();var src=null;
+            for(var k=0;k<all7.length;k++){if(all7[k].id===srcId){src=all7[k];break;}}
+            if(!src){resolve(jsonErr('Not found',404));return;}
+            var id2=_nextId++;var now3=new Date().toISOString().slice(0,10);
+            var ne={id:id2,nom:src.nom,matricule:src.matricule,classe:src.classe,etablissement:src.etablissement,annee:src.annee,created_at:now3};
+            var nr={eleve_id:id2,total:src.total,mo:src.mo,mention:src.mention,matieres:src.matieres||{},date_calc:now3};
+            all7.push(Object.assign({},ne,nr));saveAll(all7);
+            resolve(jsonResp({eleve:ne,resultat:nr},201));return;
+          }
+        }
+        resolve(jsonErr('Not found',404));
+      }catch(err){
+        console.error('[API Error]',err);
+        resolve(jsonErr(err.message||'Server error',500));
+      }
+    });
+  };
+  function jsonResp(d,s){return new Response(JSON.stringify(d),{status:s||200,headers:{'Content-Type':'application/json'}});}
+  function jsonErr(m,s){return new Response(JSON.stringify({error:m}),{status:s,headers:{'Content-Type':'application/json'}});}
+  console.log('[SAPHIR Pro] API intercepteur Android actif');
+})();
+</script>
+
+<script>
+/* ══ ANDROID PRINT HELPER ══ */
+var IS_ANDROID=/(Android)/i.test(navigator.userAgent);
+function safePrint(){
+  if(IS_ANDROID){toast('Impression non disponible sur Android. Utilisez Exporter PDF.',true);return;}
+  window.print();
+}
 /* ── MATIÈRES ── */
 const MATIERES = [
   { id:'redaction', label:'Rédaction',      coef:2, anglais:false },
@@ -2196,7 +2298,7 @@ function printSelection(){
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm;}</style></head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}</style></head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
 }
@@ -2207,7 +2309,7 @@ function exportSelection(){
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm;}</style></head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}</style></head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
 }
@@ -2302,7 +2404,7 @@ ${styles}
 <style>
   body{margin:0;padding:0;background:#fff;}
   .bulletin-sheet{page-break-after:always;margin:0;padding:0;}
-  @page{size:A4 portrait;margin:8mm 10mm;}
+  @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
 </style></head><body>${page}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
@@ -2391,7 +2493,7 @@ ${styles}
   body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
   .bulletin-sheet{page-break-after:always;margin:0;padding:0;}
   .bulletin-sheet:last-child{page-break-after:auto;}
-  @page{size:A4 portrait;margin:8mm 10mm;}
+  @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
 </style></head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>{win.print();},600);
@@ -2476,7 +2578,7 @@ function buildBulletin(){
 
 function printBulletin(){
   buildBulletin();
-  setTimeout(()=>window.print(),60);
+  setTimeout(()=>safePrint(),60);
 }
 
 function loadBulletinPreview(){
@@ -2565,7 +2667,7 @@ function exportPDF(){
   if(missing.length>0){
     toast('Note manquante : '+missing[0],true);return;
   }
-  buildBulletin();saveToHistory();window.print();toast('PDF exporté et enregistré ✔');
+  buildBulletin();saveToHistory();safePrint();toast('PDF exporté et enregistré ✔');
 }
 
 function toast(msg,isErr=false){
