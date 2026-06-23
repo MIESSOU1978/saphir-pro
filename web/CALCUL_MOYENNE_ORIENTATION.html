@@ -1851,8 +1851,13 @@ function calcRowMO(mid){
     bepc=getVal(mid+'_bepc');
   }
   const sum=mga+bepc, prod=sum*m.coef;
-  document.getElementById(mid+'_sum').textContent  = sum  ? fmtNum(sum,2)  : '—';
-  document.getElementById(mid+'_prod').textContent = prod ? fmtNum(prod,2) : '—';
+  const mgaEl=document.getElementById(mid+'_mga');
+  const bepcEl=m.anglais?null:document.getElementById(mid+'_bepc');
+  const bepcE=m.anglais?document.getElementById(mid+'_bepc_e'):null;
+  const bepcO=m.anglais?document.getElementById(mid+'_bepc_o'):null;
+  const hasInput=(mgaEl&&mgaEl.value!=='')||(bepcEl&&bepcEl.value!=='')||(bepcE&&bepcE.value!=='')||(bepcO&&bepcO.value!=='');
+  document.getElementById(mid+'_sum').textContent  = hasInput ? fmtNum(sum,2)  : '—';
+  document.getElementById(mid+'_prod').textContent = hasInput ? fmtNum(prod,2) : '—';
   calcTotalMO();
 }
 
@@ -1876,7 +1881,7 @@ function calcTotalMO(){
   const mo=total/(2*TOTAL_COEF);
   document.getElementById('r-total').textContent=fmtNum(total,2);
   const hasInput=Array.from(document.querySelectorAll('#page-mo .note-input')).some(el=>el.value!=='');
-  if(hasInput && mo>0){
+  if(hasInput){
     document.getElementById('r-mo').textContent=fmtMO(mo,2)+' / 20';
   } else {
     document.getElementById('r-mo').textContent='— / 20';
