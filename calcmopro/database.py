@@ -49,11 +49,10 @@ def _turso_exec(sql: str, args: list | None = None) -> list[dict]:
     if not results:
         return []
     first = results[0]
-    if "response" not in first:
+    if first.get("type") != "ok":
+        print(f"[Turso Error] type={first.get('type')} error={first.get('error')}")
         return []
-    resp_data = first["response"]
-    if resp_data.get("type") != "ok":
-        return []
+    resp_data = first.get("response", {})
     result = resp_data.get("result", {})
     cols = result.get("cols", [])
     rows = result.get("rows", [])
@@ -84,10 +83,9 @@ def _turso_exec_write(sql: str, args: list | None = None) -> int:
         return 0
 
     results = data.get("results", [])
-    if results and "response" in results[0]:
-        resp_data = results[0]["response"]
-        if resp_data.get("type") == "ok":
-            return resp_data.get("result", {}).get("rows_affected", 0)
+    if results and results[0].get("type") == "ok":
+        resp_data = results[0].get("response", {})
+        return resp_data.get("result", {}).get("affected_row_count", 0)
     return 0
 
 
@@ -114,10 +112,9 @@ def _turso_exec_insert(sql: str, args: list | None = None) -> int:
         return 0
 
     results = data.get("results", [])
-    if results and "response" in results[0]:
-        resp_data = results[0]["response"]
-        if resp_data.get("type") == "ok":
-            return resp_data.get("result", {}).get("last_insert_rowid", 0)
+    if results and results[0].get("type") == "ok":
+        resp_data = results[0].get("response", {})
+        return resp_data.get("result", {}).get("last_insert_rowid", 0)
     return 0
 
 
