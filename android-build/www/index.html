@@ -1804,7 +1804,8 @@ const TOTAL_COEF = MATIERES.reduce((s,m)=>s+m.coef,0);
 /* ── NAVIGATION ── */
 function showPage(id){
   const role=localStorage.getItem('saphir_role');
-  if(id==='hist'&&role!=='admin') return;
+  const IS_ANDROID=/(Android)/i.test(navigator.userAgent);
+  if(id==='hist'&&!IS_ANDROID&&role!=='admin') return;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
