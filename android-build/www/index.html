@@ -683,6 +683,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .bp-footer strong{color:#0b3d2e;}
 .bp-footer-right{text-align:left;}
 .bp-footer-date{color:#0b3d2e;font-weight:700;}
+.bp-nonprofit{margin-top:3mm;text-align:center;color:#87958d;font-size:7pt;font-style:italic;line-height:1.4;}
 
 /* ── IDENTITÉ VISUELLE SAPHIR / BULLETIN ── */
 :root{
@@ -1676,6 +1677,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       <div id="bp-filename"></div>
       <div class="bp-footer-right"><div class="bp-footer-date">Document généré le <span id="bp-date">-</span></div></div>
     </footer>
+    <div class="bp-nonprofit">Projet à but non lucratif, développé pour accompagner les utilisateurs et leur offrir un service utile, sans recherche de profit financier.</div>
   </article>
 </section>
 
@@ -2481,6 +2483,7 @@ function buildBulletinHTML(h){
 <div class="bp-summary"><div class="bp-summary-box bp-summary-total"><div class="bp-summary-label">Total général pondéré</div><div class="bp-total-value">${totalDisplay}</div><div class="bp-summary-sub"></div></div><div class="bp-summary-box bp-summary-mo ${moClass}"><div class="bp-summary-label">Moyenne d'orientation</div><div class="bp-mo-value"><span>${moDisplay}</span><small>/ 20</small></div><div class="bp-mention ${mCls}">${mention}</div></div></div>
 </div>
 <footer class="bp-footer"><div>Édité via <strong>SAPHIR Pro</strong></div><div></div><div class="bp-footer-right"><div class="bp-footer-date">Document généré le <span>${today}</span></div></div></footer>
+<div class="bp-nonprofit">Projet à but non lucratif, développé pour accompagner les utilisateurs et leur offrir un service utile, sans recherche de profit financier.</div>
 </article>`;
 }
 
