@@ -907,7 +907,7 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 .mat-table tbody td:last-child{border-right:none;border-radius:0;background:#f0f6f2;color:#064e3b;font-weight:700;}
 .mat-table tbody tr:last-child td:first-child{border-radius:0 0 0 7px;}
 .mat-table tbody tr:last-child td:last-child{border-radius:0 0 7px 0;}
-.mat-label{color:#064e3b;font-size:.88rem;font-weight:700;}
+.mat-label{color:#064e3b;font-size:.88rem;font-weight:700;white-space:nowrap;}
 .mga-summary{
   margin-top:14px;padding:10px 16px;font-size:.72rem;
   color:#60736d;letter-spacing:.5px;
@@ -1080,9 +1080,9 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 #page-mga .mat-table tbody td,
 #page-mo .mat-table tbody td{padding:14px 10px;vertical-align:middle;}
 #page-mga .mat-label,
-#page-mo .mat-label{font-size:1.147rem;line-height:1.25;}
+#page-mo .mat-label{font-size:1.05rem;line-height:1.25;}
 #page-mga .note-input,
-#page-mo .note-input{width:90px;padding:8px;border-color:#a9bbb0;background:#f9fbf9;font-size:1.087rem;box-shadow:inset 0 0 0 1px rgba(11,74,53,.025);}
+#page-mo .note-input{width:80px;padding:8px;border-color:#a9bbb0;background:#f9fbf9;font-size:1.087rem;box-shadow:inset 0 0 0 1px rgba(11,74,53,.025);}
 #page-mga .note-input:hover,
 #page-mo .note-input:hover{border-color:#829b8d;}
 #page-mo #mo-tbody tr:has(.two-notes) td:nth-child(2),
@@ -1494,10 +1494,18 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 
   <div class="card">
     <div class="section-title">Saisie MA et notes au BEPC — Calcul de la Moyenne d'Orientation</div>
-    <table class="mat-table">
+    <table class="mat-table" style="table-layout:fixed;">
+      <colgroup>
+        <col style="width:18%;">
+        <col style="width:16%;">
+        <col style="width:22%;">
+        <col style="width:14%;">
+        <col style="width:10%;">
+        <col style="width:20%;">
+      </colgroup>
       <thead>
         <tr>
-          <th style="text-align:left;width:155px;">Matière</th>
+          <th style="text-align:left;">Matière</th>
           <th>MA <span class="mga-injected" id="mga-badge" style="display:none;">✔ injecté</span></th>
           <th>Note BEPC</th>
           <th>MA + BEPC</th>
