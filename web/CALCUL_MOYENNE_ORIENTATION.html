@@ -1509,8 +1509,8 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
           <th>MA <span class="mga-injected" id="mga-badge" style="display:none;">✔ injecté</span></th>
           <th>Note BEPC</th>
           <th>MA + BEPC</th>
-          <th>Coeff.</th>
-          <th style="background:#0a6b4e;">TOTAL PONDÉRÉ <span style="font-weight:400;font-size:.62rem;display:block;letter-spacing:.3px;text-transform:none;opacity:.65;margin-top:2px;">(MA + BEPC) × Coeff.</span></th>
+          <th>Cœff.</th>
+          <th style="background:#0a6b4e;">TOTAL PONDÉRÉ <span style="font-weight:400;font-size:.62rem;display:block;letter-spacing:.3px;text-transform:none;opacity:.65;margin-top:2px;">(MA + BEPC) × Cœff.</span></th>
         </tr>
       </thead>
       <tbody id="mo-tbody"></tbody>
@@ -1659,7 +1659,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       <div class="bp-table-wrap">
         <table class="bp-grades">
           <colgroup><col><col><col><col><col><col></colgroup>
-<thead><tr><th>Matière</th><th>MA</th><th>Note BEPC</th><th>MA + BEPC</th><th>Coeff.</th><th>Total pondéré</th></tr></thead>
+<thead><tr><th>Matière</th><th>MA</th><th>Note BEPC</th><th>MA + BEPC</th><th>Cœff.</th><th>Total pondéré</th></tr></thead>
           <tbody id="bp-grades-body"></tbody>
         </table>
       </div>
@@ -2383,7 +2383,7 @@ function buildBulletinHTML(h){
 <div class="bp-section-title"><span class="bp-section-num">1</span><span>Informations de l'élève</span><span class="bp-section-line"></span></div>
 <div class="bp-student"><div class="bp-avatar">${initials}</div><div class="bp-student-info"><div class="bp-student-name">${name}</div><div class="bp-student-meta"><span>Classe : <strong>${classe}</strong></span><span class="bp-student-sep">•</span><span><strong>${school}</strong></span><span class="bp-student-sep">•</span><span>Année scolaire : <strong>${year}</strong></span></div></div><div class="bp-matricule"><small>Matricule</small><span>${matricule}</span></div></div>
 <div class="bp-section-title"><span class="bp-section-num">2</span><span>Relevé des notes par matière</span><span class="bp-section-line"></span></div>
-<div class="bp-table-wrap"><table class="bp-grades"><colgroup><col><col><col><col><col><col></colgroup><thead><tr><th>Matière</th><th>MA</th><th>Note BEPC</th><th>MA + BEPC</th><th>Coeff.</th><th>Total pondéré</th></tr></thead><tbody>${rows}</tbody></table></div>
+<div class="bp-table-wrap"><table class="bp-grades"><colgroup><col><col><col><col><col><col></colgroup><thead><tr><th>Matière</th><th>MA</th><th>Note BEPC</th><th>MA + BEPC</th><th>Cœff.</th><th>Total pondéré</th></tr></thead><tbody>${rows}</tbody></table></div>
 <div class="bp-table-note">Total pondéré = (MA + Note BEPC) × Coefficient</div>
 <div class="bp-section-title"><span class="bp-section-num">3</span><span>Synthèse</span><span class="bp-section-line"></span></div>
 <div class="bp-summary"><div class="bp-summary-box bp-summary-total"><div class="bp-summary-label">Total général pondéré</div><div class="bp-total-value">${totalDisplay}</div><div class="bp-summary-sub"></div></div><div class="bp-summary-box bp-summary-mo ${moClass}"><div class="bp-summary-label">Moyenne d'orientation</div><div class="bp-mo-value"><span>${moDisplay}</span><small>/ 20</small></div><div class="bp-mention ${mCls}">${mention}</div></div></div>
