@@ -148,6 +148,16 @@ class _Handler(BaseHTTPRequestHandler):
 
     # ── routing ──────────────────────────────────────────────
     def do_GET(self) -> None:
+        try:
+            self._handle_get()
+        except Exception as exc:
+            print(f"[FATAL] do_GET: {exc}")
+            try:
+                self._json({"error": str(exc)}, 500)
+            except Exception:
+                self.send_error(500)
+
+    def _handle_get(self) -> None:
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/")
 
@@ -178,7 +188,11 @@ class _Handler(BaseHTTPRequestHandler):
             return self._json({"role": self._get_role()})
 
         if path == "/api/eleves":
-            return self._json(db.list_eleves())
+            try:
+                return self._json(db.list_eleves())
+            except Exception as exc:
+                print(f"[ERROR] list_eleves: {exc}")
+                return self._json([], 500)
 
         if path.startswith("/api/eleves/"):
             try:
@@ -204,6 +218,16 @@ class _Handler(BaseHTTPRequestHandler):
         self.do_GET()
 
     def do_POST(self) -> None:
+        try:
+            self._handle_post()
+        except Exception as exc:
+            print(f"[FATAL] do_POST: {exc}")
+            try:
+                self._json({"error": str(exc)}, 500)
+            except Exception:
+                self.send_error(500)
+
+    def _handle_post(self) -> None:
         parsed = urlparse(self.path)
         path = parsed.path.rstrip("/")
 
@@ -247,18 +271,22 @@ class _Handler(BaseHTTPRequestHandler):
             nom = (body.get("nom") or "").strip()
             if not nom:
                 return self._json({"error": "Le nom est obligatoire."}, 400)
-            result = db.save_eleve(
-                nom=nom,
-                matricule=body.get("matricule", ""),
-                classe=body.get("classe", ""),
-                etablissement=body.get("etablissement", ""),
-                annee=body.get("annee", ""),
-                total=body.get("total", 0),
-                mo=body.get("mo", 0),
-                mention=body.get("mention", ""),
-                matieres=body.get("matieres"),
-            )
-            return self._json(result, 201)
+            try:
+                result = db.save_eleve(
+                    nom=nom,
+                    matricule=body.get("matricule", ""),
+                    classe=body.get("classe", ""),
+                    etablissement=body.get("etablissement", ""),
+                    annee=body.get("annee", ""),
+                    total=body.get("total", 0),
+                    mo=body.get("mo", 0),
+                    mention=body.get("mention", ""),
+                    matieres=body.get("matieres"),
+                )
+                return self._json(result, 201)
+            except Exception as exc:
+                print(f"[ERROR] save_eleve: {exc}")
+                return self._json({"error": str(exc)}, 500)
 
         if path == "/api/eleves/delete-multiple":
             body = self._read_body()
@@ -289,6 +317,16 @@ class _Handler(BaseHTTPRequestHandler):
         self.send_error(404)
 
     def do_DELETE(self) -> None:
+        try:
+            self._handle_delete()
+        except Exception as exc:
+            print(f"[FATAL] do_DELETE: {exc}")
+            try:
+                self._json({"error": str(exc)}, 500)
+            except Exception:
+                self.send_error(500)
+
+    def _handle_delete(self) -> None:
         if not self._require_auth():
             return
 
@@ -329,6 +367,16 @@ class _Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_PUT(self) -> None:
+        try:
+            self._handle_put()
+        except Exception as exc:
+            print(f"[FATAL] do_PUT: {exc}")
+            try:
+                self._json({"error": str(exc)}, 500)
+            except Exception:
+                self.send_error(500)
+
+    def _handle_put(self) -> None:
         if not self._require_auth():
             return
         parsed = urlparse(self.path)

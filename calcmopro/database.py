@@ -90,7 +90,7 @@ def _turso_exec_write(sql: str, args: list | None = None) -> int:
 
 
 def _turso_exec_insert(sql: str, args: list | None = None) -> int:
-    """Execute INSERT via Turso and return last_insert_rowid using SELECT."""
+    """Execute INSERT via Turso pipeline and return last_insert_rowid."""
     url = f"https://{_TURSO_URL}/v2/pipeline"
     stmt = {"sql": sql}
     if args:
@@ -109,16 +109,22 @@ def _turso_exec_insert(sql: str, args: list | None = None) -> int:
         with urllib.request.urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read())
     except Exception as e:
-        print(f"[Turso Error] {e}")
+        print(f"[Turso Error] insert pipeline: {e}")
         return 0
 
     results = data.get("results", [])
+    print(f"[Turso Debug] insert results count={len(results)}")
+    for i, r in enumerate(results):
+        print(f"[Turso Debug] result[{i}]: type={r.get('type')} response_type={r.get('response', {}).get('type', 'N/A')}")
     if len(results) >= 2 and results[1].get("type") == "ok":
         resp_data = results[1].get("response", {})
         result = resp_data.get("result", {})
         rows = result.get("rows", [])
         if rows and rows[0]:
-            return rows[0][0]
+            rowid = rows[0][0]
+            print(f"[Turso Debug] last_insert_rowid={rowid}")
+            return rowid
+    print(f"[Turso Debug] insert failed, returning 0")
     return 0
 
 
@@ -190,12 +196,14 @@ def save_eleve(nom: str, matricule: str = "", classe: str = "",
                total: float = 0, mo: float = 0, mention: str = "",
                matieres: dict | None = None) -> dict[str, Any]:
     matieres_json = json.dumps(matieres or {}, ensure_ascii=False)
+    print(f"[DB] save_eleve turso={_turso_enabled()} nom={nom}")
 
     if _turso_enabled():
         eid = _turso_exec_insert(
             "INSERT INTO eleves (nom, matricule, classe, etablissement, annee) VALUES (?, ?, ?, ?, ?)",
             [nom, matricule, classe, etablissement, annee],
         )
+        print(f"[DB] save_eleve eid={eid}")
         _turso_exec_write(
             "INSERT INTO resultats (eleve_id, total, mo, mention, matieres) VALUES (?, ?, ?, ?, ?)",
             [eid, total, mo, mention, matieres_json],
