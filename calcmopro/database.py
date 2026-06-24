@@ -67,7 +67,16 @@ def _turso_exec(sql: str, args: list | None = None) -> list[dict]:
     cols = result.get("cols", [])
     rows = result.get("rows", [])
     col_names = [c.get("name", f"col{i}") for i, c in enumerate(cols)]
-    return [dict(zip(col_names, row)) for row in rows]
+    out = []
+    for row in rows:
+        d = {}
+        for i, cell in enumerate(row):
+            if isinstance(cell, dict) and "value" in cell:
+                d[col_names[i]] = cell["value"]
+            else:
+                d[col_names[i]] = cell
+        out.append(d)
+    return out
 
 
 def _turso_exec_write(sql: str, args: list | None = None) -> int:
@@ -125,9 +134,10 @@ def _turso_exec_insert(sql: str, args: list | None = None) -> int:
         result = resp_data.get("result", {})
         rows = result.get("rows", [])
         if rows and rows[0]:
-            eid = rows[0][0]
+            cell = rows[0][0]
+            eid = cell["value"] if isinstance(cell, dict) and "value" in cell else cell
             print(f"[Turso INSERT OK] id={eid} | sql={sql[:80]}")
-            return eid
+            return int(eid) if eid else 0
     print(f"[Turso INSERT WARN] No rowid returned | results_count={len(results)}")
     return 0
 
