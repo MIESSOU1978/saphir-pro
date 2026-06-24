@@ -28,17 +28,20 @@ _thread: threading.Thread | None = None
 _APP_PASSWORD: str = os.environ.get("APP_PASSWORD", "")
 _STUDENT_PASSWORD: str = os.environ.get("STUDENT_PASSWORD", "")
 _SESSION_TTL = 86400 * 7  # 7 days
-_HMAC_KEY: str = os.environ.get("HMAC_KEY", "saphir-pro-session-key-2024")
 
 
 def _hash_password(pwd: str) -> str:
     return hashlib.sha256(pwd.encode()).hexdigest()
 
 
+def _hmac_key() -> str:
+    return _hash_password(_APP_PASSWORD or "saphir-pro-default-key")
+
+
 def _create_session(role: str = "admin") -> str:
     expiry = int(time.time()) + _SESSION_TTL
     payload = f"{role}:{expiry}"
-    sig = hmac.new(_HMAC_KEY.encode(), payload.encode(), hashlib.sha256).hexdigest()[:32]
+    sig = hmac.new(_hmac_key().encode(), payload.encode(), hashlib.sha256).hexdigest()[:32]
     return f"{payload}:{sig}"
 
 
@@ -50,7 +53,7 @@ def _get_session_role(token: str | None) -> str | None:
         if len(parts) != 2:
             return None
         payload, sig = parts
-        expected = hmac.new(_HMAC_KEY.encode(), payload.encode(), hashlib.sha256).hexdigest()[:32]
+        expected = hmac.new(_hmac_key().encode(), payload.encode(), hashlib.sha256).hexdigest()[:32]
         if not hmac.compare_digest(sig, expected):
             return None
         role, expiry_str = payload.split(":", 1)
