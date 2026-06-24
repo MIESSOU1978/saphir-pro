@@ -2070,6 +2070,7 @@ function checkDraft(){
 async function loadHistory(){
   try{
     const r=await fetch(API+'/api/eleves',{credentials:'same-origin'});
+    if(r.redirected){toast('Session expirée. Reconnectez-vous.',true);histData=[];renderHistory();return;}
     if(!r.ok) throw 0;
     histData=await r.json();
   }catch(e){histData=[];}

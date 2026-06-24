@@ -27,7 +27,7 @@ _thread: threading.Thread | None = None
 # Auth
 _APP_PASSWORD: str = os.environ.get("APP_PASSWORD", "")
 _STUDENT_PASSWORD: str = os.environ.get("STUDENT_PASSWORD", "")
-_sessions: dict[str, tuple[float, str]] = {}  # token -> (expiry, role)
+_sessions: dict[str, tuple[float, str]] = {}  # local fallback
 _SESSION_TTL = 86400 * 7  # 7 days
 
 
@@ -35,23 +35,60 @@ def _hash_password(pwd: str) -> str:
     return hashlib.sha256(pwd.encode()).hexdigest()
 
 
+def _init_sessions_table():
+    if db._turso_enabled():
+        db._turso_exec("""
+            CREATE TABLE IF NOT EXISTS sessions (
+                token   TEXT PRIMARY KEY,
+                expiry  REAL NOT NULL,
+                role    TEXT NOT NULL
+            )
+        """)
+
+
 def _create_session(role: str = "admin") -> str:
     token = secrets.token_hex(32)
-    _sessions[token] = (time.time() + _SESSION_TTL, role)
+    expiry = time.time() + _SESSION_TTL
+    _sessions[token] = (expiry, role)
+    if db._turso_enabled():
+        try:
+            db._turso_exec_write(
+                "INSERT INTO sessions (token, expiry, role) VALUES (?, ?, ?)",
+                [token, expiry, role],
+            )
+        except Exception:
+            pass
     return token
 
 
 def _get_session_role(token: str | None) -> str | None:
     if not token:
         return None
+    # Try in-memory first
     session = _sessions.get(token)
-    if session is None:
-        return None
-    expiry, role = session
-    if time.time() > expiry:
-        del _sessions[token]
-        return None
-    return role
+    if session is not None:
+        expiry, role = session
+        if time.time() > expiry:
+            del _sessions[token]
+            return None
+        return role
+    # Try Turso
+    if db._turso_enabled():
+        try:
+            rows = db._turso_exec(
+                "SELECT expiry, role FROM sessions WHERE token=?", [token]
+            )
+            if rows:
+                expiry = float(rows[0]["expiry"])
+                role = rows[0]["role"]
+                if time.time() > expiry:
+                    db._turso_exec_write("DELETE FROM sessions WHERE token=?", [token])
+                    return None
+                _sessions[token] = (expiry, role)
+                return role
+        except Exception:
+            pass
+    return None
 
 
 def _check_session(token: str | None) -> bool:
@@ -90,7 +127,7 @@ class _Handler(BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Set-Cookie", f"{cookie_name}={cookie_val}; Path=/; HttpOnly; SameSite=Strict; Max-Age={_SESSION_TTL}")
+        self.send_header("Set-Cookie", f"{cookie_name}={cookie_val}; Path=/; HttpOnly; SameSite=Lax; Max-Age={_SESSION_TTL}")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -256,8 +293,13 @@ class _Handler(BaseHTTPRequestHandler):
 
         if path == "/api/logout":
             token = self._get_cookie("session")
-            if token and token in _sessions:
-                del _sessions[token]
+            if token:
+                _sessions.pop(token, None)
+                if db._turso_enabled():
+                    try:
+                        db._turso_exec_write("DELETE FROM sessions WHERE token=?", [token])
+                    except Exception:
+                        pass
             self.send_response(302)
             self.send_header("Location", "/login")
             self.send_header("Set-Cookie", "session=; Path=/; Max-Age=0")

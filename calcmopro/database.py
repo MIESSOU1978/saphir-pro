@@ -159,6 +159,13 @@ def init_db() -> None:
                 date_calc   TEXT DEFAULT (date('now'))
             )
         """)
+        _turso_exec("""
+            CREATE TABLE IF NOT EXISTS sessions (
+                token   TEXT PRIMARY KEY,
+                expiry  REAL NOT NULL,
+                role    TEXT NOT NULL
+            )
+        """)
         return
 
     conn = _connect()

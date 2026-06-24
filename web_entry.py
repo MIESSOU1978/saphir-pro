@@ -56,6 +56,8 @@ def prepare_robots() -> Path:
 
 def main() -> None:
     db.init_db()
+    from calcmopro.api_server import _init_sessions_table
+    _init_sessions_table()
     html_path = prepare_html()
     login_path = prepare_login()
     prepare_sitemap()
