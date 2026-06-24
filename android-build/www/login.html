@@ -265,7 +265,7 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
   if(!pwd){errText.textContent='Veuillez entrer le mot de passe';errMsg.classList.add('show');return}
   btn.disabled=true;btn.textContent='Connexion...';errMsg.classList.remove('show');pwdWrap.classList.remove('error');
   try{
-    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({password:pwd})});
     const d=await r.json();
     if(d.ok){
       const role=(pwd==='RECEPTIOn8@2025')?'student':'admin';

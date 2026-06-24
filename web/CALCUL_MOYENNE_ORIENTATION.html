@@ -2069,7 +2069,7 @@ function checkDraft(){
 /* ── HISTORIQUE: LOAD / SAVE / DELETE ── */
 async function loadHistory(){
   try{
-    const r=await fetch(API+'/api/eleves');
+    const r=await fetch(API+'/api/eleves',{credentials:'same-origin'});
     if(!r.ok) throw 0;
     histData=await r.json();
   }catch(e){histData=[];}
@@ -2309,7 +2309,7 @@ function renderHistory(){
 async function downloadBulletinPDF(id){
   let h=histData.find(x=>x.id===id);
   if(!h){
-    try{const r=await fetch(API+'/api/eleves/'+id);if(r.ok)h=await r.json();}catch(e){}
+    try{const r=await fetch(API+'/api/eleves/'+id,{credentials:'same-origin'});if(r.ok)h=await r.json();}catch(e){}
   }
   if(!h||!h.matieres){toast('Données indisponibles.',true);return;}
   const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
