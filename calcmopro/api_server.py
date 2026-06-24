@@ -2,15 +2,21 @@
 
 Serves the HTML interface and exposes REST endpoints backed by SQLite.
 Supports optional password authentication with admin/student roles.
+
+Security: PBKDF2-HMAC-SHA256 password hashing, HMAC-signed session tokens,
+          CORS restricted to Render domain, rate limiting on login.
 """
 
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import os
+import secrets
 import threading
 import time
+from collections import defaultdict
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
@@ -27,30 +33,58 @@ _thread: threading.Thread | None = None
 _APP_PASSWORD: str = os.environ.get("APP_PASSWORD", "")
 _STUDENT_PASSWORD: str = os.environ.get("STUDENT_PASSWORD", "")
 _SESSION_TTL = 86400 * 7  # 7 days
+_IS_RENDER = bool(os.environ.get("PORT"))
+
+# Security: CORS origin, rate limiting, HMAC secret
+_CORS_ORIGIN = "https://saphir-pro.onrender.com"
+_HMAC_KEY = hashlib.sha256(
+    (_APP_PASSWORD or "calcmo-default-key").encode()
+).digest()
+_LOGIN_ATTEMPTS: dict[str, list[float]] = defaultdict(list)
+_MAX_LOGIN_ATTEMPTS = 5
+_LOGIN_WINDOW = 300  # 5 minutes
+
+# Security: PBKDF2-HMAC-SHA256 salt (fixed, app-specific)
+_PASSWORD_SALT = b"calcmo-saphir-pro-salt-2024-v2"
 
 
 def _hash_password(pwd: str) -> str:
-    return hashlib.sha256(pwd.encode()).hexdigest()
+    """Hash password with PBKDF2-HMAC-SHA256 (100k iterations)."""
+    return hashlib.pbkdf2_hmac(
+        "sha256", pwd.encode(), _PASSWORD_SALT, 100000
+    ).hex()
 
 
 def _create_session(role: str = "admin") -> str:
+    """Create HMAC-signed session token: role|expiry|signature."""
     expiry = int(time.time()) + _SESSION_TTL
-    raw = f"{role}|{expiry}"
-    return raw
+    payload = f"{role}|{expiry}"
+    sig = hmac.new(_HMAC_KEY, payload.encode(), "sha256").hexdigest()[:16]
+    return f"{payload}|{sig}"
 
 
 def _get_session_role(token: str | None) -> str | None:
-    if not token or "|" not in token:
+    """Validate HMAC-signed session token and return role."""
+    if not token:
+        return None
+    parts = token.split("|")
+    if len(parts) != 3:
+        return None
+    role, expiry_str, sig = parts
+    # Verify HMAC signature
+    expected = hmac.new(
+        _HMAC_KEY, f"{role}|{expiry_str}".encode(), "sha256"
+    ).hexdigest()[:16]
+    if not hmac.compare_digest(sig, expected):
         return None
     try:
-        role, expiry_str = token.split("|", 1)
         if time.time() > int(expiry_str):
             return None
-        if role not in ("admin", "student"):
-            return None
-        return role
-    except Exception:
+    except ValueError:
         return None
+    if role not in ("admin", "student"):
+        return None
+    return role
 
 
 def _check_session(token: str | None) -> bool:
@@ -59,6 +93,19 @@ def _check_session(token: str | None) -> bool:
 
 def _auth_required() -> bool:
     return bool(_APP_PASSWORD)
+
+
+def _is_rate_limited(ip: str) -> bool:
+    """Check if IP has exceeded login rate limit."""
+    now = time.time()
+    # Clean old entries
+    _LOGIN_ATTEMPTS[ip] = [
+        t for t in _LOGIN_ATTEMPTS[ip] if now - t < _LOGIN_WINDOW
+    ]
+    if len(_LOGIN_ATTEMPTS[ip]) >= _MAX_LOGIN_ATTEMPTS:
+        return True
+    _LOGIN_ATTEMPTS[ip].append(now)
+    return False
 
 
 class _Handler(BaseHTTPRequestHandler):
@@ -75,21 +122,26 @@ class _Handler(BaseHTTPRequestHandler):
                 return v
         return None
 
+    def _cors_header(self) -> str:
+        """Return CORS origin — restricted to Render domain."""
+        return _CORS_ORIGIN
+
     def _json(self, data: object, status: int = 200) -> None:
         body = json.dumps(data, ensure_ascii=False, default=str).encode()
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Origin", self._cors_header())
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
 
     def _json_with_cookie(self, data: object, cookie_name: str, cookie_val: str, status: int = 200) -> None:
         body = json.dumps(data, ensure_ascii=False, default=str).encode()
+        secure = "; Secure" if _IS_RENDER else ""
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Set-Cookie", f"{cookie_name}={cookie_val}; Path=/; HttpOnly; SameSite=Lax; Max-Age={_SESSION_TTL}")
+        self.send_header("Access-Control-Allow-Origin", self._cors_header())
+        self.send_header("Set-Cookie", f"{cookie_name}={cookie_val}; Path=/; HttpOnly; SameSite=Lax{secure}; Max-Age={_SESSION_TTL}")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -234,6 +286,11 @@ class _Handler(BaseHTTPRequestHandler):
         path = parsed.path.rstrip("/")
 
         if path == "/api/login":
+            # Rate limiting: max 5 attempts per IP per 5 minutes
+            client_ip = self.client_address[0]
+            if _is_rate_limited(client_ip):
+                return self._json({"error": "Trop de tentatives. Réessayez dans 5 minutes."}, 429)
+
             body = self._read_body()
             pwd = body.get("password", "")
 
@@ -360,7 +417,7 @@ class _Handler(BaseHTTPRequestHandler):
 
     def do_OPTIONS(self) -> None:
         self.send_response(204)
-        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Origin", self._cors_header())
         self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
