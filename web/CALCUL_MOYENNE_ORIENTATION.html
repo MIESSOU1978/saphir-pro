@@ -2322,7 +2322,7 @@ async function downloadBulletinPDF(id){
 ${styles}
 <style>
   body{margin:0;padding:0;background:#fff;}
-  .bulletin-sheet{page-break-after:always;margin:0;padding:0;}
+  .bulletin-sheet{page-break-after:auto;margin:0;padding:0;}
   @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
 </style></head><body>${page}</body></html>`);
   win.document.close();
