@@ -96,16 +96,18 @@ def _auth_required() -> bool:
 
 
 def _is_rate_limited(ip: str) -> bool:
-    """Check if IP has exceeded login rate limit."""
+    """Check if IP has exceeded login rate limit (only counts failures)."""
     now = time.time()
     # Clean old entries
     _LOGIN_ATTEMPTS[ip] = [
         t for t in _LOGIN_ATTEMPTS[ip] if now - t < _LOGIN_WINDOW
     ]
-    if len(_LOGIN_ATTEMPTS[ip]) >= _MAX_LOGIN_ATTEMPTS:
-        return True
-    _LOGIN_ATTEMPTS[ip].append(now)
-    return False
+    return len(_LOGIN_ATTEMPTS[ip]) >= _MAX_LOGIN_ATTEMPTS
+
+
+def _record_failed_login(ip: str) -> None:
+    """Record a failed login attempt for rate limiting."""
+    _LOGIN_ATTEMPTS[ip].append(time.time())
 
 
 class _Handler(BaseHTTPRequestHandler):
@@ -308,6 +310,8 @@ class _Handler(BaseHTTPRequestHandler):
                 token = _create_session("student")
                 return self._json_with_cookie({"ok": True, "role": "student"}, "session", token)
 
+            # Record failed attempt for rate limiting
+            _record_failed_login(client_ip)
             return self._json({"error": "Mot de passe incorrect"}, 401)
 
         if path == "/api/logout":
