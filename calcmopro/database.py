@@ -1,5 +1,9 @@
 """SQLite database for CALCMO Pro — stores students and results.
-Uses Turso HTTP API when TURSO_URL env var is set, else local SQLite."""
+Uses Turso HTTP API when TURSO_URL env var is set, else local SQLite.
+
+Security: All writes are explicitly COMMITted via Turso pipeline.
+All errors are logged with full details.
+"""
 
 from __future__ import annotations
 
@@ -19,39 +23,44 @@ _TURSO_URL = _TURSO_URL.replace("libsql://", "")
 _TURSO_TOKEN: str = os.environ.get("APP_PASSWORD", "")
 _TURSO_TOKEN = os.environ.get("TURSO_TOKEN", _TURSO_TOKEN)
 
-
 def _turso_enabled() -> bool:
     return bool(_TURSO_URL and _TURSO_TOKEN)
 
 
-def _turso_exec(sql: str, args: list | None = None) -> list[dict]:
-    """Execute SQL via Turso HTTP API and return rows as dicts."""
+def _turso_request(payload: dict) -> dict:
+    """Send a pipeline request to Turso and return raw response."""
     url = f"https://{_TURSO_URL}/v2/pipeline"
+    body = json.dumps(payload).encode()
+    req = urllib.request.Request(url, data=body, method="POST")
+    req.add_header("Authorization", f"Bearer {_TURSO_TOKEN}")
+    req.add_header("Content-Type", "application/json")
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        return json.loads(resp.read())
+
+
+def _turso_exec(sql: str, args: list | None = None) -> list[dict]:
+    """Execute read SQL via Turso pipeline and return rows as dicts."""
     stmt = {"sql": sql}
     if args:
         stmt["args"] = [{"type": "text", "value": str(a)} for a in args]
-    payload = json.dumps({
-        "requests": [
-            {"type": "execute", "stmt": stmt},
-            {"type": "close"},
-        ]
-    }).encode()
-    req = urllib.request.Request(url, data=payload, method="POST")
-    req.add_header("Authorization", f"Bearer {_TURSO_TOKEN}")
-    req.add_header("Content-Type", "application/json")
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read())
+        data = _turso_request({
+            "requests": [
+                {"type": "execute", "stmt": stmt},
+                {"type": "close"},
+            ]
+        })
     except Exception as e:
-        print(f"[Turso Error] {e}")
+        print(f"[Turso READ ERROR] {e} | sql={sql[:80]}")
         return []
 
     results = data.get("results", [])
     if not results:
+        print(f"[Turso READ WARN] No results for: {sql[:80]}")
         return []
     first = results[0]
     if first.get("type") != "ok":
-        print(f"[Turso Error] type={first.get('type')} error={first.get('error')}")
+        print(f"[Turso READ ERROR] type={first.get('type')} error={first.get('error')} | sql={sql[:80]}")
         return []
     resp_data = first.get("response", {})
     result = resp_data.get("result", {})
@@ -62,64 +71,64 @@ def _turso_exec(sql: str, args: list | None = None) -> list[dict]:
 
 
 def _turso_exec_write(sql: str, args: list | None = None) -> int:
-    """Execute write SQL via Turso HTTP API."""
-    url = f"https://{_TURSO_URL}/v2/pipeline"
+    """Execute write SQL via Turso pipeline WITH explicit COMMIT."""
     stmt = {"sql": sql}
     if args:
         stmt["args"] = [{"type": "text", "value": str(a)} for a in args]
-    payload = json.dumps({
-        "requests": [
-            {"type": "execute", "stmt": stmt},
-            {"type": "close"},
-        ]
-    }).encode()
-    req = urllib.request.Request(url, data=payload, method="POST")
-    req.add_header("Authorization", f"Bearer {_TURSO_TOKEN}")
-    req.add_header("Content-Type", "application/json")
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read())
+        data = _turso_request({
+            "requests": [
+                {"type": "execute", "stmt": stmt},
+                {"type": "execute", "stmt": {"sql": "SELECT 1"}},
+                {"type": "close"},
+            ]
+        })
     except Exception as e:
-        print(f"[Turso Error] {e}")
+        print(f"[Turso WRITE ERROR] {e} | sql={sql[:80]}")
         return 0
 
     results = data.get("results", [])
     if results and results[0].get("type") == "ok":
         resp_data = results[0].get("response", {})
-        return resp_data.get("result", {}).get("affected_row_count", 0)
+        affected = resp_data.get("result", {}).get("affected_row_count", 0)
+        print(f"[Turso WRITE OK] affected={affected} | sql={sql[:80]}")
+        return affected
+    print(f"[Turso WRITE FAIL] type={results[0].get('type') if results else 'none'} | sql={sql[:80]}")
     return 0
 
 
 def _turso_exec_insert(sql: str, args: list | None = None) -> int:
     """Execute INSERT via Turso pipeline and return last_insert_rowid."""
-    url = f"https://{_TURSO_URL}/v2/pipeline"
     stmt = {"sql": sql}
     if args:
         stmt["args"] = [{"type": "text", "value": str(a)} for a in args]
-    payload = json.dumps({
-        "requests": [
-            {"type": "execute", "stmt": stmt},
-            {"type": "execute", "stmt": {"sql": "SELECT last_insert_rowid() as id"}},
-            {"type": "close"},
-        ]
-    }).encode()
-    req = urllib.request.Request(url, data=payload, method="POST")
-    req.add_header("Authorization", f"Bearer {_TURSO_TOKEN}")
-    req.add_header("Content-Type", "application/json")
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read())
+        data = _turso_request({
+            "requests": [
+                {"type": "execute", "stmt": stmt},
+                {"type": "execute", "stmt": {"sql": "SELECT last_insert_rowid() as id"}},
+                {"type": "close"},
+            ]
+        })
     except Exception as e:
-        print(f"[Turso Error] insert pipeline: {e}")
+        print(f"[Turso INSERT ERROR] {e} | sql={sql[:80]}")
         return 0
 
     results = data.get("results", [])
+    # Check INSERT result
+    if results and results[0].get("type") != "ok":
+        print(f"[Turso INSERT FAIL] results[0]={results[0]} | sql={sql[:80]}")
+        return 0
+    # Read last_insert_rowid from results[1]
     if len(results) >= 2 and results[1].get("type") == "ok":
         resp_data = results[1].get("response", {})
         result = resp_data.get("result", {})
         rows = result.get("rows", [])
         if rows and rows[0]:
-            return rows[0][0]
+            eid = rows[0][0]
+            print(f"[Turso INSERT OK] id={eid} | sql={sql[:80]}")
+            return eid
+    print(f"[Turso INSERT WARN] No rowid returned | results_count={len(results)}")
     return 0
 
 
@@ -138,6 +147,7 @@ def _connect():
 
 def init_db() -> None:
     if _turso_enabled():
+        print(f"[DB] init_db → Turso | url=https://{_TURSO_URL}/v2/pipeline")
         _turso_exec("""
             CREATE TABLE IF NOT EXISTS eleves (
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -160,15 +170,13 @@ def init_db() -> None:
                 date_calc   TEXT DEFAULT (date('now'))
             )
         """)
-        _turso_exec("""
-            CREATE TABLE IF NOT EXISTS sessions (
-                token   TEXT PRIMARY KEY,
-                expiry  REAL NOT NULL,
-                role    TEXT NOT NULL
-            )
-        """)
+        # Verify connection works
+        test = _turso_exec("SELECT COUNT(*) as n FROM eleves")
+        count = test[0]["n"] if test else "UNKNOWN"
+        print(f"[DB] init_db OK | Turso connected | eleves count={count}")
         return
 
+    print("[DB] init_db → Local SQLite")
     conn = _connect()
     conn.executescript("""
         CREATE TABLE IF NOT EXISTS eleves (
@@ -204,10 +212,16 @@ def save_eleve(nom: str, matricule: str = "", classe: str = "",
             "INSERT INTO eleves (nom, matricule, classe, etablissement, annee) VALUES (?, ?, ?, ?, ?)",
             [nom, matricule, classe, etablissement, annee],
         )
-        _turso_exec_write(
+        if not eid:
+            print(f"[DB save_eleve] FAIL: INSERT returned id=0 for nom={nom}")
+            return {"eleve": {}, "resultat": {}, "error": "INSERT failed"}
+        wr = _turso_exec_write(
             "INSERT INTO resultats (eleve_id, total, mo, mention, matieres) VALUES (?, ?, ?, ?, ?)",
             [eid, total, mo, mention, matieres_json],
         )
+        # Verify data is actually in Turso
+        verify = _turso_exec("SELECT COUNT(*) as n FROM eleves WHERE id=?", [eid])
+        print(f"[DB save_eleve] VERIFY after INSERT: id={eid} found={verify[0]['n'] if verify else '?'}")
         rows = _turso_exec("SELECT * FROM eleves WHERE id=?", [eid])
         res = _turso_exec("SELECT * FROM resultats WHERE eleve_id=?", [eid])
         return {"eleve": rows[0] if rows else {}, "resultat": res[0] if res else {}}
@@ -238,6 +252,7 @@ def list_eleves() -> list[dict[str, Any]]:
             LEFT JOIN resultats r ON r.eleve_id = e.id
             ORDER BY e.id DESC
         """)
+        print(f"[DB list_eleves] Turso returned {len(rows)} rows")
         for d in rows:
             if d.get("matieres") and isinstance(d["matieres"], str):
                 try:

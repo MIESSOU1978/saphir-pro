@@ -268,6 +268,17 @@ class _Handler(BaseHTTPRequestHandler):
                 "insuffisants": total - admitted,
             })
 
+        if path == "/api/debug":
+            turso_on = db._turso_enabled()
+            turso_url = db._TURSO_URL[:40] + "..." if db._TURSO_URL else ""
+            count = db.count_eleves()
+            return self._json({
+                "turso_enabled": turso_on,
+                "turso_url": turso_url,
+                "eleves_count": count,
+                "render_env": bool(os.environ.get("PORT")),
+            })
+
         self.send_error(404)
 
     def do_HEAD(self) -> None:
@@ -343,6 +354,8 @@ class _Handler(BaseHTTPRequestHandler):
                     mention=body.get("mention", ""),
                     matieres=body.get("matieres"),
                 )
+                if result.get("error"):
+                    return self._json(result, 500)
                 return self._json(result, 201)
             except Exception as exc:
                 print(f"[ERROR] save_eleve: {exc}")
