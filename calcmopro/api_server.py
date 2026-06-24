@@ -272,12 +272,43 @@ class _Handler(BaseHTTPRequestHandler):
             turso_on = db._turso_enabled()
             turso_url = db._TURSO_URL[:40] + "..." if db._TURSO_URL else ""
             count = db.count_eleves()
+            # Test actual Turso connectivity
+            turso_status = "unknown"
+            turso_error = ""
+            if turso_on:
+                try:
+                    test = db._turso_exec("SELECT 1 as ok")
+                    if test:
+                        turso_status = "connected"
+                    else:
+                        turso_status = "query_failed"
+                except Exception as e:
+                    turso_status = "error"
+                    turso_error = str(e)
+            # Test table existence
+            tables_exist = False
+            if turso_on:
+                try:
+                    t = db._turso_exec("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('eleves','resultats')")
+                    tables_exist = len(t) >= 2
+                except Exception:
+                    pass
             return self._json({
                 "turso_enabled": turso_on,
                 "turso_url": turso_url,
+                "turso_status": turso_status,
+                "turso_error": turso_error,
+                "tables_exist": tables_exist,
                 "eleves_count": count,
                 "render_env": bool(os.environ.get("PORT")),
             })
+
+        if path == "/api/init-tables":
+            if not db._turso_enabled():
+                return self._json({"error": "Turso not enabled"})
+            db.init_db()
+            test = db._turso_exec("SELECT COUNT(*) as n FROM eleves")
+            return self._json({"ok": True, "count": test[0]["n"] if test else -1})
 
         self.send_error(404)
 
