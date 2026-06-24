@@ -2073,6 +2073,7 @@ async function loadHistory(){
     if(r.redirected){toast('Session expirée. Reconnectez-vous.',true);histData=[];renderHistory();return;}
     if(!r.ok) throw 0;
     histData=await r.json();
+    histData.forEach(h=>{h.id=Number(h.id);});
   }catch(e){histData=[];}
   selectedIds=[];
   renderHistory();

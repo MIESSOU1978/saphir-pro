@@ -264,6 +264,7 @@ def list_eleves() -> list[dict[str, Any]]:
         """)
         print(f"[DB list_eleves] Turso returned {len(rows)} rows")
         for d in rows:
+            d["id"] = int(d["id"]) if d.get("id") is not None else d.get("id")
             if d.get("matieres") and isinstance(d["matieres"], str):
                 try:
                     d["matieres"] = json.loads(d["matieres"])
@@ -302,6 +303,7 @@ def get_eleve(eleve_id: int) -> dict[str, Any] | None:
         if not rows:
             return None
         d = rows[0]
+        d["id"] = int(d["id"]) if d.get("id") is not None else d.get("id")
         if d.get("matieres") and isinstance(d["matieres"], str):
             try:
                 d["matieres"] = json.loads(d["matieres"])
