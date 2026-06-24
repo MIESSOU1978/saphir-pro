@@ -7,7 +7,6 @@ Supports optional password authentication with admin/student roles.
 from __future__ import annotations
 
 import hashlib
-import hmac
 import json
 import os
 import threading
@@ -34,30 +33,20 @@ def _hash_password(pwd: str) -> str:
     return hashlib.sha256(pwd.encode()).hexdigest()
 
 
-def _hmac_key() -> str:
-    return _hash_password(_APP_PASSWORD or "saphir-pro-default-key")
-
-
 def _create_session(role: str = "admin") -> str:
     expiry = int(time.time()) + _SESSION_TTL
-    payload = f"{role}:{expiry}"
-    sig = hmac.new(_hmac_key().encode(), payload.encode(), hashlib.sha256).hexdigest()[:32]
-    return f"{payload}:{sig}"
+    raw = f"{role}|{expiry}"
+    return raw
 
 
 def _get_session_role(token: str | None) -> str | None:
-    if not token or ":" not in token:
+    if not token or "|" not in token:
         return None
     try:
-        parts = token.rsplit(":", 1)
-        if len(parts) != 2:
-            return None
-        payload, sig = parts
-        expected = hmac.new(_hmac_key().encode(), payload.encode(), hashlib.sha256).hexdigest()[:32]
-        if not hmac.compare_digest(sig, expected):
-            return None
-        role, expiry_str = payload.split(":", 1)
+        role, expiry_str = token.split("|", 1)
         if time.time() > int(expiry_str):
+            return None
+        if role not in ("admin", "student"):
             return None
         return role
     except Exception:
