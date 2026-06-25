@@ -1047,19 +1047,24 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 .btn-icon{font-size:.85rem;line-height:1;}
 
 .btn-ghost{
-  background:#fff;color:#064E3B;border:1px solid #c4d4cb;
+  background:#fff;color:#6B7A70;border:1.5px solid #B8CEC3;
 }
-.btn-ghost:hover{background:#f4faf6;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
+.btn-ghost:hover{background:#F4FAF7;border-color:#6B7A70;color:#064E3B;box-shadow:0 2px 8px rgba(107,122,112,.15);}
 
 .btn-success{
-  background:#fff;color:#064E3B;border:1px solid #c4d4cb;
+  background:#fff;color:#064E3B;border:1.5px solid #064E3B;
 }
-.btn-success:hover{background:#f4faf6;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
+.btn-success:hover{background:#F0FAF3;border-color:#064E3B;box-shadow:0 2px 10px rgba(6,78,59,.12);}
 
 .btn-primary{
-  background:#fff;color:#064E3B;border:1px solid #c4d4cb;
+  background:#fff;color:#064E3B;border:1.5px solid #064E3B;
 }
-.btn-primary:hover{background:#f4faf6;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
+.btn-primary:hover{background:#F0FAF3;border-color:#064E3B;box-shadow:0 2px 10px rgba(6,78,59,.12);}
+
+.btn-orange{
+  background:#fff;color:#064E3B;border:1.5px solid #F5A623;
+}
+.btn-orange:hover{background:#FFF8EB;border-color:#D4890F;box-shadow:0 2px 10px rgba(245,166,35,.15);}
 
 .btn-accent{
   background:#F5A623;color:#fff;border:1px solid #F5A623;
@@ -1560,13 +1565,12 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       Enregistrer
     </button>
-
-    <button class="btn btn-primary" onclick="previewMO()">
-      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    <button class="btn btn-orange" onclick="previewMO()">
+      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
       Aperçu
     </button>
-    <button class="btn btn-primary" onclick="exportPDF()">
-      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B42318" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <button class="btn btn-orange" onclick="exportPDF()">
+      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Télécharger
     </button>
   </div>
