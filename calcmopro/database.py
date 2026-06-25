@@ -543,9 +543,18 @@ def create_session(role: str, ip: str = "", user_agent: str = "", email: str = "
     except Exception:
         username = os.environ.get("USERNAME", "")
     ville = ""
-    if ip and ip not in ("127.0.0.1", "::1", ""):
+    # Get public IP if local/private
+    geo_ip = ip
+    if not geo_ip or geo_ip in ("127.0.0.1", "::1", ""):
         try:
-            req = urllib.request.Request(f"http://ip-api.com/json/{ip}?fields=city,country")
+            req = urllib.request.Request("https://api.ipify.org?format=json")
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                geo_ip = json.loads(resp.read()).get("ip", "")
+        except Exception:
+            geo_ip = ""
+    if geo_ip and geo_ip not in ("127.0.0.1", "::1", ""):
+        try:
+            req = urllib.request.Request(f"http://ip-api.com/json/{geo_ip}?fields=city,country")
             with urllib.request.urlopen(req, timeout=3) as resp:
                 geo = json.loads(resp.read())
                 city = geo.get("city", "")
