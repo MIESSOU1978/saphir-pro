@@ -12,7 +12,7 @@ import os
 import sqlite3
 import urllib.request
 import urllib.error
-from datetime import date
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -226,8 +226,8 @@ def save_eleve(nom: str, matricule: str = "", classe: str = "",
             print(f"[DB save_eleve] FAIL: INSERT returned id=0 for nom={nom}")
             return {"eleve": {}, "resultat": {}, "error": "INSERT failed"}
         wr = _turso_exec_write(
-            "INSERT INTO resultats (eleve_id, total, mo, mention, matieres) VALUES (?, ?, ?, ?, ?)",
-            [eid, total, mo, mention, matieres_json],
+            "INSERT INTO resultats (eleve_id, total, mo, mention, matieres, date_calc) VALUES (?, ?, ?, ?, ?, ?)",
+            [eid, total, mo, mention, matieres_json, datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
         )
         # Verify data is actually in Turso
         verify = _turso_exec("SELECT COUNT(*) as n FROM eleves WHERE id=?", [eid])
@@ -243,8 +243,8 @@ def save_eleve(nom: str, matricule: str = "", classe: str = "",
     )
     eleve_id = cur.lastrowid
     conn.execute(
-        "INSERT INTO resultats (eleve_id, total, mo, mention, matieres) VALUES (?, ?, ?, ?, ?)",
-        (eleve_id, total, mo, mention, matieres_json),
+        "INSERT INTO resultats (eleve_id, total, mo, mention, matieres, date_calc) VALUES (?, ?, ?, ?, ?, ?)",
+        (eleve_id, total, mo, mention, matieres_json, datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
     )
     conn.commit()
     row = conn.execute("SELECT * FROM eleves WHERE id=?", (eleve_id,)).fetchone()
@@ -344,8 +344,8 @@ def update_eleve(eleve_id: int, nom: str, matricule: str = "", classe: str = "",
             "DELETE FROM resultats WHERE eleve_id=?", [eleve_id]
         )
         _turso_exec_write(
-            "INSERT INTO resultats (eleve_id, total, mo, mention, matieres) VALUES (?, ?, ?, ?, ?)",
-            [eleve_id, total, mo, mention, matieres_json],
+            "INSERT INTO resultats (eleve_id, total, mo, mention, matieres, date_calc) VALUES (?, ?, ?, ?, ?, ?)",
+            [eleve_id, total, mo, mention, matieres_json, datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
         )
         return get_eleve(eleve_id)
 
@@ -356,8 +356,8 @@ def update_eleve(eleve_id: int, nom: str, matricule: str = "", classe: str = "",
     )
     conn.execute("DELETE FROM resultats WHERE eleve_id=?", (eleve_id,))
     conn.execute(
-        "INSERT INTO resultats (eleve_id, total, mo, mention, matieres) VALUES (?, ?, ?, ?, ?)",
-        (eleve_id, total, mo, mention, matieres_json),
+        "INSERT INTO resultats (eleve_id, total, mo, mention, matieres, date_calc) VALUES (?, ?, ?, ?, ?, ?)",
+        (eleve_id, total, mo, mention, matieres_json, datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
     )
     conn.commit()
     row = conn.execute("SELECT * FROM eleves WHERE id=?", (eleve_id,)).fetchone()
