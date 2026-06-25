@@ -523,22 +523,33 @@ def create_session(role: str, ip: str = "", user_agent: str = "") -> int:
         username = getpass.getuser()
     except Exception:
         username = os.environ.get("USERNAME", "")
+    ville = ""
+    if ip and ip not in ("127.0.0.1", "::1", ""):
+        try:
+            req = urllib.request.Request(f"http://ip-api.com/json/{ip}?fields=city,country")
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                geo = json.loads(resp.read())
+                city = geo.get("city", "")
+                country = geo.get("country", "")
+                ville = f"{city}, {country}" if city else country
+        except Exception:
+            pass
     if _turso_enabled():
         sid = _turso_exec_insert(
             "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, username) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            [role, ip, user_agent, "", info["os"], info["navigateur"], info["appareil"], now, username],
+            [role, ip, user_agent, ville, info["os"], info["navigateur"], info["appareil"], now, username],
         )
-        print(f"[DB create_session] id={sid} role={role} ip={ip} os={info['os']} nav={info['navigateur']} user={username}")
+        print(f"[DB create_session] id={sid} role={role} ip={ip} os={info['os']} nav={info['navigateur']} user={username} ville={ville}")
         return sid
     conn = _connect()
     cur = conn.execute(
         "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, username) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        (role, ip, user_agent, "", info["os"], info["navigateur"], info["appareil"], now, username),
+        (role, ip, user_agent, ville, info["os"], info["navigateur"], info["appareil"], now, username),
     )
     sid = cur.lastrowid
     conn.commit()
     conn.close()
-    print(f"[DB create_session] id={sid} role={role} ip={ip} os={info['os']} nav={info['navigateur']} user={username}")
+    print(f"[DB create_session] id={sid} role={role} ip={ip} os={info['os']} nav={info['navigateur']} user={username} ville={ville}")
     return sid
 
 
