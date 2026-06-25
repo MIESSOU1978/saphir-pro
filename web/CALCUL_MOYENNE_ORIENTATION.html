@@ -577,6 +577,79 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-empty-text{font-size:.9rem;color:#003b32;font-weight:600;}
 .hist-empty-sub{font-size:.76rem;color:#9fb0a6;margin-top:6px;line-height:1.5;}
 
+/* ── USERS PAGE ── */
+.users-container{
+  background:#fff;border:1px solid #d9e5de;border-radius:14px;
+  padding:24px 26px 20px;box-shadow:0 1px 8px rgba(0,0,0,.04);
+}
+.users-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.users-header-left{display:flex;align-items:center;gap:12px;}
+.users-header-right{display:flex;gap:8px;align-items:center;}
+.users-title{font-size:.95rem;font-weight:700;color:#003b32;letter-spacing:.2px;}
+.users-subtitle{font-size:.74rem;color:#60736d;margin-top:2px;}
+.users-filters{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.users-search{
+  flex:1;min-width:200px;padding:9px 14px;border:1.5px solid #AFC6BA;border-radius:10px;
+  font-size:.82rem;color:#064E3B;background:#FDFEFE;font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  transition:all .18s ease;
+}
+.users-search:hover{background:#F3F8F5;border-color:#8FB7A4;}
+.users-search:focus{background:#EEF7F2;border-color:#0B6B50;outline:none;box-shadow:0 0 0 3px rgba(11,107,80,.12);}
+.users-filter-select{
+  padding:9px 14px;border:1.5px solid #AFC6BA;border-radius:10px;
+  font-size:.82rem;color:#064E3B;background:#FDFEFE;font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  cursor:pointer;transition:all .18s ease;
+}
+.users-filter-select:hover{background:#F3F8F5;border-color:#8FB7A4;}
+.users-filter-select:focus{background:#EEF7F2;border-color:#0B6B50;outline:none;}
+.users-table-wrap{overflow-x:auto;border:1px solid #d9e5de;border-radius:10px;}
+.users-table{width:100%;border-collapse:collapse;font-size:.8rem;}
+.users-table th{
+  padding:12px 14px;background:#f4f8f6;color:#064E3B;font-weight:700;font-size:.72rem;
+  text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #d5e5de;text-align:left;white-space:nowrap;
+}
+.users-table td{
+  padding:11px 14px;border-bottom:1px solid #eef3f0;color:#1a3a2e;vertical-align:middle;
+}
+.users-table tbody tr:hover{background:#f8fbf9;}
+.users-table tbody tr:last-child td{border-bottom:none;}
+.users-role-badge{
+  display:inline-block;padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:700;
+}
+.users-role-admin{background:#EAF5F0;color:#064E3B;border:1px solid #b8d4c7;}
+.users-role-student{background:#FFF7ED;color:#B45309;border:1px solid #FDBA74;}
+.users-status{display:inline-flex;align-items:center;gap:5px;font-size:.76rem;font-weight:600;}
+.users-status-dot{width:7px;height:7px;border-radius:50%;}
+.users-status-online .users-status-dot{background:#16a34a;}
+.users-status-online{color:#16a34a;}
+.users-status-offline .users-status-dot{background:#9ca3af;}
+.users-status-offline{color:#9ca3af;}
+.users-activity-btn{
+  display:inline-flex;align-items:center;gap:4px;padding:5px 12px;
+  border-radius:7px;border:1px solid #D5E5DE;background:#fff;
+  color:#064E3B;cursor:pointer;font-size:.74rem;font-weight:600;transition:all .18s ease;
+}
+.users-activity-btn:hover{background:#F0F7F3;border-color:#064E3B;box-shadow:0 2px 6px rgba(6,78,59,.08);}
+.users-activity-panel{
+  margin-top:20px;border:1px solid #d5e5de;border-radius:12px;
+  background:#fafcfb;padding:18px 20px;
+}
+.users-activity-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.users-activity-title{font-size:.88rem;font-weight:700;color:#003b32;}
+.users-activity-list{max-height:300px;overflow-y:auto;}
+.users-activity-item{
+  display:grid;grid-template-columns:140px 1fr 120px 80px;gap:12px;
+  padding:10px 14px;border-bottom:1px solid #eef3f0;font-size:.78rem;align-items:center;
+}
+.users-activity-item:last-child{border-bottom:none;}
+.users-activity-date{color:#60736d;font-weight:600;white-space:nowrap;}
+.users-activity-action{color:#1a3a2e;font-weight:600;}
+.users-activity-module{color:#60736d;}
+.users-activity-result{font-weight:600;text-align:center;}
+.users-activity-result.ok{color:#16a34a;}
+.users-activity-result.fail{color:#B42318;}
+.users-empty-state{text-align:center;padding:40px 20px;color:#9fb0a6;font-size:.85rem;}
+
 /* ── TOAST ── */
 #toast{
   position:fixed;bottom:26px;right:26px;
@@ -1287,6 +1360,10 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
     <div class="nav-item" onclick="showPage('hist')" id="nav-hist">
       <span class="nav-ico">03</span> Historique
     </div>
+    <div class="nav-sep" id="nav-sep-users" style="display:none;"></div>
+    <div class="nav-item" onclick="showPage('users')" id="nav-users" style="display:none;">
+      <span class="nav-ico">04</span> Utilisateurs
+    </div>
   </div>
   <button class="logout-btn" onclick="doLogout()" title="Se déconnecter">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -1627,6 +1704,75 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
   </div>
 </div>
 
+<!-- ════════════════════════════════════════════
+     PAGE 4 : UTILISATEURS (Admin)
+════════════════════════════════════════════ -->
+<div class="page" id="page-users">
+  <div class="users-container">
+    <div class="users-header">
+      <div class="users-header-left">
+        <div class="users-title">Utilisateurs</div>
+        <div class="users-subtitle" id="users-count">0 sessions enregistrées</div>
+      </div>
+      <div class="users-header-right">
+        <button class="btn btn-ghost" onclick="loadUsers()" title="Rafraîchir">
+          <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Rafraîchir
+        </button>
+        <button class="btn btn-ghost" onclick="exportUsersPDF()" title="Exporter en PDF">
+          <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exporter
+        </button>
+      </div>
+    </div>
+
+    <div class="users-filters">
+      <input type="text" class="users-search" id="users-search" placeholder="Rechercher un utilisateur..." oninput="filterUsers()">
+      <select class="users-filter-select" id="users-filter-role" onchange="filterUsers()">
+        <option value="">Tous les rôles</option>
+        <option value="admin">Administrateur</option>
+        <option value="student">Élève</option>
+      </select>
+      <select class="users-filter-select" id="users-filter-device" onchange="filterUsers()">
+        <option value="">Tous les appareils</option>
+        <option value="Ordinateur">Ordinateur</option>
+        <option value="Téléphone">Téléphone</option>
+        <option value="Tablette">Tablette</option>
+      </select>
+    </div>
+
+    <div class="users-table-wrap">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th>Rôle</th>
+            <th>Appareil</th>
+            <th>Système</th>
+            <th>Navigateur</th>
+            <th>Adresse IP</th>
+            <th>Connexion</th>
+            <th>Déconnexion</th>
+            <th>État</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="users-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="users-activity-panel" id="users-activity-panel" style="display:none;">
+      <div class="users-activity-header">
+        <div class="users-activity-title">Historique des activités</div>
+        <button class="btn btn-ghost" onclick="closeActivityPanel()" style="padding:6px 12px;font-size:.78rem;">
+          <svg class="btn-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Fermer
+        </button>
+      </div>
+      <div class="users-activity-list" id="users-activity-list"></div>
+    </div>
+  </div>
+</div>
+
 </main>
 <div id="toast"></div>
 <div class="draft-toast" id="draft-toast">
@@ -1730,12 +1876,14 @@ const TOTAL_COEF = MATIERES.reduce((s,m)=>s+m.coef,0);
 function showPage(id){
   const role=localStorage.getItem('saphir_role');
   if(id==='hist'&&role!=='admin') return;
+  if(id==='users'&&role!=='admin') return;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.getElementById('nav-'+id).classList.add('active');
   window.scrollTo({top:0,left:0,behavior:'auto'});
   if(id==='hist') loadHistory();
+  if(id==='users') loadUsers();
 }
 
 /* ════ PAGE MGA ════ */
@@ -2143,8 +2291,8 @@ async function saveToHistory(){
       if(r.status===401||r.status===302){toast('Session expirée. Reconnectez-vous.',true);return;}
       toast(err.error||'Erreur serveur ('+r.status+')',true);return;
     }
-    if(editingId){toast('Calcul mis à jour avec succès ✔');cancelEdit();}
-    else{toast('Enregistré : '+nom);}
+    if(editingId){toast('Calcul mis à jour avec succès ✔');cancelEdit();logActivity('Modification élève','Calcul MO','id='+editingId);}
+    else{toast('Enregistré : '+nom);logActivity('Création élève','Calcul MO',nom);}
     localStorage.removeItem('saphir_draft');
     await loadHistory();
   }catch(e){toast('Erreur lors de l\'enregistrement.',true);}
@@ -2162,6 +2310,7 @@ async function supprimerCalculHistorique(id,btn){
     selectedIds=selectedIds.filter(x=>x!==id);
     await loadHistory();
     toast('Calcul supprimé définitivement.');
+    logActivity('Suppression élève','Historique','id='+id);
   }catch(e){
     toast(e.message||'Erreur lors de la suppression.',true);
     btn.disabled=false;btn.innerHTML='&#128465; Supprimer';
@@ -2187,6 +2336,7 @@ async function clearHistory(){
   histData=[];selectedIds=[];
   renderHistory();
   toast('Historique vidé.');
+  logActivity('Vider l historique','Historique','Tous les calculs supprimés');
 }
 
 function confirmClearHistory(){
@@ -2361,6 +2511,7 @@ ${styles}
 </style></head><body>${page}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
+  logActivity('Téléchargement PDF','Bulletin',h.nom||'');
 }
 
 /* ════ APERÇU BULLETIN DEPUIS HISTORIQUE ════ */
@@ -2407,6 +2558,7 @@ ${styles}
 </div>
 </body></html>`);
   win.document.close();
+  logActivity('Aperçu PDF','Bulletin',h.nom||'');
 }
 
 /* ════ IMPRESSION MULTIPLE ════ */
@@ -2669,6 +2821,7 @@ function exportPDF(){
     toast('Note manquante : '+missing[0],true);return;
   }
   buildBulletin();saveToHistory();window.print();toast('PDF exporté et enregistré ✔');
+  logActivity('Export PDF','Calcul MO','Export depuis formulaire');
 }
 
 /* ════ APERÇU BULLETIN DEPUIS FORMULAIRE MO ════ */
@@ -2727,6 +2880,7 @@ ${styles}
 </div>
 </body></html>`);
   win.document.close();
+  logActivity('Aperçu PDF','Calcul MO',nom);
 }
 
 function toast(msg,isErr=false){
@@ -2752,6 +2906,15 @@ function applyRole(){
     if(nav){nav.style.display='none';nav.removeAttribute('onclick');}
     if(page){page.style.display='none';}
     if(page&&page.classList.contains('active')) showPage('mo');
+    const navUsers=document.getElementById('nav-users');
+    const sepUsers=document.getElementById('nav-sep-users');
+    if(navUsers) navUsers.style.display='none';
+    if(sepUsers) sepUsers.style.display='none';
+  } else {
+    const navUsers=document.getElementById('nav-users');
+    const sepUsers=document.getElementById('nav-sep-users');
+    if(navUsers) navUsers.style.display='';
+    if(sepUsers) sepUsers.style.display='';
   }
 }
 
@@ -2762,6 +2925,136 @@ function setVH(){
 }
 setVH();
 window.addEventListener('resize',setVH);
+
+/* ════ UTILISATEURS ════ */
+let _sessionId=parseInt(localStorage.getItem('saphir_session_id')||'0',10);
+let _allSessions=[];
+
+function logActivity(action,module,detail,resultat){
+  fetch(API+'/api/log-activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',
+    body:JSON.stringify({action,module,detail,resultat,session_id:_sessionId})
+  }).catch(()=>{});
+}
+
+async function loadUsers(){
+  try{
+    const r=await fetch(API+'/api/sessions',{credentials:'same-origin'});
+    if(!r.ok) return;
+    _allSessions=await r.json();
+    renderUsers(_allSessions);
+  }catch(e){}
+}
+
+function renderUsers(sessions){
+  const tb=document.getElementById('users-tbody');
+  const ct=document.getElementById('users-count');
+  if(!sessions.length){
+    ct.textContent='0 sessions enregistrées';
+    tb.innerHTML='<tr><td colspan="9" class="users-empty-state">Aucune session enregistrée</td></tr>';
+    return;
+  }
+  ct.textContent=sessions.length+' session(s) enregistrée(s)';
+  const now=new Date();
+  tb.innerHTML=sessions.map(s=>{
+    const logoutAt=s.logout_at||'';
+    const isOnline=!logoutAt;
+    const loginDisplay=(s.login_at||'').replace('T',' ').substring(0,16);
+    const logoutDisplay=logoutAt?logoutAt.substring(0,16):'—';
+    const roleLabel=s.role==='admin'?'Administrateur':'Élève';
+    const roleCls=s.role==='admin'?'users-role-admin':'users-role-student';
+    const statusCls=isOnline?'users-status-online':'users-status-offline';
+    const statusLabel=isOnline?'En ligne':'Hors ligne';
+    return `<tr>
+      <td><span class="users-role-badge ${roleCls}">${roleLabel}</span></td>
+      <td>${s.appareil||'—'}</td>
+      <td>${s.os||'—'}</td>
+      <td>${s.navigateur||'—'}</td>
+      <td style="font-family:monospace;font-size:.74rem;">${s.ip||'—'}</td>
+      <td style="font-size:.74rem;">${loginDisplay}</td>
+      <td style="font-size:.74rem;">${logoutDisplay}</td>
+      <td><span class="users-status ${statusCls}"><span class="users-status-dot"></span>${statusLabel}</span></td>
+      <td><button class="users-activity-btn" onclick="showUserActivities(${s.id})">Activités</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterUsers(){
+  const q=(document.getElementById('users-search').value||'').toLowerCase();
+  const roleF=document.getElementById('users-filter-role').value;
+  const devF=document.getElementById('users-filter-device').value;
+  let filtered=_allSessions.filter(s=>{
+    if(roleF&&s.role!==roleF) return false;
+    if(devF&&(s.appareil||'')!==devF) return false;
+    if(q){
+      const hay=((s.ip||'')+(s.os||'')+(s.navigateur||'')+(s.appareil||'')+(s.role||'')).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  renderUsers(filtered);
+}
+
+async function showUserActivities(sessionId){
+  const panel=document.getElementById('users-activity-panel');
+  const list=document.getElementById('users-activity-list');
+  panel.style.display='block';
+  list.innerHTML='<div class="users-empty-state">Chargement...</div>';
+  try{
+    const r=await fetch(API+'/api/sessions/'+sessionId+'/activities',{credentials:'same-origin'});
+    if(!r.ok){list.innerHTML='<div class="users-empty-state">Erreur de chargement</div>';return;}
+    const logs=await r.json();
+    if(!logs.length){list.innerHTML='<div class="users-empty-state">Aucune activité enregistrée pour cette session</div>';return;}
+    list.innerHTML=logs.map(l=>{
+      const dateStr=(l.created_at||'').substring(0,16).replace('T',' ');
+      const resCls=l.resultat==='succes'?'ok':'fail';
+      const resLabel=l.resultat==='succes'?'Succès':'Échec';
+      return `<div class="users-activity-item">
+        <div class="users-activity-date">${dateStr}</div>
+        <div class="users-activity-action">${l.action||'—'}</div>
+        <div class="users-activity-module">${l.module||'—'}</div>
+        <div class="users-activity-result ${resCls}">${resLabel}</div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    list.innerHTML='<div class="users-empty-state">Erreur réseau</div>';
+  }
+}
+
+function closeActivityPanel(){
+  document.getElementById('users-activity-panel').style.display='none';
+}
+
+function exportUsersPDF(){
+  if(!_allSessions.length){toast('Aucune session à exporter.',true);return;}
+  const rows=_allSessions.map(s=>{
+    const logoutAt=s.logout_at||'—';
+    const status=s.logout_at?'Hors ligne':'En ligne';
+    return `<tr>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${s.role==='admin'?'Administrateur':'Élève'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${s.appareil||'—'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${s.os||'—'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${s.navigateur||'—'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${s.ip||'—'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${(s.login_at||'').substring(0,16)}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${logoutAt.substring(0,16)}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${status}</td>
+    </tr>`;
+  }).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Utilisateurs - SAPHIR Pro</title>
+    <style>body{font-family:'Ebrima',Arial,sans-serif;padding:20px;color:#1a3a2e;}
+    h1{font-size:1.1rem;color:#064E3B;margin-bottom:4px;}
+    p{font-size:.75rem;color:#60736d;margin-bottom:16px;}
+    table{width:100%;border-collapse:collapse;font-size:.75rem;}
+    th{background:#f4f8f6;padding:8px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#064E3B;border-bottom:2px solid #d5e5de;}
+    </style></head><body>
+    <h1>Liste des utilisateurs — SAPHIR Pro</h1>
+    <p>${_allSessions.length} session(s) • Exporté le ${new Date().toLocaleDateString('fr-FR')}</p>
+    <table><thead><tr><th>Rôle</th><th>Appareil</th><th>Système</th><th>Navigateur</th><th>IP</th><th>Connexion</th><th>Déconnexion</th><th>État</th></tr></thead><tbody>${rows}</tbody></table>
+    </body></html>`;
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+  win.document.write(html);win.document.close();setTimeout(()=>win.print(),400);
+}
 
 /* ── INIT ── */
 buildMGATable();

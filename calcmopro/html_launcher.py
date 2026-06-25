@@ -79,6 +79,7 @@ def open_app_window(port: int) -> None:
         sw, sh = 1920, 1080
     w, h = int(sw * 0.50), int(sh * 0.50)
     x, y = (sw - w) // 2, (sh - h) // 2
+    user_data_dir = str(Path(os.environ.get("LOCALAPPDATA", tempfile.gettempdir())) / "CALCMO-Pro" / "edge-profile")
     subprocess.Popen(
         [
             str(edge),
@@ -86,6 +87,7 @@ def open_app_window(port: int) -> None:
             f"--window-size={w},{h}",
             f"--window-position={x},{y}",
             "--new-window",
+            f"--user-data-dir={user_data_dir}",
         ],
         close_fds=True,
         creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),

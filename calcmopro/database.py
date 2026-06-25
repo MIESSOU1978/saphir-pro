@@ -180,7 +180,32 @@ def init_db() -> None:
                 date_calc   TEXT DEFAULT (datetime('now','localtime'))
             )
         """)
-        # Verify connection works
+        _turso_exec("""
+            CREATE TABLE IF NOT EXISTS sessions (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                role        TEXT NOT NULL DEFAULT 'student',
+                ip          TEXT DEFAULT '',
+                user_agent  TEXT DEFAULT '',
+                ville       TEXT DEFAULT '',
+                os          TEXT DEFAULT '',
+                navigateur  TEXT DEFAULT '',
+                appareil    TEXT DEFAULT '',
+                login_at    TEXT DEFAULT (datetime('now','localtime')),
+                logout_at   TEXT DEFAULT ''
+            )
+        """)
+        _turso_exec("""
+            CREATE TABLE IF NOT EXISTS activity_log (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_id  INTEGER DEFAULT 0,
+                role        TEXT DEFAULT '',
+                action      TEXT NOT NULL,
+                module      TEXT DEFAULT '',
+                detail      TEXT DEFAULT '',
+                resultat    TEXT DEFAULT 'succes',
+                created_at  TEXT DEFAULT (datetime('now','localtime'))
+            )
+        """)
         test = _turso_exec("SELECT COUNT(*) as n FROM eleves")
         count = test[0]["n"] if test else "UNKNOWN"
         print(f"[DB] init_db OK | Turso connected | eleves count={count}")
@@ -206,6 +231,28 @@ def init_db() -> None:
             mention     TEXT DEFAULT '',
             matieres    TEXT DEFAULT '{}',
             date_calc   TEXT DEFAULT (datetime('now','localtime'))
+        );
+        CREATE TABLE IF NOT EXISTS sessions (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            role        TEXT NOT NULL DEFAULT 'student',
+            ip          TEXT DEFAULT '',
+            user_agent  TEXT DEFAULT '',
+            ville       TEXT DEFAULT '',
+            os          TEXT DEFAULT '',
+            navigateur  TEXT DEFAULT '',
+            appareil    TEXT DEFAULT '',
+            login_at    TEXT DEFAULT (datetime('now','localtime')),
+            logout_at   TEXT DEFAULT ''
+        );
+        CREATE TABLE IF NOT EXISTS activity_log (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id  INTEGER DEFAULT 0,
+            role        TEXT DEFAULT '',
+            action      TEXT NOT NULL,
+            module      TEXT DEFAULT '',
+            detail      TEXT DEFAULT '',
+            resultat    TEXT DEFAULT 'succes',
+            created_at  TEXT DEFAULT (datetime('now','localtime'))
         );
     """)
     conn.close()
@@ -437,6 +484,123 @@ def count_eleves() -> int:
     n = conn.execute("SELECT COUNT(*) FROM eleves").fetchone()[0]
     conn.close()
     return n
+
+
+# ── SESSIONS & ACTIVITY LOG ──────────────────────────────────────
+
+def _parse_user_agent(ua: str) -> dict:
+    """Extract OS, browser, device type from User-Agent string."""
+    ua_lower = ua.lower()
+    # OS
+    os_name = "Inconnu"
+    if "windows" in ua_lower: os_name = "Windows"
+    elif "android" in ua_lower: os_name = "Android"
+    elif "iphone" in ua_lower or "ipad" in ua_lower: os_name = "iOS"
+    elif "mac os" in ua_lower or "macos" in ua_lower: os_name = "macOS"
+    elif "linux" in ua_lower: os_name = "Linux"
+    # Browser
+    nav = "Inconnu"
+    if "edg/" in ua_lower or "edge/" in ua_lower: nav = "Edge"
+    elif "chrome/" in ua_lower and "edg/" not in ua_lower: nav = "Chrome"
+    elif "firefox/" in ua_lower: nav = "Firefox"
+    elif "safari/" in ua_lower and "chrome/" not in ua_lower: nav = "Safari"
+    # Device
+    appareil = "Ordinateur"
+    if "mobile" in ua_lower or "android" in ua_lower: appareil = "Téléphone"
+    elif "ipad" in ua_lower or "tablet" in ua_lower: appareil = "Tablette"
+    return {"os": os_name, "navigateur": nav, "appareil": appareil}
+
+
+def create_session(role: str, ip: str = "", user_agent: str = "") -> int:
+    """Create a session record and return session_id."""
+    info = _parse_user_agent(user_agent)
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if _turso_enabled():
+        sid = _turso_exec_insert(
+            "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [role, ip, user_agent, "", info["os"], info["navigateur"], info["appareil"], now],
+        )
+        print(f"[DB create_session] id={sid} role={role} ip={ip} os={info['os']} nav={info['navigateur']}")
+        return sid
+    conn = _connect()
+    cur = conn.execute(
+        "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (role, ip, user_agent, "", info["os"], info["navigateur"], info["appareil"], now),
+    )
+    sid = cur.lastrowid
+    conn.commit()
+    conn.close()
+    print(f"[DB create_session] id={sid} role={role} ip={ip} os={info['os']} nav={info['navigateur']}")
+    return sid
+
+
+def close_session(session_id: int) -> None:
+    """Mark session as logged out."""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if _turso_enabled():
+        _turso_exec_write("UPDATE sessions SET logout_at=? WHERE id=?", [now, session_id])
+        return
+    conn = _connect()
+    conn.execute("UPDATE sessions SET logout_at=? WHERE id=?", (now, session_id))
+    conn.commit()
+    conn.close()
+
+
+def log_activity(session_id: int, role: str, action: str, module: str = "", detail: str = "", resultat: str = "succes") -> None:
+    """Log an activity event."""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if _turso_enabled():
+        _turso_exec_insert(
+            "INSERT INTO activity_log (session_id, role, action, module, detail, resultat, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [session_id, role, action, module, detail, resultat, now],
+        )
+        return
+    conn = _connect()
+    conn.execute(
+        "INSERT INTO activity_log (session_id, role, action, module, detail, resultat, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (session_id, role, action, module, detail, resultat, now),
+    )
+    conn.commit()
+    conn.close()
+
+
+def list_sessions() -> list[dict]:
+    """List all sessions with activity summary."""
+    if _turso_enabled():
+        rows = _turso_exec("SELECT * FROM sessions ORDER BY id DESC")
+        for d in rows:
+            d["id"] = int(d["id"]) if d.get("id") is not None else d["id"]
+        return rows
+    conn = _connect()
+    rows = conn.execute("SELECT * FROM sessions ORDER BY id DESC").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def list_activity_logs(limit: int = 200) -> list[dict]:
+    """List recent activity logs."""
+    if _turso_enabled():
+        rows = _turso_exec(f"SELECT * FROM activity_log ORDER BY id DESC LIMIT {limit}")
+        for d in rows:
+            d["id"] = int(d["id"]) if d.get("id") is not None else d["id"]
+        return rows
+    conn = _connect()
+    rows = conn.execute("SELECT * FROM activity_log ORDER BY id DESC LIMIT ?", (limit,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_session_activities(session_id: int) -> list[dict]:
+    """Get all activities for a specific session."""
+    if _turso_enabled():
+        rows = _turso_exec("SELECT * FROM activity_log WHERE session_id=? ORDER BY id DESC", [session_id])
+        for d in rows:
+            d["id"] = int(d["id"]) if d.get("id") is not None else d["id"]
+        return rows
+    conn = _connect()
+    rows = conn.execute("SELECT * FROM activity_log WHERE session_id=? ORDER BY id DESC", (session_id,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
 
 
 # Auto-init on import

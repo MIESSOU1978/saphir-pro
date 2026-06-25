@@ -310,6 +310,25 @@ class _Handler(BaseHTTPRequestHandler):
             test = db._turso_exec("SELECT COUNT(*) as n FROM eleves")
             return self._json({"ok": True, "count": test[0]["n"] if test else -1})
 
+        if path == "/api/sessions":
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            return self._json(db.list_sessions())
+
+        if path == "/api/activity-logs":
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            return self._json(db.list_activity_logs())
+
+        if path.startswith("/api/sessions/") and path.endswith("/activities"):
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                sid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            return self._json(db.get_session_activities(sid))
+
         self.send_error(404)
 
     def do_HEAD(self) -> None:
@@ -341,16 +360,28 @@ class _Handler(BaseHTTPRequestHandler):
             if not _auth_required():
                 if _STUDENT_PASSWORD and _hash_password(pwd) == _hash_password(_STUDENT_PASSWORD):
                     token = _create_session("student")
-                    return self._json_with_cookie({"ok": True, "role": "student"}, "session", token)
-                return self._json({"ok": True, "role": "admin"})
+                    ip = self.client_address[0]
+                    ua = self.headers.get("User-Agent", "")
+                    sid = db.create_session("student", ip, ua)
+                    return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
+                ip = self.client_address[0]
+                ua = self.headers.get("User-Agent", "")
+                sid = db.create_session("admin", ip, ua)
+                return self._json({"ok": True, "role": "admin", "session_id": sid})
 
             if _hash_password(pwd) == _hash_password(_APP_PASSWORD):
                 token = _create_session("admin")
-                return self._json_with_cookie({"ok": True, "role": "admin"}, "session", token)
+                ip = self.client_address[0]
+                ua = self.headers.get("User-Agent", "")
+                sid = db.create_session("admin", ip, ua)
+                return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid}, "session", token)
 
             if _STUDENT_PASSWORD and _hash_password(pwd) == _hash_password(_STUDENT_PASSWORD):
                 token = _create_session("student")
-                return self._json_with_cookie({"ok": True, "role": "student"}, "session", token)
+                ip = self.client_address[0]
+                ua = self.headers.get("User-Agent", "")
+                sid = db.create_session("student", ip, ua)
+                return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
 
             # Record failed attempt for rate limiting
             _record_failed_login(client_ip)
@@ -417,6 +448,38 @@ class _Handler(BaseHTTPRequestHandler):
             if result is None:
                 return self._json({"error": "Calcul introuvable"}, 404)
             return self._json(result, 201)
+
+        if path == "/api/log-activity":
+            body = self._read_body()
+            action = body.get("action", "")
+            module = body.get("module", "")
+            detail = body.get("detail", "")
+            resultat = body.get("resultat", "succes")
+            session_id = body.get("session_id", 0)
+            role = self._get_role()
+            try:
+                db.log_activity(session_id, role, action, module, detail, resultat)
+            except Exception as exc:
+                print(f"[ERROR] log_activity: {exc}")
+            return self._json({"ok": True})
+
+        if path == "/api/sessions/create":
+            body = self._read_body()
+            role = body.get("role", self._get_role())
+            ip = self.client_address[0]
+            ua = self.headers.get("User-Agent", "")
+            sid = db.create_session(role, ip, ua)
+            return self._json({"ok": True, "session_id": sid})
+
+        if path.startswith("/api/sessions/") and path.endswith("/close"):
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                sid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            db.close_session(sid)
+            return self._json({"ok": True})
 
         self.send_error(404)
 

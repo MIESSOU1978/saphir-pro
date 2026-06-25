@@ -270,6 +270,7 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
     if(d.ok){
       const role=(pwd==='RECEPTIOn8@2025')?'student':'admin';
       localStorage.setItem('saphir_role',role);
+      if(d.session_id) localStorage.setItem('saphir_session_id',d.session_id);
       if(remember) localStorage.setItem('saphir_pwd',pwd);
       else localStorage.removeItem('saphir_pwd');
       window.location.href='/';
