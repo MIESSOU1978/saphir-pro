@@ -3077,6 +3077,8 @@ window.addEventListener('resize',setVH);
 let _sessionId=parseInt(localStorage.getItem('saphir_session_id')||'0',10);
 let _allSessions=[];
 
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
 function sendNotification(titre,message,type){
   const n={id:Date.now(),titre,message,type:type||'info',lu:0,created_at:new Date().toISOString()};
   try{const arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');arr.unshift(n);if(arr.length>50)arr.length=50;localStorage.setItem('saphir_notifs',JSON.stringify(arr));}catch(e){}
