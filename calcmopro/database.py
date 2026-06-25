@@ -166,6 +166,7 @@ def init_db() -> None:
                 classe      TEXT DEFAULT '',
                 etablissement TEXT DEFAULT '',
                 annee       TEXT DEFAULT '',
+                annee_scolaire TEXT DEFAULT '',
                 created_at  TEXT DEFAULT (datetime('now','localtime'))
             )
         """)
@@ -218,6 +219,25 @@ def init_db() -> None:
                 created_at  TEXT DEFAULT (datetime('now','localtime'))
             )
         """)
+        _turso_exec("""
+            CREATE TABLE IF NOT EXISTS notifications (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id     TEXT DEFAULT 'all',
+                titre       TEXT NOT NULL,
+                message     TEXT DEFAULT '',
+                type        TEXT DEFAULT 'info',
+                lu          INTEGER DEFAULT 0,
+                created_at  TEXT DEFAULT (datetime('now','localtime'))
+            )
+        """)
+        # Add missing columns for existing tables
+        for col, typ, default in [
+            ("annee_scolaire", "TEXT", "''"),
+        ]:
+            try:
+                _turso_exec(f"ALTER TABLE eleves ADD COLUMN {col} {typ} DEFAULT {default}")
+            except Exception:
+                pass
         test = _turso_exec("SELECT COUNT(*) as n FROM eleves")
         count = test[0]["n"] if test else "UNKNOWN"
         print(f"[DB] init_db OK | Turso connected | eleves count={count}")
@@ -268,6 +288,15 @@ def init_db() -> None:
             resultat    TEXT DEFAULT 'succes',
             created_at  TEXT DEFAULT (datetime('now','localtime'))
         );
+        CREATE TABLE IF NOT EXISTS notifications (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id     TEXT DEFAULT 'all',
+            titre       TEXT NOT NULL,
+            message     TEXT DEFAULT '',
+            type        TEXT DEFAULT 'info',
+            lu          INTEGER DEFAULT 0,
+            created_at  TEXT DEFAULT (datetime('now','localtime'))
+        );
     """)
     # Add missing columns for existing tables
     conn = _connect()
@@ -276,19 +305,24 @@ def init_db() -> None:
             conn.execute(f"ALTER TABLE sessions ADD COLUMN {col} {typ} DEFAULT ''")
         except Exception:
             pass
+    try:
+        conn.execute("ALTER TABLE eleves ADD COLUMN annee_scolaire TEXT DEFAULT ''")
+    except Exception:
+        pass
     conn.close()
 
 
 def save_eleve(nom: str, matricule: str = "", classe: str = "",
                etablissement: str = "", annee: str = "",
                total: float = 0, mo: float = 0, mention: str = "",
-               matieres: dict | None = None) -> dict[str, Any]:
+               matieres: dict | None = None,
+               annee_scolaire: str = "") -> dict[str, Any]:
     matieres_json = json.dumps(matieres or {}, ensure_ascii=False)
 
     if _turso_enabled():
         eid = _turso_exec_insert(
-            "INSERT INTO eleves (nom, matricule, classe, etablissement, annee) VALUES (?, ?, ?, ?, ?)",
-            [nom, matricule, classe, etablissement, annee],
+            "INSERT INTO eleves (nom, matricule, classe, etablissement, annee, annee_scolaire) VALUES (?, ?, ?, ?, ?, ?)",
+            [nom, matricule, classe, etablissement, annee, annee_scolaire],
         )
         if not eid:
             print(f"[DB save_eleve] FAIL: INSERT returned id=0 for nom={nom}")
@@ -306,8 +340,8 @@ def save_eleve(nom: str, matricule: str = "", classe: str = "",
 
     conn = _connect()
     cur = conn.execute(
-        "INSERT INTO eleves (nom, matricule, classe, etablissement, annee) VALUES (?, ?, ?, ?, ?)",
-        (nom, matricule, classe, etablissement, annee),
+        "INSERT INTO eleves (nom, matricule, classe, etablissement, annee, annee_scolaire) VALUES (?, ?, ?, ?, ?, ?)",
+        (nom, matricule, classe, etablissement, annee, annee_scolaire),
     )
     eleve_id = cur.lastrowid
     conn.execute(
@@ -400,13 +434,14 @@ def get_eleve(eleve_id: int) -> dict[str, Any] | None:
 def update_eleve(eleve_id: int, nom: str, matricule: str = "", classe: str = "",
                  etablissement: str = "", annee: str = "",
                  total: float = 0, mo: float = 0, mention: str = "",
-                 matieres: dict | None = None) -> dict[str, Any] | None:
+                 matieres: dict | None = None,
+                 annee_scolaire: str = "") -> dict[str, Any] | None:
     matieres_json = json.dumps(matieres or {}, ensure_ascii=False)
 
     if _turso_enabled():
         _turso_exec_write(
-            "UPDATE eleves SET nom=?, matricule=?, classe=?, etablissement=?, annee=? WHERE id=?",
-            [nom, matricule, classe, etablissement, annee, eleve_id],
+            "UPDATE eleves SET nom=?, matricule=?, classe=?, etablissement=?, annee=?, annee_scolaire=? WHERE id=?",
+            [nom, matricule, classe, etablissement, annee, annee_scolaire, eleve_id],
         )
         _turso_exec_write(
             "DELETE FROM resultats WHERE eleve_id=?", [eleve_id]
@@ -419,8 +454,8 @@ def update_eleve(eleve_id: int, nom: str, matricule: str = "", classe: str = "",
 
     conn = _connect()
     conn.execute(
-        "UPDATE eleves SET nom=?, matricule=?, classe=?, etablissement=?, annee=? WHERE id=?",
-        (nom, matricule, classe, etablissement, annee, eleve_id),
+        "UPDATE eleves SET nom=?, matricule=?, classe=?, etablissement=?, annee=?, annee_scolaire=? WHERE id=?",
+        (nom, matricule, classe, etablissement, annee, annee_scolaire, eleve_id),
     )
     conn.execute("DELETE FROM resultats WHERE eleve_id=?", (eleve_id,))
     conn.execute(
@@ -659,6 +694,138 @@ def get_session_activities(session_id: int) -> list[dict]:
     rows = conn.execute("SELECT * FROM activity_log WHERE session_id=? ORDER BY id DESC", (session_id,)).fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+
+# ── NOTIFICATIONS ──────────────────────────────────────────
+def add_notification(titre: str, message: str = "", ntype: str = "info", user_id: str = "all") -> int:
+    """Create a notification."""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if _turso_enabled():
+        nid = _turso_exec_insert(
+            "INSERT INTO notifications (user_id, titre, message, type, created_at) VALUES (?, ?, ?, ?, ?)",
+            [user_id, titre, message, ntype, now],
+        )
+        return nid
+    conn = _connect()
+    cur = conn.execute(
+        "INSERT INTO notifications (user_id, titre, message, type, created_at) VALUES (?, ?, ?, ?, ?)",
+        (user_id, titre, message, ntype, now),
+    )
+    nid = cur.lastrowid
+    conn.commit()
+    conn.close()
+    return nid
+
+
+def list_notifications(user_id: str = "all", limit: int = 50) -> list[dict]:
+    """List notifications for a user."""
+    if _turso_enabled():
+        rows = _turso_exec(
+            "SELECT * FROM notifications WHERE user_id=? OR user_id='all' ORDER BY id DESC LIMIT ?",
+            [user_id, limit],
+        )
+        for d in rows:
+            d["id"] = int(d["id"]) if d.get("id") is not None else d["id"]
+        return rows
+    conn = _connect()
+    rows = conn.execute(
+        "SELECT * FROM notifications WHERE user_id=? OR user_id='all' ORDER BY id DESC LIMIT ?",
+        (user_id, limit),
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def mark_notification_read(notif_id: int) -> None:
+    """Mark a notification as read."""
+    if _turso_enabled():
+        _turso_exec_write("UPDATE notifications SET lu=1 WHERE id=?", [notif_id])
+        return
+    conn = _connect()
+    conn.execute("UPDATE notifications SET lu=1 WHERE id=?", (notif_id,))
+    conn.commit()
+    conn.close()
+
+
+def mark_all_notifications_read() -> None:
+    """Mark all notifications as read."""
+    if _turso_enabled():
+        _turso_exec_write("UPDATE notifications SET lu=1 WHERE lu=0")
+        return
+    conn = _connect()
+    conn.execute("UPDATE notifications SET lu=1 WHERE lu=0")
+    conn.commit()
+    conn.close()
+
+
+def count_unread_notifications(user_id: str = "all") -> int:
+    """Count unread notifications."""
+    if _turso_enabled():
+        rows = _turso_exec(
+            "SELECT COUNT(*) as n FROM notifications WHERE lu=0 AND (user_id=? OR user_id='all')",
+            [user_id],
+        )
+        return int(rows[0]["n"]) if rows else 0
+    conn = _connect()
+    row = conn.execute(
+        "SELECT COUNT(*) as n FROM notifications WHERE lu=0 AND (user_id=? OR user_id='all')",
+        (user_id,),
+    ).fetchone()
+    conn.close()
+    return row["n"] if row else 0
+
+
+def delete_notification(notif_id: int) -> None:
+    """Delete a notification."""
+    if _turso_enabled():
+        _turso_exec_write("DELETE FROM notifications WHERE id=?", [notif_id])
+        return
+    conn = _connect()
+    conn.execute("DELETE FROM notifications WHERE id=?", (notif_id,))
+    conn.commit()
+    conn.close()
+
+
+# ── ANNEES SCOLAIRES ──────────────────────────────────────
+def list_annees_scolaires() -> list[str]:
+    """List all distinct school years."""
+    if _turso_enabled():
+        rows = _turso_exec("SELECT DISTINCT annee_scolaire FROM eleves WHERE annee_scolaire != '' ORDER BY annee_scolaire DESC")
+        return [r["annee_scolaire"] for r in rows if r.get("annee_scolaire")]
+    conn = _connect()
+    rows = conn.execute("SELECT DISTINCT annee_scolaire FROM eleves WHERE annee_scolaire != '' ORDER BY annee_scolaire DESC").fetchall()
+    conn.close()
+    return [r["annee_scolaire"] for r in rows if r["annee_scolaire"]]
+
+
+def update_eleve_annee_scolaire(eleve_id: int, annee_scolaire: str) -> None:
+    """Update annee_scolaire for an eleve."""
+    if _turso_enabled():
+        _turso_exec_write("UPDATE eleves SET annee_scolaire=? WHERE id=?", [annee_scolaire, eleve_id])
+        return
+    conn = _connect()
+    conn.execute("UPDATE eleves SET annee_scolaire=? WHERE id=?", (annee_scolaire, eleve_id))
+    conn.commit()
+    conn.close()
+
+
+def archive_eleves(annee_scolaire: str) -> int:
+    """Mark all eleves without annee_scolaire as archived for the given year."""
+    count = 0
+    if _turso_enabled():
+        rows = _turso_exec("SELECT id FROM eleves WHERE annee_scolaire=''")
+        for r in rows:
+            _turso_exec_write("UPDATE eleves SET annee_scolaire=? WHERE id=?", [annee_scolaire, r["id"]])
+            count += 1
+        return count
+    conn = _connect()
+    rows = conn.execute("SELECT id FROM eleves WHERE annee_scolaire=''").fetchall()
+    for r in rows:
+        conn.execute("UPDATE eleves SET annee_scolaire=? WHERE id=?", (annee_scolaire, r["id"]))
+        count += 1
+    conn.commit()
+    conn.close()
+    return count
 
 
 # Auto-init on import

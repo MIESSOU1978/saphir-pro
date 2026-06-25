@@ -339,6 +339,27 @@ class _Handler(BaseHTTPRequestHandler):
                 return self._json({"error": "id invalide"}, 400)
             return self._json(db.get_session_activities(sid))
 
+        if path == "/api/notifications":
+            return self._json(db.list_notifications())
+
+        if path == "/api/notifications/unread":
+            return self._json({"count": db.count_unread_notifications()})
+
+        if path.startswith("/api/notifications/") and path.endswith("/read"):
+            try:
+                nid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            db.mark_notification_read(nid)
+            return self._json({"ok": True})
+
+        if path == "/api/notifications/read-all":
+            db.mark_all_notifications_read()
+            return self._json({"ok": True})
+
+        if path == "/api/annees-scolaires":
+            return self._json(db.list_annees_scolaires())
+
         self.send_error(404)
 
     def do_HEAD(self) -> None:
@@ -426,6 +447,7 @@ class _Handler(BaseHTTPRequestHandler):
                     mo=body.get("mo", 0),
                     mention=body.get("mention", ""),
                     matieres=body.get("matieres"),
+                    annee_scolaire=body.get("annee_scolaire", ""),
                 )
                 if result.get("error"):
                     return self._json(result, 500)
@@ -491,6 +513,25 @@ class _Handler(BaseHTTPRequestHandler):
                 return self._json({"error": "id invalide"}, 400)
             db.close_session(sid)
             return self._json({"ok": True})
+
+        if path == "/api/notifications":
+            body = self._read_body()
+            titre = body.get("titre", "")
+            message = body.get("message", "")
+            ntype = body.get("type", "info")
+            nid = db.add_notification(titre, message, ntype)
+            return self._json({"ok": True, "id": nid}, 201)
+
+        if path == "/api/archive":
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            body = self._read_body()
+            annee = body.get("annee_scolaire", "")
+            if not annee:
+                return self._json({"error": "Année scolaire requise"}, 400)
+            count = db.archive_eleves(annee)
+            db.add_notification("Archivage", f"{count} calcul(s) archivé(s) pour {annee}", "info")
+            return self._json({"ok": True, "archived": count})
 
         self.send_error(404)
 
@@ -603,6 +644,7 @@ class _Handler(BaseHTTPRequestHandler):
                     mo=body.get("mo", 0),
                     mention=body.get("mention", ""),
                     matieres=body.get("matieres"),
+                    annee_scolaire=body.get("annee_scolaire", ""),
                 )
             except Exception as exc:
                 return self._json({"error": str(exc)}, 500)
