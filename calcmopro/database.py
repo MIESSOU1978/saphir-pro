@@ -358,7 +358,7 @@ def save_eleve(nom: str, matricule: str = "", classe: str = "",
 def list_eleves() -> list[dict[str, Any]]:
     if _turso_enabled():
         rows = _turso_exec("""
-            SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.created_at,
+            SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_at,
                    r.total, r.mo, r.mention, r.matieres, r.date_calc
             FROM eleves e
             LEFT JOIN resultats r ON r.eleve_id = e.id
@@ -376,7 +376,7 @@ def list_eleves() -> list[dict[str, Any]]:
 
     conn = _connect()
     rows = conn.execute("""
-        SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.created_at,
+        SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_at,
                r.total, r.mo, r.mention, r.matieres, r.date_calc
         FROM eleves e
         LEFT JOIN resultats r ON r.eleve_id = e.id

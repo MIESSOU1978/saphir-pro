@@ -1643,7 +1643,34 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       </div>
       <div class="field-group">
         <label>CLASSE</label>
-        <input type="text" id="mo-classe" placeholder="Ex : 3ème A">
+        <select id="mo-classe">
+          <option value="">— Sélectionner —</option>
+          <option value="3ème 1">3ème 1</option>
+          <option value="3ème 2">3ème 2</option>
+          <option value="3ème 3">3ème 3</option>
+          <option value="3ème 4">3ème 4</option>
+          <option value="3ème A">3ème A</option>
+          <option value="3ème B">3ème B</option>
+          <option value="3ème C">3ème C</option>
+          <option value="3ème D">3ème D</option>
+          <option value="4ème 1">4ème 1</option>
+          <option value="4ème 2">4ème 2</option>
+          <option value="4ème 3">4ème 3</option>
+          <option value="4ème A">4ème A</option>
+          <option value="4ème B">4ème B</option>
+          <option value="5ème 1">5ème 1</option>
+          <option value="5ème 2">5ème 2</option>
+          <option value="5ème A">5ème A</option>
+          <option value="6ème 1">6ème 1</option>
+          <option value="6ème 2">6ème 2</option>
+          <option value="6ème A">6ème A</option>
+          <option value="2nde A">2nde A</option>
+          <option value="2nde B">2nde B</option>
+          <option value="1ère A">1ère A</option>
+          <option value="1ère B">1ère B</option>
+          <option value="Tle A">Tle A</option>
+          <option value="Tle B">Tle B</option>
+        </select>
       </div>
       <div class="field-group">
         <label>ANNÉE SCOLAIRE</label>
@@ -2360,6 +2387,8 @@ async function loadHistory(){
       h.id=Number(h.id);
       if(h.annee_scolaire!=null&&typeof h.annee_scolaire==='object') h.annee_scolaire=h.annee_scolaire.value||'';
       if(h.annee_scolaire==null) h.annee_scolaire='';
+      if(h.etablissement!=null&&typeof h.etablissement==='object') h.etablissement=h.etablissement.value||'';
+      if(h.etablissement==null) h.etablissement='';
     });
   }catch(e){histData=[];}
   selectedIds=[];
@@ -2696,7 +2725,7 @@ function buildBulletinHTML(h){
   })();
   const classe=h.classe||'-';
   const school=h.etablissement||'NON RENSEIGNÉ';
-  const year=h.annee||'-';
+  const year=h.annee_scolaire||h.annee||'-';
   const matricule=h.matricule||'-';
   const today=new Date().toLocaleDateString('fr-FR');
   let totalWeighted=0;
@@ -3049,7 +3078,7 @@ function applyRole(){
     if(navUsers) navUsers.style.display=isWeb?'':'none';
     if(sepUsers) sepUsers.style.display=isWeb?'':'none';
     const bell=document.getElementById('notif-bell');
-    if(bell) bell.style.display=isWeb?'flex':'none';
+    if(bell) bell.style.display='flex';
   }
 }
 
