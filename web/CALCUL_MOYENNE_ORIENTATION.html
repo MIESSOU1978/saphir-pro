@@ -3172,6 +3172,33 @@ buildMOTable();
 document.querySelectorAll('#page-mo .field-group input').forEach(el=>el.addEventListener('input',updateMOInfo));
 document.querySelectorAll('input').forEach(el=>{el.setAttribute('autocomplete','off');el.setAttribute('data-lpignore','true');});
 document.querySelectorAll('#page-mo .note-input, #page-mo .field-group input').forEach(el=>el.addEventListener('input',saveDraft));
+
+/* ── ACTIVITY TRACKING: Saisies ── */
+const _inputLogTimers={};
+function _trackInput(e){
+  const el=e.target;
+  const id=el.id||'';
+  const val=(el.value||'').trim();
+  const key='input_'+id;
+  clearTimeout(_inputLogTimers[key]);
+  _inputLogTimers[key]=setTimeout(()=>{
+    if(!val) return;
+    let mod='',act='';
+    if(id.includes('_mga')){mod='Calcul MGA';act='Saisie note '+id.replace('_mga','').replace('_t1',' T1').replace('_t2',' T2').replace('_t3',' T3');}
+    else if(id.includes('_bepc')){mod='Calcul MO';act='Saisie BEPC '+id.replace('_bepc','');}
+    else if(id==='mo-nom'||id==='nomEleve'){mod='Informations élève';act='Modification nom';}
+    else if(id==='mo-matricule'||id==='matricule'){mod='Informations élève';act='Modification matricule';}
+    else if(id==='mo-classe'||id==='classe'){mod='Informations élève';act='Modification classe';}
+    else if(id==='mo-annee'||id==='annee'){mod='Informations élève';act='Modification année';}
+    else if(id==='mo-etablissement'||id==='etablissement'){mod='Informations élève';act='Modification établissement';}
+    else{mod='Saisie';act='Modification '+id;}
+    logActivity(act,mod,val);
+  },800);
+}
+document.querySelectorAll('#page-mga .note-input').forEach(el=>el.addEventListener('input',_trackInput));
+document.querySelectorAll('#page-mo .note-input').forEach(el=>el.addEventListener('input',_trackInput));
+document.querySelectorAll('#page-mo .field-group input, #page-mga .field-group input').forEach(el=>el.addEventListener('input',_trackInput));
+
 applyRole();
 loadHistory();
 checkDraft();
