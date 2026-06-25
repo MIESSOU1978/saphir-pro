@@ -244,6 +244,24 @@ class _Handler(BaseHTTPRequestHandler):
                 return self._text(rt)
             return self.send_error(404)
 
+        if path == "/api/notifications":
+            return self._json(db.list_notifications())
+
+        if path == "/api/notifications/unread":
+            return self._json({"count": db.count_unread_notifications()})
+
+        if path.startswith("/api/notifications/") and path.endswith("/read"):
+            try:
+                nid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            db.mark_notification_read(nid)
+            return self._json({"ok": True})
+
+        if path == "/api/notifications/read-all":
+            db.mark_all_notifications_read()
+            return self._json({"ok": True})
+
         if not self._require_auth():
             return
 
@@ -338,24 +356,6 @@ class _Handler(BaseHTTPRequestHandler):
             except (ValueError, IndexError):
                 return self._json({"error": "id invalide"}, 400)
             return self._json(db.get_session_activities(sid))
-
-        if path == "/api/notifications":
-            return self._json(db.list_notifications())
-
-        if path == "/api/notifications/unread":
-            return self._json({"count": db.count_unread_notifications()})
-
-        if path.startswith("/api/notifications/") and path.endswith("/read"):
-            try:
-                nid = int(path.split("/")[-2])
-            except (ValueError, IndexError):
-                return self._json({"error": "id invalide"}, 400)
-            db.mark_notification_read(nid)
-            return self._json({"ok": True})
-
-        if path == "/api/notifications/read-all":
-            db.mark_all_notifications_read()
-            return self._json({"ok": True})
 
         if path == "/api/annees-scolaires":
             return self._json(db.list_annees_scolaires())
