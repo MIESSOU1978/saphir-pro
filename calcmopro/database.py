@@ -196,6 +196,16 @@ def init_db() -> None:
                 logout_at   TEXT DEFAULT ''
             )
         """)
+        # Add missing columns for existing tables
+        for col, typ, default in [
+            ("username", "TEXT", "''"),
+            ("email", "TEXT", "''"),
+            ("ville", "TEXT", "''"),
+        ]:
+            try:
+                _turso_exec(f"ALTER TABLE sessions ADD COLUMN {col} {typ} DEFAULT {default}")
+            except Exception:
+                pass
         _turso_exec("""
             CREATE TABLE IF NOT EXISTS activity_log (
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -259,6 +269,13 @@ def init_db() -> None:
             created_at  TEXT DEFAULT (datetime('now','localtime'))
         );
     """)
+    # Add missing columns for existing tables
+    conn = _connect()
+    for col, typ in [("username", "TEXT"), ("email", "TEXT"), ("ville", "TEXT")]:
+        try:
+            conn.execute(f"ALTER TABLE sessions ADD COLUMN {col} {typ} DEFAULT ''")
+        except Exception:
+            pass
     conn.close()
 
 
