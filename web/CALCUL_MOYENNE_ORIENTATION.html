@@ -3041,11 +3041,15 @@ function applyRole(){
     const sepUsers=document.getElementById('nav-sep-users');
     if(navUsers) navUsers.style.display='none';
     if(sepUsers) sepUsers.style.display='none';
+    const bell=document.getElementById('notif-bell');
+    if(bell) bell.style.display='none';
   } else {
     const navUsers=document.getElementById('nav-users');
     const sepUsers=document.getElementById('nav-sep-users');
     if(navUsers) navUsers.style.display=isWeb?'':'none';
     if(sepUsers) sepUsers.style.display=isWeb?'':'none';
+    const bell=document.getElementById('notif-bell');
+    if(bell) bell.style.display=isWeb?'flex':'none';
   }
 }
 
