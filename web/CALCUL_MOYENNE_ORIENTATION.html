@@ -1177,9 +1177,7 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 #page-mga .section-title,
 #page-mo .section-title{margin-bottom:18px;padding-bottom:10px;font-size:.987rem;line-height:1.35;letter-spacing:1.35px;}
 #page-mga .eleve-grid,
-#page-mo .eleve-grid{gap:14px 16px;grid-template-columns:2.8fr 0.8fr 0.8fr 1fr 1.6fr;}
-#page-mga .eleve-grid .field-group:last-child,
-#page-mo .eleve-grid .field-group:last-child{grid-column:1/-1;}
+#page-mo .eleve-grid{gap:14px 16px;grid-template-columns:1.5fr 0.6fr 0.6fr 1fr 2.8fr;}
 #page-mga .field-group,
 #page-mo .field-group{gap:6px;}
 #page-mga .field-group label,
@@ -1261,8 +1259,6 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
   #page-mo .card:has(.mat-table){overflow-x:auto;}
   #page-mga .eleve-grid,
   #page-mo .eleve-grid{grid-template-columns:1fr 1fr!important;}
-  #page-mga .eleve-grid .field-group:last-child,
-  #page-mo .eleve-grid .field-group:last-child{grid-column:1/-1;}
 }
 @media (max-width:700px){
   header:not(.bp-header){position:relative;grid-template-columns:1fr auto;min-height:88px;padding:18px 18px 13px;}
@@ -1491,10 +1487,6 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       </div>
       <div class="field-group">
         <label>ANNÉE SCOLAIRE</label>
-        <input type="text" id="annee" value="2025–2026">
-      </div>
-      <div class="field-group">
-        <label>PÉRIODE</label>
         <select id="annee_scolaire">
           <option value="">— Sélectionner —</option>
           <option value="2025-2026">2025–2026</option>
@@ -1655,10 +1647,6 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       </div>
       <div class="field-group">
         <label>ANNÉE SCOLAIRE</label>
-        <input type="text" id="mo-annee" value="2025–2026">
-      </div>
-      <div class="field-group">
-        <label>PÉRIODE</label>
         <select id="mo-annee_scolaire">
           <option value="">— Sélectionner —</option>
           <option value="2025-2026">2025–2026</option>
@@ -2061,7 +2049,7 @@ function resetMGA(){
   document.getElementById('nomEleve').value='';
   document.getElementById('matricule').value='';
   document.getElementById('classe').value='';
-  document.getElementById('annee').value='';
+  document.getElementById('annee_scolaire').value='';
   document.getElementById('etablissement').value='';
   MATIERES.forEach(m=>{
     ['t1','t2','t3'].forEach(t=>{const el=document.getElementById(m.id+'_'+t);if(el)el.value='';});
@@ -2104,12 +2092,12 @@ function exportMGAtoMO(){
   const nom=document.getElementById('nomEleve').value;
   const mat=document.getElementById('matricule')?.value || '';
   const cls=document.getElementById('classe')?.value || '';
-  const annee=document.getElementById('annee')?.value || '';
+  const anneeScolaire=document.getElementById('annee_scolaire')?.value || '';
   const etab=document.getElementById('etablissement')?.value || '';
   if(nom){ document.getElementById('mo-nom').value=nom; }
   if(mat){ document.getElementById('mo-matricule').value=mat; }
   if(cls){ document.getElementById('mo-classe').value=cls; }
-  if(annee){ document.getElementById('mo-annee').value=annee; }
+  if(anneeScolaire){ document.getElementById('mo-annee_scolaire').value=anneeScolaire; }
   if(etab){ document.getElementById('mo-etablissement').value=etab; }
   // Badge
   document.getElementById('mga-badge').style.display='inline';
@@ -2252,7 +2240,7 @@ function resetMO(){
   document.getElementById('mo-nom').value='';
   document.getElementById('mo-matricule').value='';
   document.getElementById('mo-classe').value='';
-  document.getElementById('mo-annee').value='2025–2026';
+  document.getElementById('mo-annee_scolaire').value='';
   document.getElementById('mo-etablissement').value='';
   document.querySelectorAll('#page-mo .note-input').forEach(el=>el.value='');
   document.querySelectorAll('#mo-tbody .computed-val, #mo-tbody .sum-val').forEach(el=>el.textContent='—');
@@ -2294,7 +2282,7 @@ function saveDraft(){
       nom:document.getElementById('mo-nom')?.value||'',
       matricule:document.getElementById('mo-matricule')?.value||'',
       classe:document.getElementById('mo-classe')?.value||'',
-      annee:document.getElementById('mo-annee')?.value||'',
+      annee_scolaire:document.getElementById('mo-annee_scolaire')?.value||'',
       etablissement:document.getElementById('mo-etablissement')?.value||'',
       tab:document.querySelector('.page.active')?.id||'',
       matieres:{}
@@ -2329,7 +2317,7 @@ function restoreDraft(){
   if(d.nom) document.getElementById('mo-nom').value=d.nom;
   if(d.matricule) document.getElementById('mo-matricule').value=d.matricule;
   if(d.classe) document.getElementById('mo-classe').value=d.classe;
-  if(d.annee) document.getElementById('mo-annee').value=d.annee;
+  if(d.annee_scolaire) document.getElementById('mo-annee_scolaire').value=d.annee_scolaire;
   if(d.etablissement) document.getElementById('mo-etablissement').value=d.etablissement;
   if(d.matieres){
     MATIERES.forEach(m=>{
@@ -2385,19 +2373,18 @@ async function saveToHistory(){
   if(!nom){toast('Veuillez remplir les informations de l\'élève avant d\'enregistrer.',true);return;}
   const matricule=(document.getElementById('mo-matricule').value||document.getElementById('matricule')?.value||'').trim();
   const classe=(document.getElementById('mo-classe').value||document.getElementById('classe')?.value||'').trim();
-  const annee=(document.getElementById('mo-annee')?.value||document.getElementById('annee')?.value||'').trim();
-  if(!matricule||!classe||!annee){
+  const anneeScolaire=(document.getElementById('mo-annee_scolaire')?.value||document.getElementById('annee_scolaire')?.value||'').trim();
+  if(!matricule||!classe||!anneeScolaire){
     const manquants=[];
     if(!matricule) manquants.push('Matricule');
     if(!classe) manquants.push('Classe');
-    if(!annee) manquants.push('Année');
+    if(!anneeScolaire) manquants.push('Année scolaire');
     toast('Champs manquants : '+manquants.join(', '),true);return;
   }
   const total=document.getElementById('r-total').textContent;
   const mo=document.getElementById('r-mo').textContent;
   const mention=document.getElementById('r-mention').textContent;
   const etab=(document.getElementById('mo-etablissement').value||document.getElementById('etablissement')?.value||'').trim();
-  const anneeScolaire=(document.getElementById('mo-annee_scolaire')?.value||document.getElementById('annee_scolaire')?.value||'').trim();
   const matieres={};
   MATIERES.forEach(m=>{
     const d={mga:parseNoteValue(document.getElementById(m.id+'_mga')?.value)};
@@ -2405,7 +2392,7 @@ async function saveToHistory(){
     else{d.bepc=parseNoteValue(document.getElementById(m.id+'_bepc')?.value);}
     matieres[m.id]=d;
   });
-  const payload={nom,matricule,classe,etablissement:etab,annee,annee_scolaire:anneeScolaire,total:parseFloat(String(total).replace(',','.'))||0,mo:parseFloat(String(mo).replace(',','.'))||0,mention,matieres};
+  const payload={nom,matricule,classe,etablissement:etab,annee:anneeScolaire,annee_scolaire:anneeScolaire,total:parseFloat(String(total).replace(',','.'))||0,mo:parseFloat(String(mo).replace(',','.'))||0,mention,matieres};
   try{
     let r;
     if(editingId){
@@ -2567,7 +2554,6 @@ function loadCalcToMO(h){
   document.getElementById('mo-nom').value=h.nom||'';
   document.getElementById('mo-matricule').value=h.matricule||'';
   document.getElementById('mo-classe').value=h.classe||'';
-  document.getElementById('mo-annee').value=h.annee||'';
   document.getElementById('mo-etablissement').value=h.etablissement||'';
   const asEl=document.getElementById('mo-annee_scolaire');
   if(asEl) asEl.value=h.annee_scolaire||'';
@@ -2822,7 +2808,7 @@ function buildBulletin(){
   document.getElementById('bp-initials').textContent=bulletinInitials(name);
   document.getElementById('bp-class').textContent=bulletinField('mo-classe');
   document.getElementById('bp-school').textContent=bulletinField('mo-etablissement','NON RENSEIGNÉ');
-  document.getElementById('bp-year').textContent=bulletinField('mo-annee');
+  document.getElementById('bp-year').textContent=bulletinField('mo-annee_scolaire');
   document.getElementById('bp-matricule').textContent=bulletinField('mo-matricule');
 
   document.getElementById('bp-grades-body').innerHTML=MATIERES.map(m=>{
@@ -2879,7 +2865,7 @@ function printBulletin(){
 function loadBulletinPreview(){
   const sample={
     'mo-nom':'YAO LIESSOU ALEXANDRE','mo-matricule':'240101245U','mo-classe':'3ème 2',
-    'mo-annee':'2025-2026','mo-etablissement':'Lycée Moderne Abengourou',
+    'mo-annee_scolaire':'2025-2026','mo-etablissement':'Lycée Moderne Abengourou',
     'redaction_mga':'10','redaction_bepc':'10','maths_mga':'15','maths_bepc':'14',
     'pc_mga':'10','pc_bepc':'11','anglais_mga':'11','anglais_bepc_e':'8','anglais_bepc_o':'12'
   };
@@ -3262,6 +3248,7 @@ buildMOTable();
 document.querySelectorAll('#page-mo .field-group input').forEach(el=>el.addEventListener('input',updateMOInfo));
 document.querySelectorAll('input').forEach(el=>{el.setAttribute('autocomplete','off');el.setAttribute('data-lpignore','true');});
 document.querySelectorAll('#page-mo .note-input, #page-mo .field-group input').forEach(el=>el.addEventListener('input',saveDraft));
+document.querySelectorAll('#page-mo .field-group select').forEach(el=>el.addEventListener('change',saveDraft));
 
 /* ── ACTIVITY TRACKING: Saisies ── */
 const _inputLogTimers={};
@@ -3279,7 +3266,7 @@ function _trackInput(e){
     else if(id==='mo-nom'||id==='nomEleve'){mod='Informations élève';act='Modification nom';}
     else if(id==='mo-matricule'||id==='matricule'){mod='Informations élève';act='Modification matricule';}
     else if(id==='mo-classe'||id==='classe'){mod='Informations élève';act='Modification classe';}
-    else if(id==='mo-annee'||id==='annee'){mod='Informations élève';act='Modification année';}
+    else if(id==='mo-annee_scolaire'||id==='annee_scolaire'){mod='Informations élève';act='Modification année scolaire';}
     else if(id==='mo-etablissement'||id==='etablissement'){mod='Informations élève';act='Modification établissement';}
     else{mod='Saisie';act='Modification '+id;}
     logActivity(act,mod,val);
@@ -3288,6 +3275,7 @@ function _trackInput(e){
 document.querySelectorAll('#page-mga .note-input').forEach(el=>el.addEventListener('input',_trackInput));
 document.querySelectorAll('#page-mo .note-input').forEach(el=>el.addEventListener('input',_trackInput));
 document.querySelectorAll('#page-mo .field-group input, #page-mga .field-group input').forEach(el=>el.addEventListener('input',_trackInput));
+document.querySelectorAll('#page-mo .field-group select, #page-mga .field-group select').forEach(el=>el.addEventListener('change',_trackInput));
 
 /* ═══ NOTIFICATIONS ═══ */
 let _notifOpen=false;
