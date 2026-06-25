@@ -1746,6 +1746,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         <thead>
           <tr>
             <th>Utilisateur</th>
+            <th>Email</th>
             <th>Rôle</th>
             <th>Ville</th>
             <th>Appareil</th>
@@ -2968,8 +2969,10 @@ function renderUsers(sessions){
     const statusLabel=isOnline?'En ligne':'Hors ligne';
     const uname=s.username||'—';
     const ville=s.ville||'—';
+    const email=s.email||'—';
     return `<tr>
       <td style="font-weight:600;">${uname}</td>
+      <td style="font-size:.76rem;">${email}</td>
       <td><span class="users-role-badge ${roleCls}">${roleLabel}</span></td>
       <td>${ville}</td>
       <td>${s.appareil||'—'}</td>
@@ -3037,6 +3040,7 @@ function exportUsersPDF(){
     const status=s.logout_at?'Hors ligne':'En ligne';
     return `<tr>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.username||'—'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${s.email||'—'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.role==='admin'?'Administrateur':'Élève'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.ville||'—'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.appareil||'—'}</td>
@@ -3057,7 +3061,7 @@ function exportUsersPDF(){
     </style></head><body>
     <h1>Liste des utilisateurs — SAPHIR Pro</h1>
     <p>${_allSessions.length} session(s) • Exporté le ${new Date().toLocaleDateString('fr-FR')}</p>
-    <table><thead><tr><th>Utilisateur</th><th>Rôle</th><th>Ville</th><th>Appareil</th><th>Système</th><th>Navigateur</th><th>IP</th><th>Connexion</th><th>Déconnexion</th><th>État</th></tr></thead><tbody>${rows}</tbody></table>
+    <table><thead><tr><th>Utilisateur</th><th>Email</th><th>Rôle</th><th>Ville</th><th>Appareil</th><th>Système</th><th>Navigateur</th><th>IP</th><th>Connexion</th><th>Déconnexion</th><th>État</th></tr></thead><tbody>${rows}</tbody></table>
     </body></html>`;
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}

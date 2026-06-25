@@ -191,6 +191,7 @@ def init_db() -> None:
                 navigateur  TEXT DEFAULT '',
                 appareil    TEXT DEFAULT '',
                 username    TEXT DEFAULT '',
+                email       TEXT DEFAULT '',
                 login_at    TEXT DEFAULT (datetime('now','localtime')),
                 logout_at   TEXT DEFAULT ''
             )
@@ -243,6 +244,7 @@ def init_db() -> None:
             navigateur  TEXT DEFAULT '',
             appareil    TEXT DEFAULT '',
             username    TEXT DEFAULT '',
+            email       TEXT DEFAULT '',
             login_at    TEXT DEFAULT (datetime('now','localtime')),
             logout_at   TEXT DEFAULT ''
         );
@@ -513,7 +515,7 @@ def _parse_user_agent(ua: str) -> dict:
     return {"os": os_name, "navigateur": nav, "appareil": appareil}
 
 
-def create_session(role: str, ip: str = "", user_agent: str = "") -> int:
+def create_session(role: str, ip: str = "", user_agent: str = "", email: str = "") -> int:
     """Create a session record and return session_id."""
     info = _parse_user_agent(user_agent)
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -536,15 +538,15 @@ def create_session(role: str, ip: str = "", user_agent: str = "") -> int:
             pass
     if _turso_enabled():
         sid = _turso_exec_insert(
-            "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, username) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            [role, ip, user_agent, ville, info["os"], info["navigateur"], info["appareil"], now, username],
+            "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, username, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [role, ip, user_agent, ville, info["os"], info["navigateur"], info["appareil"], now, username, email],
         )
         print(f"[DB create_session] id={sid} role={role} ip={ip} os={info['os']} nav={info['navigateur']} user={username} ville={ville}")
         return sid
     conn = _connect()
     cur = conn.execute(
-        "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, username) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        (role, ip, user_agent, ville, info["os"], info["navigateur"], info["appareil"], now, username),
+        "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, username, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (role, ip, user_agent, ville, info["os"], info["navigateur"], info["appareil"], now, username, email),
     )
     sid = cur.lastrowid
     conn.commit()

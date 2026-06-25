@@ -194,6 +194,9 @@ body{font-family:'Ebrima','Segoe UI',sans-serif;min-height:100vh;display:flex;ba
       <p>Entrez votre mot de passe pour accéder à SAPHIR Pro.</p>
     </div>
     <form id="loginForm">
+      <div class="form-group" style="margin-bottom:12px;">
+        <input type="email" id="email" placeholder="Adresse email (optionnel)" autocomplete="email" style="width:100%;padding:10px 14px;border:1.5px solid #AFC6BA;border-radius:10px;font-size:.88rem;color:#064E3B;background:#FDFEFE;font-family:'Ebrima','Segoe UI',Arial,sans-serif;box-sizing:border-box;">
+      </div>
       <div class="form-group">
         <label for="pwd">Mot de passe</label>
         <div class="input-wrap" id="pwdWrap">
@@ -261,11 +264,12 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
   const errMsg=document.getElementById('errMsg');
   const errText=document.getElementById('errText');
   const pwd=pwdInput.value;
+  const email=(document.getElementById('email')?.value||'').trim();
   const remember=document.getElementById('rememberMe').checked;
   if(!pwd){errText.textContent='Veuillez entrer le mot de passe';errMsg.classList.add('show');return}
   btn.disabled=true;btn.textContent='Connexion...';errMsg.classList.remove('show');pwdWrap.classList.remove('error');
   try{
-    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({password:pwd})});
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({password:pwd,email:email})});
     const d=await r.json();
     if(d.ok){
       const role=(pwd==='RECEPTIOn8@2025')?'student':'admin';
