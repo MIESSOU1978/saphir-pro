@@ -1483,7 +1483,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       </div>
       <div class="field-group">
         <label>CLASSE</label>
-        <input type="text" id="classe" placeholder="Ex : 3ème A">
+        <input type="text" id="classe" list="classe-list" placeholder="Saisir ou sélectionner...">
       </div>
       <div class="field-group">
         <label>ANNÉE SCOLAIRE</label>
@@ -1575,6 +1575,16 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
           <option>COLLÈGE SAINT JOSEPH ABENGOUROU</option>
           <option>COURS SECONDAIRE NANAN ATTA ANO APPOISSO</option>
         </datalist>
+        <datalist id="classe-list">
+          <option>3ème 1</option>
+          <option>3ème 2</option>
+          <option>3ème 3</option>
+          <option>3ème 4</option>
+          <option>3ème A</option>
+          <option>3ème B</option>
+          <option>3ème C</option>
+          <option>3ème D</option>
+        </datalist>
       </div>
     </div>
   </div>
@@ -1643,17 +1653,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       </div>
       <div class="field-group">
         <label>CLASSE</label>
-        <select id="mo-classe">
-          <option value="">— Sélectionner —</option>
-          <option value="3ème 1">3ème 1</option>
-          <option value="3ème 2">3ème 2</option>
-          <option value="3ème 3">3ème 3</option>
-          <option value="3ème 4">3ème 4</option>
-          <option value="3ème A">3ème A</option>
-          <option value="3ème B">3ème B</option>
-          <option value="3ème C">3ème C</option>
-          <option value="3ème D">3ème D</option>
-        </select>
+        <input type="text" id="mo-classe" list="classe-list" placeholder="Saisir ou sélectionner...">
       </div>
       <div class="field-group">
         <label>ANNÉE SCOLAIRE</label>
