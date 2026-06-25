@@ -1564,6 +1564,10 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
       Imprimer
     </button>
+    <button class="btn btn-accent" onclick="previewMO()">
+      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Aperçu
+    </button>
     <button class="btn btn-accent" onclick="exportPDF()">
       <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Exporter PDF
@@ -2653,6 +2657,64 @@ function exportPDF(){
     toast('Note manquante : '+missing[0],true);return;
   }
   buildBulletin();saveToHistory();window.print();toast('PDF exporté et enregistré ✔');
+}
+
+/* ════ APERÇU BULLETIN DEPUIS FORMULAIRE MO ════ */
+function previewMO(){
+  const missing=[];
+  MATIERES.forEach(m=>{
+    const mgaEl=document.getElementById(m.id+'_mga');
+    if(!mgaEl||mgaEl.value==='') missing.push(m.label+' → MA');
+    if(m.anglais){
+      const be=document.getElementById(m.id+'_bepc_e');
+      const bo=document.getElementById(m.id+'_bepc_o');
+      if(!be||be.value==='') missing.push(m.label+' → BEPC Écrit');
+      if(!bo||bo.value==='') missing.push(m.label+' → BEPC Oral');
+    } else {
+      const bepcEl=document.getElementById(m.id+'_bepc');
+      if(!bepcEl||bepcEl.value==='') missing.push(m.label+' → BEPC');
+    }
+  });
+  if(missing.length>0){toast('Note manquante : '+missing[0],true);return;}
+  buildBulletin();
+  const page=document.getElementById('bulletin-print').innerHTML;
+  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+  const nom=(document.getElementById('mo-nom')?.value||'Élève').trim();
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Aperçu — ${nom} — SAPHIR Pro</title>
+${styles}
+<style>
+  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#e8ece9;font-family:'Ebrima','Segoe UI',Arial,sans-serif;width:100%;height:100%;}
+  .preview-toolbar{position:fixed;top:0;left:0;right:0;background:#064E3B;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .preview-toolbar-title{font-size:.9rem;font-weight:700;}
+  .preview-toolbar-btn{background:#fff;color:#064E3B;border:none;padding:8px 16px;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+  .preview-toolbar-btn:hover{background:#F4FAF7;}
+  .preview-page-wrap{display:flex;justify-content:center;padding:60px 16px 24px;min-height:100vh;}
+  .preview-a4{width:210mm;min-height:297mm;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.18);padding:8mm 10mm 8mm 12mm;overflow:hidden;}
+  .bulletin-sheet{width:100%;margin:0;padding:0;box-shadow:none;border:none;background:transparent;}
+  .bulletin-sheet .bp-header{box-shadow:none;border:1px solid #dfe7e2;border-top:0;}
+  .bulletin-sheet .bp-table-wrap{border:1px solid #bdcdc4;}
+  @media print{
+    html,body{margin:0;padding:0;background:#fff;width:auto;height:auto;}
+    .preview-toolbar{display:none!important;}
+    .preview-page-wrap{padding:0;margin:0;display:block;}
+    .preview-a4{width:100%;min-height:auto;padding:0;box-shadow:none;background:transparent;}
+    .bulletin-sheet{width:100%;margin:0;box-shadow:none;}
+    @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
+  }
+</style></head><body>
+<div class="preview-toolbar">
+  <span class="preview-toolbar-title">Aperçu du bulletin — ${nom}</span>
+  <button class="preview-toolbar-btn" onclick="window.print()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Imprimer / PDF</button>
+</div>
+<div class="preview-page-wrap">
+  <div class="preview-a4">${page}</div>
+</div>
+</body></html>`);
+  win.document.close();
 }
 
 function toast(msg,isErr=false){
