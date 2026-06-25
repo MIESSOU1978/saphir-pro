@@ -2053,6 +2053,7 @@ function exportMGAtoMO(){
   updateMOInfo();
   showPage('mo');
   toast('MA transférées vers le module MO ✔');
+  logActivity('Transfert vers MO','MGA → MO','Transfert de '+MATIERES.length+' matières','succes');
 }
 
 /* ════ PAGE MO ════ */
@@ -2475,6 +2476,7 @@ function editCalc(id){
   document.getElementById('edit-indicator').classList.add('show');
   showPage('mo');
   toast('Modification du calcul enregistré');
+  logActivity('Modification élève','Calcul MO','Chargement id='+id);
 }
 function duplicateCalc(id){
   const h=histData.find(x=>x.id===id);
@@ -2484,6 +2486,7 @@ function duplicateCalc(id){
   document.getElementById('edit-indicator').classList.remove('show');
   showPage('mo');
   toast('Calcul dupliqué. Vous pouvez le modifier puis l\'enregistrer comme nouveau calcul.');
+  logActivity('Duplication élève','Calcul MO','Duplication id='+id);
 }
 function loadCalcToMO(h){
   document.getElementById('mo-nom').value=h.nom||'';
@@ -2706,6 +2709,7 @@ ${styles}
   win.document.close();
   setTimeout(()=>{win.print();},600);
   toast('Impression de '+histData.filter(h=>h.matieres).length+' bulletins...');
+  logActivity('Impression multiple','Bulletin',histData.filter(h=>h.matieres).length+' bulletins');
 }
 
 /* ════ BULLETIN A4 ════ */
@@ -2949,6 +2953,7 @@ function toast(msg,isErr=false){
 
 /* ── ROLE-BASED UI ── */
 function doLogout(){
+  logActivity('Déconnexion','Authentification','Déconnexion utilisateur');
   localStorage.removeItem('saphir_role');
   localStorage.removeItem('saphir_pwd');
   window.location.href='/login';
@@ -3157,6 +3162,7 @@ function exportUsersPDF(){
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
   win.document.write(html);win.document.close();setTimeout(()=>win.print(),400);
+  logActivity('Export PDF','Utilisateurs',_allSessions.length+' session(s)');
 }
 
 /* ── INIT ── */
