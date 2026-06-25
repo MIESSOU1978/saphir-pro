@@ -2319,7 +2319,7 @@ function renderHistory(){
     const timePart=dateStr?(dateStr.includes('T')?dateStr.split('T')[1]:dateStr.split(' ')[1]||''):'';
     const timeDisplay=timePart?timePart.split('.')[0].substring(0,5):'';
     const checked=selectedIds.includes(h.id)?'checked':'';
-    return '<div class="hist-card"><input type="checkbox" class="hist-select" '+checked+' onchange="toggleSelect('+h.id+',this)" title="Sélectionner"><div class="hist-card-info"><div class="hist-card-name" title="'+(h.nom||'\u2014')+'">'+(h.nom||'\u2014')+'</div><div class="hist-card-meta" title="'+(h.matricule||'\u2014')+' · '+(h.classe||'\u2014')+' · '+(h.etablissement||'\u2014')+'">'+(h.matricule||'\u2014')+' &middot; '+(h.classe||'\u2014')+' &middot; '+(h.etablissement||'\u2014')+'</div>'+(dateDisplay?'<div class="hist-card-date" title="Enregistr\u00e9 le '+dateStr+'">&#128197; '+dateDisplay+(timeDisplay?' &agrave; '+timeDisplay:'')+'</div>':'')+'</div><div class="hist-card-mo"><div class="mo-value">'+moDisplay+'</div><div class="mo-label">Moyenne</div></div><span class="hist-badge '+badgeClass+'">'+mention+'</span><div class="hist-actions"><button class="hist-btn-edit" onclick="editCalc('+h.id+')" title="Modifier ce calcul">&#9998; Modifier</button><button class="hist-btn-dup" onclick="duplicateCalc('+h.id+')" title="Dupliquer ce calcul">&#128203; Dupliquer</button><button class="hist-btn-icon" onclick="downloadBulletinPDF('+h.id+')" title="T\u00e9l\u00e9charger le bulletin en PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button><button class="hist-btn-icon hist-btn-icon-del" onclick="confirmDelHistory('+h.id+',this)" title="Supprimer ce calcul"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></div>';
+    return '<div class="hist-card"><input type="checkbox" class="hist-select" '+checked+' onchange="toggleSelect('+h.id+',this)" title="Sélectionner"><div class="hist-card-info"><div class="hist-card-name" title="'+(h.nom||'\u2014')+'">'+(h.nom||'\u2014')+'</div><div class="hist-card-meta" title="'+(h.matricule||'\u2014')+' · '+(h.classe||'\u2014')+' · '+(h.etablissement||'\u2014')+'">'+(h.matricule||'\u2014')+' &middot; '+(h.classe||'\u2014')+' &middot; '+(h.etablissement||'\u2014')+'</div>'+(dateDisplay?'<div class="hist-card-date" title="Enregistr\u00e9 le '+dateStr+'">&#128197; '+dateDisplay+(timeDisplay?' &agrave; '+timeDisplay:'')+'</div>':'')+'</div><div class="hist-card-mo"><div class="mo-value">'+moDisplay+'</div><div class="mo-label">Moyenne</div></div><span class="hist-badge '+badgeClass+'">'+mention+'</span><div class="hist-actions"><button class="hist-btn-edit" onclick="editCalc('+h.id+')" title="Modifier ce calcul">&#9998; Modifier</button><button class="hist-btn-dup" onclick="duplicateCalc('+h.id+')" title="Dupliquer ce calcul">&#128203; Dupliquer</button><button class="hist-btn-icon" onclick="previewBulletinPDF('+h.id+')" title="Aperçu du bulletin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button class="hist-btn-icon" onclick="downloadBulletinPDF('+h.id+')" title="T\u00e9l\u00e9charger le bulletin en PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button><button class="hist-btn-icon hist-btn-icon-del" onclick="confirmDelHistory('+h.id+',this)" title="Supprimer ce calcul"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></div>';
   }).join('');
   updateSelBar();
 }
@@ -2345,6 +2345,39 @@ ${styles}
 </style></head><body>${page}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
+}
+
+/* ════ APERÇU BULLETIN DEPUIS HISTORIQUE ════ */
+async function previewBulletinPDF(id){
+  let h=histData.find(x=>x.id===id);
+  if(!h){
+    try{const r=await fetch(API+'/api/eleves/'+id,{credentials:'same-origin'});if(r.ok)h=await r.json();}catch(e){}
+  }
+  if(!h||!h.matieres){toast('Données indisponibles.',true);return;}
+  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+  const page=buildBulletinHTML(h);
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Aperçu — ${h.nom||'Élève'} — SAPHIR Pro</title>
+${styles}
+<style>
+  body{margin:0;padding:20px;background:#f0f0f0;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
+  .preview-toolbar{position:fixed;top:0;left:0;right:0;background:#064E3B;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .preview-toolbar-title{font-size:.9rem;font-weight:700;}
+  .preview-toolbar-btn{background:#fff;color:#064E3B;border:none;padding:8px 16px;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+  .preview-toolbar-btn:hover{background:#F4FAF7;}
+  .preview-container{margin-top:60px;display:flex;justify-content:center;}
+  .bulletin-sheet{background:#fff;box-shadow:0 2px 12px rgba(0,0,0,.15);max-width:210mm;margin:0 auto;}
+  @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
+</style></head><body>
+<div class="preview-toolbar">
+  <span class="preview-toolbar-title">Aperçu du bulletin — ${h.nom||'Élève'}</span>
+  <button class="preview-toolbar-btn" onclick="window.print()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Imprimer / PDF</button>
+</div>
+<div class="preview-container">${page}</div>
+</body></html>`);
+  win.document.close();
 }
 
 /* ════ IMPRESSION MULTIPLE ════ */
