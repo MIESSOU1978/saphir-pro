@@ -426,6 +426,14 @@ class _Handler(BaseHTTPRequestHandler):
             self.end_headers()
             return
 
+        if path == "/api/notifications":
+            body = self._read_body()
+            titre = body.get("titre", "")
+            message = body.get("message", "")
+            ntype = body.get("type", "info")
+            nid = db.add_notification(titre, message, ntype)
+            return self._json({"ok": True, "id": nid}, 201)
+
         if not self._require_auth():
             return
 
@@ -513,14 +521,6 @@ class _Handler(BaseHTTPRequestHandler):
                 return self._json({"error": "id invalide"}, 400)
             db.close_session(sid)
             return self._json({"ok": True})
-
-        if path == "/api/notifications":
-            body = self._read_body()
-            titre = body.get("titre", "")
-            message = body.get("message", "")
-            ntype = body.get("type", "info")
-            nid = db.add_notification(titre, message, ntype)
-            return self._json({"ok": True, "id": nid}, 201)
 
         if path == "/api/archive":
             if role != "admin":

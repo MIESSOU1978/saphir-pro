@@ -3066,9 +3066,11 @@ let _sessionId=parseInt(localStorage.getItem('saphir_session_id')||'0',10);
 let _allSessions=[];
 
 function sendNotification(titre,message,type){
+  const n={id:Date.now(),titre,message,type:type||'info',lu:0,created_at:new Date().toISOString()};
+  try{const arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');arr.unshift(n);if(arr.length>50)arr.length=50;localStorage.setItem('saphir_notifs',JSON.stringify(arr));}catch(e){}
   fetch(API+'/api/notifications',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',
     body:JSON.stringify({titre,message,type:type||'info'})
-  }).then(()=>loadNotifications()).catch(()=>{});
+  }).then(r=>{if(r.ok) loadNotifications();}).catch(()=>{loadNotifications();});
 }
 
 function logActivity(action,module,detail,resultat){
@@ -3298,11 +3300,16 @@ document.addEventListener('click',closeNotifPanel);
 
 async function loadNotifications(){
   try{
-    const r=await fetch('/api/notifications',{credentials:'same-origin'});
-    if(!r.ok) return;
-    const list=await r.json();
-    renderNotifications(list);
-    updateNotifBadge(list.filter(n=>!n.lu).length);
+    const r=await fetch(API+'/api/notifications',{credentials:'same-origin'});
+    if(r.ok){
+      const list=await r.json();
+      if(list&&list.length){renderNotifications(list);updateNotifBadge(list.filter(n=>!n.lu).length);return;}
+    }
+  }catch(e){}
+  try{
+    const arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');
+    renderNotifications(arr);
+    updateNotifBadge(arr.filter(n=>!n.lu).length);
   }catch(e){}
 }
 function renderNotifications(list){
@@ -3322,18 +3329,16 @@ function updateNotifBadge(count){
   else{badge.style.display='none';}
 }
 async function markNotifRead(id){
-  try{
-    await fetch('/api/notifications/'+id+'/read',{method:'POST',credentials:'same-origin'});
-    logActivity('Notification lue','Notifications','id='+id);
-    loadNotifications();
-  }catch(e){}
+  try{await fetch(API+'/api/notifications/'+id+'/read',{method:'POST',credentials:'same-origin'});}catch(e){}
+  try{let arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');arr=arr.map(n=>n.id===id?{...n,lu:1}:n);localStorage.setItem('saphir_notifs',JSON.stringify(arr));}catch(e){}
+  logActivity('Notification lue','Notifications','id='+id);
+  loadNotifications();
 }
 async function markAllRead(){
-  try{
-    await fetch('/api/notifications/read-all',{method:'POST',credentials:'same-origin'});
-    logActivity('Toutes notifications lues','Notifications');
-    loadNotifications();
-  }catch(e){}
+  try{await fetch(API+'/api/notifications/read-all',{method:'POST',credentials:'same-origin'});}catch(e){}
+  try{let arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');arr=arr.map(n=>({...n,lu:1}));localStorage.setItem('saphir_notifs',JSON.stringify(arr));}catch(e){}
+  logActivity('Toutes notifications lues','Notifications');
+  loadNotifications();
 }
 
 /* ═══ ANNÉE SCOLAIRE FILTRE ═══ */
