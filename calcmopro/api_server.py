@@ -202,6 +202,16 @@ class _Handler(BaseHTTPRequestHandler):
         role = _get_session_role(token)
         return role or "guest"
 
+    def _get_real_ip(self) -> str:
+        """Get real client IP from X-Forwarded-For or X-Real-IP headers."""
+        forwarded = self.headers.get("X-Forwarded-For", "")
+        if forwarded:
+            return forwarded.split(",")[0].strip()
+        real_ip = self.headers.get("X-Real-IP", "")
+        if real_ip:
+            return real_ip.strip()
+        return self.client_address[0]
+
     # ── routing ──────────────────────────────────────────────
     def do_GET(self) -> None:
         try:
@@ -361,25 +371,25 @@ class _Handler(BaseHTTPRequestHandler):
             if not _auth_required():
                 if _STUDENT_PASSWORD and _hash_password(pwd) == _hash_password(_STUDENT_PASSWORD):
                     token = _create_session("student")
-                    ip = self.client_address[0]
+                    ip = self._get_real_ip()
                     ua = self.headers.get("User-Agent", "")
                     sid = db.create_session("student", ip, ua, email)
                     return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
-                ip = self.client_address[0]
+                ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("admin", ip, ua, email)
                 return self._json({"ok": True, "role": "admin", "session_id": sid})
 
             if _hash_password(pwd) == _hash_password(_APP_PASSWORD):
                 token = _create_session("admin")
-                ip = self.client_address[0]
+                ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("admin", ip, ua, email)
                 return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid}, "session", token)
 
             if _STUDENT_PASSWORD and _hash_password(pwd) == _hash_password(_STUDENT_PASSWORD):
                 token = _create_session("student")
-                ip = self.client_address[0]
+                ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("student", ip, ua, email)
                 return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
@@ -467,7 +477,7 @@ class _Handler(BaseHTTPRequestHandler):
         if path == "/api/sessions/create":
             body = self._read_body()
             role = body.get("role", self._get_role())
-            ip = self.client_address[0]
+            ip = self._get_real_ip()
             ua = self.headers.get("User-Agent", "")
             sid = db.create_session(role, ip, ua)
             return self._json({"ok": True, "session_id": sid})

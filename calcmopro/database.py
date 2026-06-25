@@ -536,22 +536,33 @@ def create_session(role: str, ip: str = "", user_agent: str = "", email: str = "
     """Create a session record and return session_id."""
     info = _parse_user_agent(user_agent)
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ville = ""
+    if ip and ip not in ("127.0.0.1", "::1", ""):
+        try:
+            req = urllib.request.Request(f"http://ip-api.com/json/{ip}?fields=city,country")
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                geo = json.loads(resp.read())
+                city = geo.get("city", "")
+                country = geo.get("country", "")
+                ville = f"{city}, {country}" if city else country
+        except Exception:
+            pass
     if _turso_enabled():
         sid = _turso_exec_insert(
-            "INSERT INTO sessions (role, ip, user_agent, os, navigateur, appareil, login_at, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            [role, ip, user_agent, info["os"], info["navigateur"], info["appareil"], now, email],
+            "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [role, ip, user_agent, ville, info["os"], info["navigateur"], info["appareil"], now, email],
         )
-        print(f"[DB create_session] id={sid} role={role} ip={ip} os={info['os']} nav={info['navigateur']}")
+        print(f"[DB create_session] id={sid} role={role} ip={ip} ville={ville} os={info['os']} nav={info['navigateur']}")
         return sid
     conn = _connect()
     cur = conn.execute(
-        "INSERT INTO sessions (role, ip, user_agent, os, navigateur, appareil, login_at, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        (role, ip, user_agent, info["os"], info["navigateur"], info["appareil"], now, email),
+        "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (role, ip, user_agent, ville, info["os"], info["navigateur"], info["appareil"], now, email),
     )
     sid = cur.lastrowid
     conn.commit()
     conn.close()
-    print(f"[DB create_session] id={sid} role={role} ip={ip} os={info['os']} nav={info['navigateur']}")
+    print(f"[DB create_session] id={sid} role={role} ip={ip} ville={ville} os={info['os']} nav={info['navigateur']}")
     return sid
 
 
