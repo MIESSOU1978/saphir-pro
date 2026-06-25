@@ -583,52 +583,70 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
   padding:24px 26px 20px;box-shadow:0 1px 8px rgba(0,0,0,.04);
 }
 .users-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
-.users-header-left{display:flex;align-items:center;gap:12px;}
-.users-header-right{display:flex;gap:12px;align-items:center;}
-.users-header-right .btn{min-height:45px;padding:10px 20px;font-size:.927rem;line-height:1.2;}
+.users-header-left{display:flex;align-items:center;gap:10px;}
+.users-header-ico{width:36px;height:36px;border-radius:10px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;}
 .users-title{font-size:.95rem;font-weight:700;color:#003b32;letter-spacing:.2px;}
 .users-subtitle{font-size:.74rem;color:#60736d;margin-top:2px;}
-.users-filters{display:flex;gap:10px;margin-bottom:16px;align-items:center;}
+.users-header-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.users-header-right .btn{min-height:36px;padding:6px 16px;font-size:.8rem;line-height:1.2;}
+.users-btn-danger{background:#FEF2F2;color:#991B1B!important;border:1.5px solid #FECACA!important;}
+.users-btn-danger svg{stroke:#991B1B;}
+.users-btn-danger:hover{background:#FEE2E2;border-color:#F87171!important;box-shadow:0 2px 8px rgba(153,27,27,.12);}
+.users-filters{display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;}
 .users-search{
-  flex:1 1 260px;padding:9px 14px;border:1.5px solid #AFC6BA;border-radius:10px;
-  font-size:.82rem;color:#064E3B;background:#FDFEFE;font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  flex:1 1 220px;padding:8px 12px;border:1.5px solid #AFC6BA;border-radius:10px;
+  font-size:.8rem;color:#064E3B;background:#FDFEFE;font-family:'Ebrima','Segoe UI',Arial,sans-serif;
   transition:all .18s ease;
 }
 .users-search:hover{background:#F3F8F5;border-color:#8FB7A4;}
 .users-search:focus{background:#EEF7F2;border-color:#0B6B50;outline:none;box-shadow:0 0 0 3px rgba(11,107,80,.12);}
 .users-filter-select{
-  flex:0 0 auto;min-width:150px;padding:9px 14px;border:1.5px solid #AFC6BA;border-radius:10px;
-  font-size:.82rem;color:#064E3B;background:#FDFEFE;font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  flex:0 0 auto;min-width:140px;padding:8px 12px;border:1.5px solid #AFC6BA;border-radius:10px;
+  font-size:.8rem;color:#064E3B;background:#FDFEFE;font-family:'Ebrima','Segoe UI',Arial,sans-serif;
   cursor:pointer;transition:all .18s ease;
 }
 .users-filter-select:hover{background:#F3F8F5;border-color:#8FB7A4;}
 .users-filter-select:focus{background:#EEF7F2;border-color:#0B6B50;outline:none;}
 .users-table-wrap{overflow-x:auto;border:1px solid #d9e5de;border-radius:10px;}
-.users-table{width:100%;border-collapse:collapse;font-size:.8rem;}
+.users-table{width:100%;border-collapse:collapse;font-size:.78rem;table-layout:fixed;}
 .users-table th{
-  padding:12px 14px;background:#f4f8f6;color:#064E3B;font-weight:700;font-size:.72rem;
+  padding:10px 10px;background:#f4f8f6;color:#064E3B;font-weight:700;font-size:.7rem;
   text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #d5e5de;text-align:left;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;
 }
 .users-table td{
-  padding:11px 14px;border-bottom:1px solid #eef3f0;color:#1a3a2e;vertical-align:middle;
+  padding:9px 10px;border-bottom:1px solid #eef3f0;color:#1a3a2e;vertical-align:middle;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 .users-table tbody tr:hover{background:#f8fbf9;}
 .users-table tbody tr:last-child td{border-bottom:none;}
+.users-table colgroup .col-cb{width:36px;}
+.users-table colgroup .col-email{width:16%;}
+.users-table colgroup .col-role{width:8%;}
+.users-table colgroup .col-device{width:8%;}
+.users-table colgroup .col-os{width:10%;}
+.users-table colgroup .col-browser{width:9%;}
+.users-table colgroup .col-ville{width:12%;}
+.users-table colgroup .col-ip{width:10%;}
+.users-table colgroup .col-login{width:10%;}
+.users-table colgroup .col-logout{width:10%;}
+.users-table colgroup .col-status{width:7%;}
+.users-table colgroup .col-actions{width:8%;}
 .users-role-badge{
-  display:inline-block;padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:700;
+  display:inline-block;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700;
 }
 .users-role-admin{background:#EAF5F0;color:#064E3B;border:1px solid #b8d4c7;}
 .users-role-student{background:#FFF7ED;color:#B45309;border:1px solid #FDBA74;}
-.users-status{display:inline-flex;align-items:center;gap:5px;font-size:.76rem;font-weight:600;}
-.users-status-dot{width:7px;height:7px;border-radius:50%;}
+.users-status{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:600;}
+.users-status-dot{width:6px;height:6px;border-radius:50%;}
 .users-status-online .users-status-dot{background:#16a34a;}
 .users-status-online{color:#16a34a;}
 .users-status-offline .users-status-dot{background:#9ca3af;}
 .users-status-offline{color:#9ca3af;}
 .users-activity-btn{
-  display:inline-flex;align-items:center;gap:4px;padding:5px 12px;
-  border-radius:7px;border:1px solid #D5E5DE;background:#fff;
-  color:#064E3B;cursor:pointer;font-size:.74rem;font-weight:600;transition:all .18s ease;
+  display:inline-flex;align-items:center;gap:3px;padding:4px 10px;
+  border-radius:6px;border:1px solid #D5E5DE;background:#fff;
+  color:#064E3B;cursor:pointer;font-size:.72rem;font-weight:600;transition:all .18s ease;
 }
 .users-activity-btn:hover{background:#F0F7F3;border-color:#064E3B;box-shadow:0 2px 6px rgba(6,78,59,.08);}
 .users-activity-panel{
@@ -637,19 +655,20 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 }
 .users-activity-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .users-activity-title{font-size:.88rem;font-weight:700;color:#003b32;}
-.users-activity-list{max-height:300px;overflow-y:auto;}
+.users-activity-list{max-height:400px;overflow-y:auto;}
 .users-activity-item{
-  display:grid;grid-template-columns:140px 1fr 120px 80px;gap:12px;
-  padding:10px 14px;border-bottom:1px solid #eef3f0;font-size:.78rem;align-items:center;
+  display:grid;grid-template-columns:130px 1fr 100px;gap:10px;
+  padding:10px 12px;border-bottom:1px solid #eef3f0;font-size:.76rem;align-items:start;
 }
 .users-activity-item:last-child{border-bottom:none;}
-.users-activity-date{color:#60736d;font-weight:600;white-space:nowrap;}
+.users-activity-date{color:#60736d;font-weight:600;white-space:nowrap;font-size:.72rem;}
 .users-activity-action{color:#1a3a2e;font-weight:600;}
-.users-activity-module{color:#60736d;}
-.users-activity-result{font-weight:600;text-align:center;}
+.users-activity-detail{color:#60736d;font-size:.72rem;margin-top:2px;}
+.users-activity-result{font-weight:600;text-align:right;font-size:.72rem;}
 .users-activity-result.ok{color:#16a34a;}
 .users-activity-result.fail{color:#B42318;}
 .users-empty-state{text-align:center;padding:40px 20px;color:#9fb0a6;font-size:.85rem;}
+.users-empty-sub{font-size:.74rem;color:#b8c8be;margin-top:6px;}
 
 /* ── TOAST ── */
 #toast{
@@ -1712,16 +1731,21 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
   <div class="users-container">
     <div class="users-header">
       <div class="users-header-left">
-        <div class="users-title">Utilisateurs</div>
-        <div class="users-subtitle" id="users-count">0 sessions enregistrées</div>
+        <div class="users-header-ico">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <div class="users-title">Utilisateurs</div>
+          <div class="users-subtitle" id="users-count">Aucune session enregistrée</div>
+        </div>
       </div>
       <div class="users-header-right">
-        <button class="btn btn-reset" id="users-delete-selected" onclick="deleteSelectedUsers()" style="display:none;" title="Supprimer sélection">
+        <button class="btn btn-reset" id="users-delete-selected" onclick="deleteSelectedUsers()" style="display:none;" title="Supprimer la sélection">
           <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
           Supprimer
         </button>
-        <button class="btn btn-reset" id="users-delete-all" onclick="clearAllUsers()" title="Tout supprimer">
-          <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+        <button class="btn btn-reset users-btn-danger" id="users-delete-all" onclick="clearAllUsers()" title="Tout supprimer">
+          <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#991B1B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
           Tout supprimer
         </button>
         <button class="btn btn-reset" onclick="loadUsers()" title="Rafraîchir">
@@ -1736,7 +1760,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
     </div>
 
     <div class="users-filters">
-      <input type="text" class="users-search" id="users-search" placeholder="Rechercher un utilisateur..." oninput="filterUsers()">
+      <input type="text" class="users-search" id="users-search" placeholder="Rechercher..." oninput="filterUsers()">
       <select class="users-filter-select" id="users-filter-role" onchange="filterUsers()">
         <option value="">Tous les rôles</option>
         <option value="admin">Administrateur</option>
@@ -1748,19 +1772,39 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         <option value="Téléphone">Téléphone</option>
         <option value="Tablette">Tablette</option>
       </select>
+      <select class="users-filter-select" id="users-filter-status" onchange="filterUsers()">
+        <option value="">Tous les états</option>
+        <option value="online">En ligne</option>
+        <option value="offline">Déconnecté</option>
+      </select>
     </div>
 
     <div class="users-table-wrap">
       <table class="users-table">
+        <colgroup>
+          <col class="col-cb">
+          <col class="col-email">
+          <col class="col-role">
+          <col class="col-device">
+          <col class="col-os">
+          <col class="col-browser">
+          <col class="col-ville">
+          <col class="col-ip">
+          <col class="col-login">
+          <col class="col-logout">
+          <col class="col-status">
+          <col class="col-actions">
+        </colgroup>
         <thead>
           <tr>
-            <th style="width:36px;"><input type="checkbox" id="users-select-all" onchange="toggleSelectAll(this)"></th>
+            <th><input type="checkbox" id="users-select-all" onchange="toggleSelectAll(this)"></th>
             <th>Email</th>
             <th>Rôle</th>
             <th>Appareil</th>
             <th>Système</th>
             <th>Navigateur</th>
-            <th>Adresse IP</th>
+            <th>Ville</th>
+            <th>IP</th>
             <th>Connexion</th>
             <th>Déconnexion</th>
             <th>État</th>
@@ -1773,8 +1817,8 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 
     <div class="users-activity-panel" id="users-activity-panel" style="display:none;">
       <div class="users-activity-header">
-        <div class="users-activity-title">Historique des activités</div>
-        <button class="btn btn-ghost" onclick="closeActivityPanel()" style="padding:6px 12px;font-size:.78rem;">
+        <div class="users-activity-title" id="users-activity-title">Historique des activités</div>
+        <button class="btn btn-reset" onclick="closeActivityPanel()" style="min-height:32px;padding:4px 12px;font-size:.76rem;">
           <svg class="btn-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           Fermer
         </button>
@@ -2961,34 +3005,36 @@ function renderUsers(sessions){
   const tb=document.getElementById('users-tbody');
   const ct=document.getElementById('users-count');
   if(!sessions.length){
-    ct.textContent='0 sessions enregistrées';
-    tb.innerHTML='<tr><td colspan="9" class="users-empty-state">Aucune session enregistrée</td></tr>';
+    ct.textContent='Aucune session enregistrée';
+    tb.innerHTML='<tr><td colspan="12" class="users-empty-state">Aucune session enregistrée<div class="users-empty-sub">Les connexions des utilisateurs apparaîtront ici.</div></td></tr>';
     return;
   }
-  ct.textContent=sessions.length+' session(s) enregistrée(s)';
-  const now=new Date();
+  const n=sessions.length;
+  ct.textContent=n+' session'+(n>1?'s':'')+' enregistrée'+(n>1?'s':'');
   tb.innerHTML=sessions.map(s=>{
     const logoutAt=s.logout_at||'';
     const isOnline=!logoutAt;
     const loginDisplay=(s.login_at||'').replace('T',' ').substring(0,16);
-    const logoutDisplay=logoutAt?logoutAt.substring(0,16):'—';
+    const logoutDisplay=logoutAt?logoutAt.replace('T',' ').substring(0,16):'—';
     const roleLabel=s.role==='admin'?'Administrateur':'Élève';
     const roleCls=s.role==='admin'?'users-role-admin':'users-role-student';
     const statusCls=isOnline?'users-status-online':'users-status-offline';
-    const statusLabel=isOnline?'En ligne':'Hors ligne';
-    const email=s.email||'—';
-    return `<tr>
-      <td style="width:36px;text-align:center;"><input type="checkbox" class="users-cb" value="${s.id}" onchange="updateDeleteBtn()"></td>
-      <td style="font-size:.76rem;">${email}</td>
+    const statusLabel=isOnline?'En ligne':'Déconnecté';
+    const email=s.email||'Utilisateur inconnu';
+    const ville=s.ville||'—';
+    return `<tr title="${email} | ${s.os||''} | ${s.navigateur||''} | ${s.ip||''}">
+      <td style="text-align:center;"><input type="checkbox" class="users-cb" value="${s.id}" onchange="updateDeleteBtn()"></td>
+      <td title="${email}">${email}</td>
       <td><span class="users-role-badge ${roleCls}">${roleLabel}</span></td>
-      <td>${s.appareil||'—'}</td>
-      <td>${s.os||'—'}</td>
-      <td>${s.navigateur||'—'}</td>
-      <td style="font-family:monospace;font-size:.74rem;">${s.ip||'—'}</td>
-      <td style="font-size:.74rem;">${loginDisplay}</td>
-      <td style="font-size:.74rem;">${logoutDisplay}</td>
+      <td title="${s.appareil||''}">${s.appareil||'—'}</td>
+      <td title="${s.os||''}">${s.os||'—'}</td>
+      <td title="${s.navigateur||''}">${s.navigateur||'—'}</td>
+      <td title="${ville}">${ville}</td>
+      <td style="font-family:monospace;font-size:.72rem;" title="${s.ip||''}">${s.ip||'—'}</td>
+      <td style="font-size:.72rem;">${loginDisplay}</td>
+      <td style="font-size:.72rem;">${logoutDisplay}</td>
       <td><span class="users-status ${statusCls}"><span class="users-status-dot"></span>${statusLabel}</span></td>
-      <td><button class="users-activity-btn" onclick="showUserActivities(${s.id})">Activités</button></td>
+      <td><button class="users-activity-btn" onclick="showUserActivities(${s.id},'${email.replace(/'/g,"\\'")}')">Activités</button></td>
     </tr>`;
   }).join('');
 }
@@ -2997,11 +3043,14 @@ function filterUsers(){
   const q=(document.getElementById('users-search').value||'').toLowerCase();
   const roleF=document.getElementById('users-filter-role').value;
   const devF=document.getElementById('users-filter-device').value;
+  const stF=document.getElementById('users-filter-status').value;
   let filtered=_allSessions.filter(s=>{
     if(roleF&&s.role!==roleF) return false;
     if(devF&&(s.appareil||'')!==devF) return false;
+    if(stF==='online'&&s.logout_at) return false;
+    if(stF==='offline'&&!s.logout_at) return false;
     if(q){
-      const hay=((s.ip||'')+(s.os||'')+(s.navigateur||'')+(s.appareil||'')+(s.role||'')).toLowerCase();
+      const hay=((s.email||'')+(s.ip||'')+(s.os||'')+(s.navigateur||'')+(s.appareil||'')+(s.role||'')+(s.ville||'')).toLowerCase();
       if(!hay.includes(q)) return false;
     }
     return true;
@@ -3027,7 +3076,7 @@ function getSelectedUserIds(){
 async function deleteSelectedUsers(){
   const ids=getSelectedUserIds();
   if(!ids.length) return;
-  if(!confirm('Supprimer '+ids.length+' session(s) sélectionnée(s) ?')) return;
+  if(!confirm('Supprimer '+ids.length+' session(s) sélectionnée(s) ? Cette action est irréversible.')) return;
   for(const id of ids){
     try{await fetch('/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});}catch(e){}
   }
@@ -3036,7 +3085,7 @@ async function deleteSelectedUsers(){
 }
 
 async function clearAllUsers(){
-  if(!confirm('Supprimer TOUTES les sessions ?')) return;
+  if(!confirm('Voulez-vous vraiment supprimer toutes les sessions enregistrées ?\nCette action est irréversible.')) return;
   try{
     const r=await fetch('/api/sessions/clear',{method:'DELETE',credentials:'same-origin'});
     if(r.ok) toast('Toutes les sessions ont été supprimées');
@@ -3045,24 +3094,25 @@ async function clearAllUsers(){
   await loadUsers();
 }
 
-async function showUserActivities(sessionId){
+async function showUserActivities(sessionId,email){
   const panel=document.getElementById('users-activity-panel');
+  const title=document.getElementById('users-activity-title');
   const list=document.getElementById('users-activity-list');
+  title.textContent='Activités — '+(email||'Session #'+sessionId);
   panel.style.display='block';
   list.innerHTML='<div class="users-empty-state">Chargement...</div>';
   try{
     const r=await fetch(API+'/api/sessions/'+sessionId+'/activities',{credentials:'same-origin'});
     if(!r.ok){list.innerHTML='<div class="users-empty-state">Erreur de chargement</div>';return;}
     const logs=await r.json();
-    if(!logs.length){list.innerHTML='<div class="users-empty-state">Aucune activité enregistrée pour cette session</div>';return;}
+    if(!logs.length){list.innerHTML='<div class="users-empty-state">Aucune activité enregistrée<div class="users-empty-sub">Les actions de cet utilisateur apparaîtront ici.</div></div>';return;}
     list.innerHTML=logs.map(l=>{
-      const dateStr=(l.created_at||'').substring(0,16).replace('T',' ');
+      const dateStr=(l.created_at||'').replace('T',' ').substring(0,16);
       const resCls=l.resultat==='succes'?'ok':'fail';
       const resLabel=l.resultat==='succes'?'Succès':'Échec';
       return `<div class="users-activity-item">
         <div class="users-activity-date">${dateStr}</div>
-        <div class="users-activity-action">${l.action||'—'}</div>
-        <div class="users-activity-module">${l.module||'—'}</div>
+        <div><div class="users-activity-action">${l.action||'—'}</div>${l.detail?'<div class="users-activity-detail">'+l.detail+'</div>':''}</div>
         <div class="users-activity-result ${resCls}">${resLabel}</div>
       </div>`;
     }).join('');
@@ -3079,14 +3129,15 @@ function exportUsersPDF(){
   if(!_allSessions.length){toast('Aucune session à exporter.',true);return;}
   const rows=_allSessions.map(s=>{
     const logoutAt=s.logout_at||'—';
-    const status=s.logout_at?'Hors ligne':'En ligne';
+    const status=s.logout_at?'Déconnecté':'En ligne';
     return `<tr>
-      <td style="padding:8px;border-bottom:1px solid #eee;">${s.email||'—'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${s.email||'Utilisateur inconnu'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.role==='admin'?'Administrateur':'Élève'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.appareil||'—'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.os||'—'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.navigateur||'—'}</td>
-      <td style="padding:8px;border-bottom:1px solid #eee;">${s.ip||'—'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${s.ville||'—'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;font-family:monospace;font-size:.72rem;">${s.ip||'—'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${(s.login_at||'').substring(0,16)}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${logoutAt.substring(0,16)}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${status}</td>
@@ -3101,7 +3152,7 @@ function exportUsersPDF(){
     </style></head><body>
     <h1>Liste des utilisateurs — SAPHIR Pro</h1>
     <p>${_allSessions.length} session(s) • Exporté le ${new Date().toLocaleDateString('fr-FR')}</p>
-    <table><thead><tr><th>Email</th><th>Rôle</th><th>Appareil</th><th>Système</th><th>Navigateur</th><th>IP</th><th>Connexion</th><th>Déconnexion</th><th>État</th></tr></thead><tbody>${rows}</tbody></table>
+    <table><thead><tr><th>Email</th><th>Rôle</th><th>Appareil</th><th>Système</th><th>Navigateur</th><th>Ville</th><th>IP</th><th>Connexion</th><th>Déconnexion</th><th>État</th></tr></thead><tbody>${rows}</tbody></table>
     </body></html>`;
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
