@@ -1417,7 +1417,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       <span id="notif-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#B42318;color:#fff;font-size:.6rem;font-weight:700;border-radius:50%;width:16px;height:16px;align-items:center;justify-content:center;">0</span>
     </div>
     <div class="notif-panel" id="notif-panel">
-      <div class="notif-panel-hdr"><h4>Notifications</h4><button onclick="markAllRead()">Tout marquer lu</button></div>
+      <div class="notif-panel-hdr"><h4>Notifications</h4><div style="display:flex;gap:6px;"><button onclick="markAllRead()">Tout marquer lu</button><button onclick="clearAllNotifs()" style="color:#B42318;">Vider</button></div></div>
       <div class="notif-list" id="notif-list"><div class="notif-empty">Aucune notification</div></div>
     </div>
   <button class="logout-btn" onclick="doLogout()" title="Se déconnecter">
@@ -3352,6 +3352,12 @@ async function markAllRead(){
   try{await fetch(API+'/api/notifications/read-all',{method:'POST',credentials:'same-origin'});}catch(e){}
   try{let arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');arr=arr.map(n=>({...n,lu:1}));localStorage.setItem('saphir_notifs',JSON.stringify(arr));}catch(e){}
   logActivity('Toutes notifications lues','Notifications');
+  loadNotifications();
+}
+async function clearAllNotifs(){
+  try{await fetch(API+'/api/notifications/clear',{method:'POST',credentials:'same-origin'});}catch(e){}
+  try{localStorage.removeItem('saphir_notifs');}catch(e){}
+  logActivity('Notifications vidées','Notifications');
   loadNotifications();
 }
 

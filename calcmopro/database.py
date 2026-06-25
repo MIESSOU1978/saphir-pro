@@ -786,6 +786,17 @@ def delete_notification(notif_id: int) -> None:
     conn.close()
 
 
+def clear_all_notifications() -> None:
+    """Delete all notifications."""
+    if _turso_enabled():
+        _turso_exec_write("DELETE FROM notifications")
+        return
+    conn = _connect()
+    conn.execute("DELETE FROM notifications")
+    conn.commit()
+    conn.close()
+
+
 # ── ANNEES SCOLAIRES ──────────────────────────────────────
 def list_annees_scolaires() -> list[str]:
     """List all distinct school years."""

@@ -434,6 +434,10 @@ class _Handler(BaseHTTPRequestHandler):
             nid = db.add_notification(titre, message, ntype)
             return self._json({"ok": True, "id": nid}, 201)
 
+        if path == "/api/notifications/clear":
+            db.clear_all_notifications()
+            return self._json({"ok": True})
+
         if not self._require_auth():
             return
 
