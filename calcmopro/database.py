@@ -532,16 +532,19 @@ def _parse_user_agent(ua: str) -> dict:
     return {"os": os_name, "navigateur": nav, "appareil": appareil}
 
 
+def _get_username() -> str:
+    try:
+        import getpass
+        return getpass.getuser()
+    except Exception:
+        return os.environ.get("USERNAME", "")
+
+
 def create_session(role: str, ip: str = "", user_agent: str = "", email: str = "") -> int:
     """Create a session record and return session_id."""
     info = _parse_user_agent(user_agent)
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    username = ""
-    try:
-        import getpass
-        username = getpass.getuser()
-    except Exception:
-        username = os.environ.get("USERNAME", "")
+    username = _get_username()
     ville = ""
     # Get public IP if local/private
     geo_ip = ip
