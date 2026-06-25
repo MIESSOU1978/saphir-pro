@@ -567,6 +567,32 @@ def close_session(session_id: int) -> None:
     conn.close()
 
 
+def delete_session(session_id: int) -> None:
+    """Delete a session and its activities."""
+    if _turso_enabled():
+        _turso_exec_write("DELETE FROM activity_log WHERE session_id=?", [session_id])
+        _turso_exec_write("DELETE FROM sessions WHERE id=?", [session_id])
+        return
+    conn = _connect()
+    conn.execute("DELETE FROM activity_log WHERE session_id=?", (session_id,))
+    conn.execute("DELETE FROM sessions WHERE id=?", (session_id,))
+    conn.commit()
+    conn.close()
+
+
+def clear_sessions() -> None:
+    """Delete all sessions and activities."""
+    if _turso_enabled():
+        _turso_exec_write("DELETE FROM activity_log")
+        _turso_exec_write("DELETE FROM sessions")
+        return
+    conn = _connect()
+    conn.execute("DELETE FROM activity_log")
+    conn.execute("DELETE FROM sessions")
+    conn.commit()
+    conn.close()
+
+
 def log_activity(session_id: int, role: str, action: str, module: str = "", detail: str = "", resultat: str = "succes") -> None:
     """Log an activity event."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

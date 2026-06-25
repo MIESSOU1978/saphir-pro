@@ -525,6 +525,28 @@ class _Handler(BaseHTTPRequestHandler):
                 return self._json({"error": str(exc)}, 500)
             return self._json({"ok": True})
 
+        if path == "/api/sessions/clear":
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                db.clear_sessions()
+            except Exception as exc:
+                return self._json({"error": str(exc)}, 500)
+            return self._json({"ok": True})
+
+        if path.startswith("/api/sessions/"):
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                sid = int(path.split("/")[-1])
+            except ValueError:
+                return self._json({"error": "id invalide"}, 400)
+            try:
+                db.delete_session(sid)
+            except Exception as exc:
+                return self._json({"error": str(exc)}, 500)
+            return self._json({"ok": True})
+
         self.send_error(404)
 
     def do_OPTIONS(self) -> None:

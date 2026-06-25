@@ -1715,6 +1715,14 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         <div class="users-subtitle" id="users-count">0 sessions enregistrées</div>
       </div>
       <div class="users-header-right">
+        <button class="btn btn-ghost" id="users-delete-selected" onclick="deleteSelectedUsers()" style="display:none;" title="Supprimer sélection">
+          <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B42318" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+          Supprimer
+        </button>
+        <button class="btn btn-ghost" id="users-delete-all" onclick="clearAllUsers()" title="Tout supprimer" style="color:#B42318;">
+          <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B42318" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          Tout supprimer
+        </button>
         <button class="btn btn-ghost" onclick="loadUsers()" title="Rafraîchir">
           <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
           Rafraîchir
@@ -1745,6 +1753,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       <table class="users-table">
         <thead>
           <tr>
+            <th style="width:36px;"><input type="checkbox" id="users-select-all" onchange="toggleSelectAll(this)"></th>
             <th>Email</th>
             <th>Rôle</th>
             <th>Appareil</th>
@@ -2968,6 +2977,7 @@ function renderUsers(sessions){
     const statusLabel=isOnline?'En ligne':'Hors ligne';
     const email=s.email||'—';
     return `<tr>
+      <td style="width:36px;text-align:center;"><input type="checkbox" class="users-cb" value="${s.id}" onchange="updateDeleteBtn()"></td>
       <td style="font-size:.76rem;">${email}</td>
       <td><span class="users-role-badge ${roleCls}">${roleLabel}</span></td>
       <td>${s.appareil||'—'}</td>
@@ -2996,6 +3006,42 @@ function filterUsers(){
     return true;
   });
   renderUsers(filtered);
+}
+
+function toggleSelectAll(cb){
+  document.querySelectorAll('.users-cb').forEach(c=>{c.checked=cb.checked;});
+  updateDeleteBtn();
+}
+
+function updateDeleteBtn(){
+  const n=document.querySelectorAll('.users-cb:checked').length;
+  const btn=document.getElementById('users-delete-selected');
+  if(btn) btn.style.display=n>0?'':'none';
+}
+
+function getSelectedUserIds(){
+  return Array.from(document.querySelectorAll('.users-cb:checked')).map(c=>parseInt(c.value));
+}
+
+async function deleteSelectedUsers(){
+  const ids=getSelectedUserIds();
+  if(!ids.length) return;
+  if(!confirm('Supprimer '+ids.length+' session(s) sélectionnée(s) ?')) return;
+  for(const id of ids){
+    try{await fetch('/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});}catch(e){}
+  }
+  toast(ids.length+' session(s) supprimée(s)');
+  await loadUsers();
+}
+
+async function clearAllUsers(){
+  if(!confirm('Supprimer TOUTES les sessions ?')) return;
+  try{
+    const r=await fetch('/api/sessions/clear',{method:'DELETE',credentials:'same-origin'});
+    if(r.ok) toast('Toutes les sessions ont été supprimées');
+    else toast('Erreur lors de la suppression',true);
+  }catch(e){toast('Erreur réseau',true);}
+  await loadUsers();
 }
 
 async function showUserActivities(sessionId){
