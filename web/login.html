@@ -284,12 +284,14 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
       errMsg.classList.add('show');
       pwdWrap.classList.add('error');
       try{await fetch('/api/log-activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({action:'Erreur de connexion',module:'Authentification',detail:'Mot de passe incorrect',resultat:'echec',session_id:0})});}catch(e){}
+      try{await fetch('/api/notifications',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({titre:'Tentative échouée',message:'Mot de passe incorrect — connexion refusée',type:'error'})});}catch(e){}
       btn.disabled=false;btn.textContent='Se connecter';
     }
   }catch(ex){
     errText.textContent='Erreur de connexion au serveur';
     errMsg.classList.add('show');
     try{await fetch('/api/log-activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({action:'Erreur de connexion',module:'Authentification',detail:'Erreur réseau: '+ex.message,resultat:'echec',session_id:0})});}catch(e){}
+    try{await fetch('/api/notifications',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({titre:'Erreur serveur',message:'Impossible de joindre le serveur — '+ex.message,type:'error'})});}catch(e){}
     btn.disabled=false;btn.textContent='Se connecter';
   }
 });

@@ -2113,6 +2113,7 @@ function exportMGAtoMO(){
   showPage('mo');
   toast('MA transférées vers le module MO ✔');
   logActivity('Transfert vers MO','MGA → MO','Transfert de '+MATIERES.length+' matières','succes');
+  sendNotification('Transfert MA→MO','Valeurs MA transférées vers le module MO','success');
 }
 
 /* ════ PAGE MO ════ */
@@ -2413,8 +2414,8 @@ async function saveToHistory(){
       if(r.status===401||r.status===302){toast('Session expirée. Reconnectez-vous.',true);return;}
       toast(err.error||'Erreur serveur ('+r.status+')',true);return;
     }
-    if(editingId){toast('Calcul mis à jour avec succès ✔');cancelEdit();logActivity('Modification élève','Calcul MO','id='+editingId);}
-    else{toast('Enregistré : '+nom);logActivity('Création élève','Calcul MO',nom);}
+    if(editingId){toast('Calcul mis à jour avec succès ✔');cancelEdit();logActivity('Modification élève','Calcul MO','id='+editingId);sendNotification('Modification','Calcul de '+nom+' modifié (#'+editingId+')','info');}
+    else{toast('Enregistré : '+nom);logActivity('Création élève','Calcul MO',nom);sendNotification('Nouveau calcul','Calcul de '+nom+' enregistré avec succès','success');}
     localStorage.removeItem('saphir_draft');
     await loadHistory();
   }catch(e){toast('Erreur lors de l\'enregistrement.',true);}
@@ -2433,6 +2434,7 @@ async function supprimerCalculHistorique(id,btn){
     await loadHistory();
     toast('Calcul supprimé définitivement.');
     logActivity('Suppression élève','Historique','id='+id);
+    sendNotification('Suppression','Calcul #'+id+' supprimé','warning');
   }catch(e){
     toast(e.message||'Erreur lors de la suppression.',true);
     btn.disabled=false;btn.innerHTML='&#128465; Supprimer';
@@ -2459,6 +2461,7 @@ async function clearHistory(){
   renderHistory();
   toast('Historique vidé.');
   logActivity('Vider l historique','Historique','Tous les calculs supprimés');
+  sendNotification('Historique vidé','Tous les calculs ont été supprimés','warning');
 }
 
 function confirmClearHistory(){
@@ -2957,6 +2960,7 @@ function exportPDF(){
   }
   buildBulletin();saveToHistory();window.print();toast('PDF exporté et enregistré ✔');
   logActivity('Export PDF','Calcul MO','Export depuis formulaire');
+  sendNotification('PDF exporté','Bulletin téléchargé depuis le formulaire','info');
 }
 
 /* ════ APERÇU BULLETIN DEPUIS FORMULAIRE MO ════ */
@@ -3066,6 +3070,12 @@ window.addEventListener('resize',setVH);
 /* ════ UTILISATEURS ════ */
 let _sessionId=parseInt(localStorage.getItem('saphir_session_id')||'0',10);
 let _allSessions=[];
+
+function sendNotification(titre,message,type){
+  fetch(API+'/api/notifications',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',
+    body:JSON.stringify({titre,message,type:type||'info'})
+  }).then(()=>loadNotifications()).catch(()=>{});
+}
 
 function logActivity(action,module,detail,resultat){
   fetch(API+'/api/log-activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',
