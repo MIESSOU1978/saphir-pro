@@ -364,25 +364,25 @@ class _Handler(BaseHTTPRequestHandler):
                     ip = self.client_address[0]
                     ua = self.headers.get("User-Agent", "")
                     sid = db.create_session("student", ip, ua, email)
-                    return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid, "username": db._get_username()}, "session", token)
+                    return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
                 ip = self.client_address[0]
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("admin", ip, ua, email)
-                return self._json({"ok": True, "role": "admin", "session_id": sid, "username": db._get_username()})
+                return self._json({"ok": True, "role": "admin", "session_id": sid})
 
             if _hash_password(pwd) == _hash_password(_APP_PASSWORD):
                 token = _create_session("admin")
                 ip = self.client_address[0]
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("admin", ip, ua, email)
-                return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid, "username": db._get_username()}, "session", token)
+                return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid}, "session", token)
 
             if _STUDENT_PASSWORD and _hash_password(pwd) == _hash_password(_STUDENT_PASSWORD):
                 token = _create_session("student")
                 ip = self.client_address[0]
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("student", ip, ua, email)
-                return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid, "username": db._get_username()}, "session", token)
+                return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
 
             # Record failed attempt for rate limiting
             _record_failed_login(client_ip)
