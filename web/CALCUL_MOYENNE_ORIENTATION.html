@@ -2903,7 +2903,7 @@ function doLogout(){
 }
 function applyRole(){
   const role=localStorage.getItem('saphir_role');
-  const isWeb=location.hostname==='saphir-pro.onrender.com';
+  const isWeb=location.hostname!=='localhost'&&location.hostname!=='127.0.0.1';
   if(role&&role!=='admin'){
     const nav=document.getElementById('nav-hist');
     const page=document.getElementById('page-hist');
