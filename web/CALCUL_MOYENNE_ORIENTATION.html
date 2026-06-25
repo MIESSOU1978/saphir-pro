@@ -2903,6 +2903,7 @@ function doLogout(){
 }
 function applyRole(){
   const role=localStorage.getItem('saphir_role');
+  const isWeb=location.hostname==='saphir-pro.onrender.com';
   if(role&&role!=='admin'){
     const nav=document.getElementById('nav-hist');
     const page=document.getElementById('page-hist');
@@ -2916,8 +2917,8 @@ function applyRole(){
   } else {
     const navUsers=document.getElementById('nav-users');
     const sepUsers=document.getElementById('nav-sep-users');
-    if(navUsers) navUsers.style.display='';
-    if(sepUsers) sepUsers.style.display='';
+    if(navUsers) navUsers.style.display=isWeb?'':'none';
+    if(sepUsers) sepUsers.style.display=isWeb?'':'none';
   }
 }
 
