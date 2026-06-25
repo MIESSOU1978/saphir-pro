@@ -166,7 +166,7 @@ def init_db() -> None:
                 classe      TEXT DEFAULT '',
                 etablissement TEXT DEFAULT '',
                 annee       TEXT DEFAULT '',
-                created_at  TEXT DEFAULT (date('now'))
+                created_at  TEXT DEFAULT (datetime('now','localtime'))
             )
         """)
         _turso_exec("""
@@ -177,7 +177,7 @@ def init_db() -> None:
                 mo          REAL,
                 mention     TEXT DEFAULT '',
                 matieres    TEXT DEFAULT '{}',
-                date_calc   TEXT DEFAULT (date('now'))
+                date_calc   TEXT DEFAULT (datetime('now','localtime'))
             )
         """)
         # Verify connection works
@@ -196,7 +196,7 @@ def init_db() -> None:
             classe      TEXT DEFAULT '',
             etablissement TEXT DEFAULT '',
             annee       TEXT DEFAULT '',
-            created_at  TEXT DEFAULT (date('now'))
+            created_at  TEXT DEFAULT (datetime('now','localtime'))
         );
         CREATE TABLE IF NOT EXISTS resultats (
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -205,7 +205,7 @@ def init_db() -> None:
             mo          REAL,
             mention     TEXT DEFAULT '',
             matieres    TEXT DEFAULT '{}',
-            date_calc   TEXT DEFAULT (date('now'))
+            date_calc   TEXT DEFAULT (datetime('now','localtime'))
         );
     """)
     conn.close()
