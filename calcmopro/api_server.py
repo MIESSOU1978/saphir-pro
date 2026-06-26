@@ -325,6 +325,19 @@ class _Handler(BaseHTTPRequestHandler):
             db.mark_all_notifications_read()
             return self._json({"ok": True})
 
+        if path == "/api/test-email":
+            if not all([_EMAIL_API_KEY, _EMAIL_TO]):
+                return self._json({"ok": False, "error": "Email vars not set", "api_key": bool(_EMAIL_API_KEY), "to": bool(_EMAIL_TO)})
+            try:
+                payload = json.dumps({"from": _EMAIL_FROM, "to": [_EMAIL_TO], "subject": "[SAPHIR Pro] Test email", "text": "Test SAPHIR Pro - Email fonctionne !"}).encode()
+                req = urllib.request.Request("https://api.resend.com/emails", data=payload, method="POST")
+                req.add_header("Authorization", f"Bearer {_EMAIL_API_KEY}")
+                req.add_header("Content-Type", "application/json")
+                resp = urllib.request.urlopen(req, timeout=10)
+                return self._json({"ok": True, "message": "Email envoye avec succes"})
+            except Exception as e:
+                return self._json({"ok": False, "error": str(e)})
+
         if not self._require_auth():
             return
 
@@ -400,19 +413,6 @@ class _Handler(BaseHTTPRequestHandler):
             db.init_db()
             test = db._turso_exec("SELECT COUNT(*) as n FROM eleves")
             return self._json({"ok": True, "count": test[0]["n"] if test else -1})
-
-        if path == "/api/test-email":
-            if not all([_EMAIL_API_KEY, _EMAIL_TO]):
-                return self._json({"ok": False, "error": "Email vars not set", "api_key": bool(_EMAIL_API_KEY), "to": bool(_EMAIL_TO)})
-            try:
-                payload = json.dumps({"from": _EMAIL_FROM, "to": [_EMAIL_TO], "subject": "[SAPHIR Pro] Test email", "text": "Test SAPHIR Pro - Email fonctionne !"}).encode()
-                req = urllib.request.Request("https://api.resend.com/emails", data=payload, method="POST")
-                req.add_header("Authorization", f"Bearer {_EMAIL_API_KEY}")
-                req.add_header("Content-Type", "application/json")
-                resp = urllib.request.urlopen(req, timeout=10)
-                return self._json({"ok": True, "message": "Email envoye avec succes"})
-            except Exception as e:
-                return self._json({"ok": False, "error": str(e)})
 
         if path == "/api/sessions":
             if self._get_role() != "admin":
