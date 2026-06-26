@@ -127,7 +127,7 @@ def _send_login_sms(role: str, ip: str, email: str) -> None:
     body = f"*[SAPHIR Pro] Connexion detectee*\nRole: {role_label}\nIP: {ip}\nDate: {now}"
     if email:
         body += f"\nEmail: {email}"
-    wa_from = "whatsapp:" + _TWILIO_FROM
+    wa_from = "whatsapp:+14155238886"
     wa_to = "whatsapp:" + _TWILIO_TO
     data = urllib.parse.urlencode({"From": wa_from, "To": wa_to, "Body": body}).encode()
     req = urllib.request.Request(
