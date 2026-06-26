@@ -14,13 +14,11 @@ import hmac
 import json
 import os
 import secrets
-import smtplib
 import threading
 import time
 import urllib.request
 import urllib.parse
 from collections import defaultdict
-from email.mime.text import MIMEText
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
@@ -54,10 +52,10 @@ _TWILIO_TOKEN: str = os.environ.get("TWILIO_AUTH_TOKEN", "")
 _TWILIO_FROM: str = os.environ.get("TWILIO_FROM", "")
 _TWILIO_TO: str = os.environ.get("TWILIO_TO", "")
 
-# Gmail SMTP config
-_EMAIL_FROM: str = os.environ.get("EMAIL_FROM", "")
+# Resend email config
+_EMAIL_API_KEY: str = os.environ.get("RESEND_API_KEY", "")
+_EMAIL_FROM: str = os.environ.get("EMAIL_FROM", "SAPHIR Pro <onboarding@resend.dev>")
 _EMAIL_TO: str = os.environ.get("EMAIL_TO", "")
-_EMAIL_PASS: str = os.environ.get("EMAIL_PASS", "")
 
 # Security: PBKDF2-HMAC-SHA256 salt (fixed, app-specific)
 _PASSWORD_SALT = b"calcmo-saphir-pro-salt-2024-v2"
@@ -151,8 +149,8 @@ def _send_login_sms(role: str, ip: str, email: str) -> None:
 
 
 def _send_login_email(role: str, ip: str, email: str) -> None:
-    """Send email via Gmail SMTP on successful login (non-blocking)."""
-    if not all([_EMAIL_FROM, _EMAIL_TO, _EMAIL_PASS]):
+    """Send email via Resend API on successful login (non-blocking)."""
+    if not all([_EMAIL_API_KEY, _EMAIL_TO]):
         return
     now = time.strftime("%d/%m/%Y %H:%M:%S")
     role_label = "Administrateur" if role == "admin" else "Élève"
@@ -160,15 +158,16 @@ def _send_login_email(role: str, ip: str, email: str) -> None:
     body = f"Nouvelle connexion détectée sur SAPHIR Pro\n\nRôle : {role_label}\nIP : {ip}\nDate : {now}"
     if email:
         body += f"\nEmail : {email}"
-    msg = MIMEText(body, "plain", "utf-8")
-    msg["Subject"] = subject
-    msg["From"] = _EMAIL_FROM
-    msg["To"] = _EMAIL_TO
+    payload = json.dumps({"from": _EMAIL_FROM, "to": [_EMAIL_TO], "subject": subject, "text": body}).encode()
+    req = urllib.request.Request(
+        "https://api.resend.com/emails",
+        data=payload,
+        method="POST",
+    )
+    req.add_header("Authorization", f"Bearer {_EMAIL_API_KEY}")
+    req.add_header("Content-Type", "application/json")
     try:
-        with smtplib.SMTP("smtp.gmail.com", 587, timeout=10) as s:
-            s.starttls()
-            s.login(_EMAIL_FROM, _EMAIL_PASS)
-            s.send_message(msg)
+        urllib.request.urlopen(req, timeout=10)
         print(f"[EMAIL] Sent to {_EMAIL_TO} for {role} login from {ip}")
     except Exception as e:
         print(f"[EMAIL ERROR] {e}")
@@ -403,17 +402,14 @@ class _Handler(BaseHTTPRequestHandler):
             return self._json({"ok": True, "count": test[0]["n"] if test else -1})
 
         if path == "/api/test-email":
-            if not all([_EMAIL_FROM, _EMAIL_TO, _EMAIL_PASS]):
-                return self._json({"ok": False, "error": "Email vars not set", "from": bool(_EMAIL_FROM), "to": bool(_EMAIL_TO), "pass": bool(_EMAIL_PASS)})
+            if not all([_EMAIL_API_KEY, _EMAIL_TO]):
+                return self._json({"ok": False, "error": "Email vars not set", "api_key": bool(_EMAIL_API_KEY), "to": bool(_EMAIL_TO)})
             try:
-                msg = MIMEText("Test SAPHIR Pro - Email fonctionne !", "plain", "utf-8")
-                msg["Subject"] = "[SAPHIR Pro] Test email"
-                msg["From"] = _EMAIL_FROM
-                msg["To"] = _EMAIL_TO
-                with smtplib.SMTP("smtp.gmail.com", 587, timeout=10) as s:
-                    s.starttls()
-                    s.login(_EMAIL_FROM, _EMAIL_PASS)
-                    s.send_message(msg)
+                payload = json.dumps({"from": _EMAIL_FROM, "to": [_EMAIL_TO], "subject": "[SAPHIR Pro] Test email", "text": "Test SAPHIR Pro - Email fonctionne !"}).encode()
+                req = urllib.request.Request("https://api.resend.com/emails", data=payload, method="POST")
+                req.add_header("Authorization", f"Bearer {_EMAIL_API_KEY}")
+                req.add_header("Content-Type", "application/json")
+                resp = urllib.request.urlopen(req, timeout=10)
                 return self._json({"ok": True, "message": "Email envoye avec succes"})
             except Exception as e:
                 return self._json({"ok": False, "error": str(e)})
