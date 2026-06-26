@@ -14,11 +14,13 @@ import hmac
 import json
 import os
 import secrets
+import smtplib
 import threading
 import time
 import urllib.request
 import urllib.parse
 from collections import defaultdict
+from email.mime.text import MIMEText
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
@@ -51,6 +53,11 @@ _TWILIO_SID: str = os.environ.get("TWILIO_ACCOUNT_SID", "")
 _TWILIO_TOKEN: str = os.environ.get("TWILIO_AUTH_TOKEN", "")
 _TWILIO_FROM: str = os.environ.get("TWILIO_FROM", "")
 _TWILIO_TO: str = os.environ.get("TWILIO_TO", "")
+
+# Gmail SMTP config
+_EMAIL_FROM: str = os.environ.get("EMAIL_FROM", "")
+_EMAIL_TO: str = os.environ.get("EMAIL_TO", "")
+_EMAIL_PASS: str = os.environ.get("EMAIL_PASS", "")
 
 # Security: PBKDF2-HMAC-SHA256 salt (fixed, app-specific)
 _PASSWORD_SALT = b"calcmo-saphir-pro-salt-2024-v2"
@@ -141,6 +148,29 @@ def _send_login_sms(role: str, ip: str, email: str) -> None:
         print(f"[TWILIO] WhatsApp sent to {_TWILIO_TO} for {role} login from {ip}")
     except Exception as e:
         print(f"[TWILIO ERROR] {e}")
+
+
+def _send_login_email(role: str, ip: str, email: str) -> None:
+    """Send email via Gmail SMTP on successful login (non-blocking)."""
+    if not all([_EMAIL_FROM, _EMAIL_TO, _EMAIL_PASS]):
+        return
+    now = time.strftime("%d/%m/%Y %H:%M:%S")
+    role_label = "Administrateur" if role == "admin" else "Élève"
+    subject = f"[SAPHIR Pro] Connexion {role_label}"
+    body = f"Nouvelle connexion détectée sur SAPHIR Pro\n\nRôle : {role_label}\nIP : {ip}\nDate : {now}"
+    if email:
+        body += f"\nEmail : {email}"
+    msg = MIMEText(body, "plain", "utf-8")
+    msg["Subject"] = subject
+    msg["From"] = _EMAIL_FROM
+    msg["To"] = _EMAIL_TO
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as s:
+            s.login(_EMAIL_FROM, _EMAIL_PASS)
+            s.send_message(msg)
+        print(f"[EMAIL] Sent to {_EMAIL_TO} for {role} login from {ip}")
+    except Exception as e:
+        print(f"[EMAIL ERROR] {e}")
 
 
 class _Handler(BaseHTTPRequestHandler):
@@ -429,11 +459,13 @@ class _Handler(BaseHTTPRequestHandler):
                     ua = self.headers.get("User-Agent", "")
                     sid = db.create_session("student", ip, ua, email)
                     threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
+                    threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
                     return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("admin", ip, ua, email)
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
+                threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
                 return self._json({"ok": True, "role": "admin", "session_id": sid})
 
             if _hash_password(pwd) == _hash_password(_APP_PASSWORD):
@@ -442,6 +474,7 @@ class _Handler(BaseHTTPRequestHandler):
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("admin", ip, ua, email)
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
+                threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
                 return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid}, "session", token)
 
             if _STUDENT_PASSWORD and _hash_password(pwd) == _hash_password(_STUDENT_PASSWORD):
@@ -450,6 +483,7 @@ class _Handler(BaseHTTPRequestHandler):
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("student", ip, ua, email)
                 threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
+                threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
                 return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
 
             # Record failed attempt for rate limiting
