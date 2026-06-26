@@ -52,9 +52,9 @@ _TWILIO_TOKEN: str = os.environ.get("TWILIO_AUTH_TOKEN", "")
 _TWILIO_FROM: str = os.environ.get("TWILIO_FROM", "")
 _TWILIO_TO: str = os.environ.get("TWILIO_TO", "")
 
-# Resend email config
-_EMAIL_API_KEY: str = os.environ.get("RESEND_API_KEY", "")
-_EMAIL_FROM: str = os.environ.get("EMAIL_FROM", "SAPHIR Pro <onboarding@resend.dev>")
+# Email config (SendGrid API)
+_EMAIL_API_KEY: str = os.environ.get("SENDGRID_API_KEY", "")
+_EMAIL_FROM: str = os.environ.get("EMAIL_FROM", "miessou8@gmail.com")
 _EMAIL_TO: str = os.environ.get("EMAIL_TO", "")
 
 # Security: PBKDF2-HMAC-SHA256 salt (fixed, app-specific)
@@ -149,7 +149,7 @@ def _send_login_sms(role: str, ip: str, email: str) -> None:
 
 
 def _send_login_email(role: str, ip: str, email: str) -> None:
-    """Send email via Resend API on successful login (non-blocking)."""
+    """Send email via SendGrid API on successful login (non-blocking)."""
     if not all([_EMAIL_API_KEY, _EMAIL_TO]):
         return
     now = time.strftime("%d/%m/%Y %H:%M:%S")
@@ -158,9 +158,14 @@ def _send_login_email(role: str, ip: str, email: str) -> None:
     body = f"Nouvelle connexion détectée sur SAPHIR Pro\n\nRôle : {role_label}\nIP : {ip}\nDate : {now}"
     if email:
         body += f"\nEmail : {email}"
-    payload = json.dumps({"from": _EMAIL_FROM, "to": [_EMAIL_TO], "subject": subject, "text": body}).encode()
+    payload = json.dumps({
+        "personalizations": [{"to": [{"email": _EMAIL_TO}]}],
+        "from": {"email": _EMAIL_FROM, "name": "SAPHIR Pro"},
+        "subject": subject,
+        "content": [{"type": "text/plain", "value": body}]
+    }).encode()
     req = urllib.request.Request(
-        "https://api.resend.com/emails",
+        "https://api.sendgrid.com/v3/mail/send",
         data=payload,
         method="POST",
     )
@@ -330,8 +335,13 @@ class _Handler(BaseHTTPRequestHandler):
             if not all([_EMAIL_API_KEY, _EMAIL_TO]):
                 return self._json({"ok": False, "error": "Email vars not set", "api_key": bool(_EMAIL_API_KEY), "to": bool(_EMAIL_TO)})
             try:
-                payload = json.dumps({"from": _EMAIL_FROM, "to": [_EMAIL_TO], "subject": "[SAPHIR Pro] Test email", "text": "Test SAPHIR Pro - Email fonctionne !"}).encode()
-                req = urllib.request.Request("https://api.resend.com/emails", data=payload, method="POST")
+                payload = json.dumps({
+                    "personalizations": [{"to": [{"email": _EMAIL_TO}]}],
+                    "from": {"email": _EMAIL_FROM, "name": "SAPHIR Pro"},
+                    "subject": "[SAPHIR Pro] Test email",
+                    "content": [{"type": "text/plain", "value": "Test SAPHIR Pro - Email fonctionne !"}]
+                }).encode()
+                req = urllib.request.Request("https://api.sendgrid.com/v3/mail/send", data=payload, method="POST")
                 req.add_header("Authorization", f"Bearer {_EMAIL_API_KEY}")
                 req.add_header("Content-Type", "application/json")
                 req.add_header("User-Agent", "Mozilla/5.0")
