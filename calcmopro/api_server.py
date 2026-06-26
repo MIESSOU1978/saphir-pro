@@ -16,6 +16,8 @@ import os
 import secrets
 import threading
 import time
+import urllib.request
+import urllib.parse
 from collections import defaultdict
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
@@ -43,6 +45,12 @@ _HMAC_KEY = hashlib.sha256(
 _LOGIN_ATTEMPTS: dict[str, list[float]] = defaultdict(list)
 _MAX_LOGIN_ATTEMPTS = 5
 _LOGIN_WINDOW = 300  # 5 minutes
+
+# Twilio SMS config
+_TWILIO_SID: str = os.environ.get("TWILIO_ACCOUNT_SID", "")
+_TWILIO_TOKEN: str = os.environ.get("TWILIO_AUTH_TOKEN", "")
+_TWILIO_FROM: str = os.environ.get("TWILIO_FROM", "")
+_TWILIO_TO: str = os.environ.get("TWILIO_TO", "")
 
 # Security: PBKDF2-HMAC-SHA256 salt (fixed, app-specific)
 _PASSWORD_SALT = b"calcmo-saphir-pro-salt-2024-v2"
@@ -108,6 +116,29 @@ def _is_rate_limited(ip: str) -> bool:
 def _record_failed_login(ip: str) -> None:
     """Record a failed login attempt for rate limiting."""
     _LOGIN_ATTEMPTS[ip].append(time.time())
+
+
+def _send_login_sms(role: str, ip: str, email: str) -> None:
+    """Send SMS via Twilio on successful login (non-blocking)."""
+    if not all([_TWILIO_SID, _TWILIO_TOKEN, _TWILIO_FROM, _TWILIO_TO]):
+        return
+    now = time.strftime("%d/%m/%Y %H:%M:%S")
+    role_label = "Administrateur" if role == "admin" else "Élève"
+    body = f"[SAPHIR Pro] Connexion detectee\nRole: {role_label}\nIP: {ip}\nDate: {now}"
+    if email:
+        body += f"\nEmail: {email}"
+    data = urllib.parse.urlencode({"From": _TWILIO_FROM, "To": _TWILIO_TO, "Body": body}).encode()
+    req = urllib.request.Request(
+        f"https://api.twilio.com/2010-04-01/Accounts/{_TWILIO_SID}/Messages.json",
+        data=data,
+        method="POST",
+    )
+    req.add_header("Authorization", "Basic " + __import__("base64").b64encode(f"{_TWILIO_SID}:{_TWILIO_TOKEN}".encode()).decode())
+    try:
+        urllib.request.urlopen(req, timeout=10)
+        print(f"[TWILIO] SMS sent to {_TWILIO_TO} for {role} login from {ip}")
+    except Exception as e:
+        print(f"[TWILIO ERROR] {e}")
 
 
 class _Handler(BaseHTTPRequestHandler):
@@ -395,10 +426,12 @@ class _Handler(BaseHTTPRequestHandler):
                     ip = self._get_real_ip()
                     ua = self.headers.get("User-Agent", "")
                     sid = db.create_session("student", ip, ua, email)
+                    threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
                     return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("admin", ip, ua, email)
+                threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 return self._json({"ok": True, "role": "admin", "session_id": sid})
 
             if _hash_password(pwd) == _hash_password(_APP_PASSWORD):
@@ -406,6 +439,7 @@ class _Handler(BaseHTTPRequestHandler):
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("admin", ip, ua, email)
+                threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid}, "session", token)
 
             if _STUDENT_PASSWORD and _hash_password(pwd) == _hash_password(_STUDENT_PASSWORD):
@@ -413,6 +447,7 @@ class _Handler(BaseHTTPRequestHandler):
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("student", ip, ua, email)
+                threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
                 return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
 
             # Record failed attempt for rate limiting
