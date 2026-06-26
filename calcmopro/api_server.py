@@ -401,6 +401,21 @@ class _Handler(BaseHTTPRequestHandler):
             test = db._turso_exec("SELECT COUNT(*) as n FROM eleves")
             return self._json({"ok": True, "count": test[0]["n"] if test else -1})
 
+        if path == "/api/test-email":
+            if not all([_EMAIL_FROM, _EMAIL_TO, _EMAIL_PASS]):
+                return self._json({"ok": False, "error": "Email vars not set", "from": bool(_EMAIL_FROM), "to": bool(_EMAIL_TO), "pass": bool(_EMAIL_PASS)})
+            try:
+                msg = MIMEText("Test SAPHIR Pro - Email fonctionne !", "plain", "utf-8")
+                msg["Subject"] = "[SAPHIR Pro] Test email"
+                msg["From"] = _EMAIL_FROM
+                msg["To"] = _EMAIL_TO
+                with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as s:
+                    s.login(_EMAIL_FROM, _EMAIL_PASS)
+                    s.send_message(msg)
+                return self._json({"ok": True, "message": "Email envoye avec succes"})
+            except Exception as e:
+                return self._json({"ok": False, "error": str(e)})
+
         if path == "/api/sessions":
             if self._get_role() != "admin":
                 return self._json({"error": "Accès refusé"}, 403)
