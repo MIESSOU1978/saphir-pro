@@ -3079,6 +3079,18 @@ let _allSessions=[];
 
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
+let _lastNotifId=0;
+let _notifPoll=null;
+function requestNotifPermission(){
+  if('Notification' in window && Notification.permission==='default'){
+    Notification.requestPermission();
+  }
+}
+function pushBrowserNotif(title,body){
+  if('Notification' in window && Notification.permission==='granted'){
+    try{new Notification(title,{body:body,icon:'saphir.ico',tag:'saphir-'+Date.now()});}catch(e){}
+  }
+}
 function sendNotification(titre,message,type){
   const n={id:Date.now(),titre,message,type:type||'info',lu:0,created_at:new Date().toISOString()};
   try{const arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');arr.unshift(n);if(arr.length>50)arr.length=50;localStorage.setItem('saphir_notifs',JSON.stringify(arr));}catch(e){}
@@ -3313,17 +3325,25 @@ function closeNotifPanel(e){
 document.addEventListener('click',closeNotifPanel);
 
 async function loadNotifications(){
+  let list=[];
   try{
     const r=await fetch(API+'/api/notifications',{credentials:'same-origin'});
     if(r.ok){
-      const list=await r.json();
-      if(list&&list.length){renderNotifications(list);updateNotifBadge(list.filter(n=>!n.lu).length);return;}
+      list=await r.json();
+      if(list&&list.length){
+        renderNotifications(list);
+        updateNotifBadge(list.filter(n=>!n.lu).length);
+        list.forEach(n=>{if(n.id>_lastNotifId&&n.id){_lastNotifId=n.id;pushBrowserNotif(n.titre||'SAPHIR Pro',n.message||'');}});
+        if(list.length&&list[0].id) _lastNotifId=Math.max(_lastNotifId,list[0].id);
+        return;
+      }
     }
   }catch(e){}
   try{
     const arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');
     renderNotifications(arr);
     updateNotifBadge(arr.filter(n=>!n.lu).length);
+    arr.forEach(n=>{if(n.id>_lastNotifId&&n.id){_lastNotifId=n.id;pushBrowserNotif(n.titre||'SAPHIR Pro',n.message||'');}});
   }catch(e){}
 }
 function renderNotifications(list){
@@ -3376,7 +3396,9 @@ function filterByYear(){
 }
 
 applyRole();
+requestNotifPermission();
 loadNotifications();
+_notifPoll=setInterval(loadNotifications,15000);
 loadHistory();
 checkDraft();
 window.addEventListener('beforeprint',buildBulletin);
