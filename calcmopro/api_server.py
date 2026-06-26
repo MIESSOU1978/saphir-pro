@@ -166,7 +166,7 @@ def _send_login_email(role: str, ip: str, email: str) -> None:
     )
     req.add_header("Authorization", f"Bearer {_EMAIL_API_KEY}")
     req.add_header("Content-Type", "application/json")
-    req.add_header("User-Agent", "SAPHIR-Pro/2.0")
+    req.add_header("User-Agent", "Mozilla/5.0")
     try:
         urllib.request.urlopen(req, timeout=10)
         print(f"[EMAIL] Sent to {_EMAIL_TO} for {role} login from {ip}")
@@ -334,7 +334,7 @@ class _Handler(BaseHTTPRequestHandler):
                 req = urllib.request.Request("https://api.resend.com/emails", data=payload, method="POST")
                 req.add_header("Authorization", f"Bearer {_EMAIL_API_KEY}")
                 req.add_header("Content-Type", "application/json")
-                req.add_header("User-Agent", "SAPHIR-Pro/2.0")
+                req.add_header("User-Agent", "Mozilla/5.0")
                 resp = urllib.request.urlopen(req, timeout=10)
                 return self._json({"ok": True, "message": "Email envoye avec succes"})
             except Exception as e:
