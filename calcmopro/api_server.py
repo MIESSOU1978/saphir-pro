@@ -52,8 +52,9 @@ _TWILIO_TOKEN: str = os.environ.get("TWILIO_AUTH_TOKEN", "")
 _TWILIO_FROM: str = os.environ.get("TWILIO_FROM", "")
 _TWILIO_TO: str = os.environ.get("TWILIO_TO", "")
 
-# Email config (SendGrid API)
-_EMAIL_API_KEY: str = os.environ.get("SENDGRID_API_KEY", "")
+# Email config (Bird API)
+_EMAIL_API_KEY: str = os.environ.get("BIRD_API_KEY", "")
+_EMAIL_WORKSPACE: str = os.environ.get("BIRD_WORKSPACE_ID", "")
 _EMAIL_FROM: str = os.environ.get("EMAIL_FROM", "miessou8@gmail.com")
 _EMAIL_TO: str = os.environ.get("EMAIL_TO", "")
 
@@ -149,8 +150,8 @@ def _send_login_sms(role: str, ip: str, email: str) -> None:
 
 
 def _send_login_email(role: str, ip: str, email: str) -> None:
-    """Send email via SendGrid API on successful login (non-blocking)."""
-    if not all([_EMAIL_API_KEY, _EMAIL_TO]):
+    """Send email via Bird API on successful login (non-blocking)."""
+    if not all([_EMAIL_API_KEY, _EMAIL_WORKSPACE, _EMAIL_TO]):
         return
     now = time.strftime("%d/%m/%Y %H:%M:%S")
     role_label = "Administrateur" if role == "admin" else "Élève"
@@ -159,17 +160,16 @@ def _send_login_email(role: str, ip: str, email: str) -> None:
     if email:
         body += f"\nEmail : {email}"
     payload = json.dumps({
-        "personalizations": [{"to": [{"email": _EMAIL_TO}]}],
-        "from": {"email": _EMAIL_FROM, "name": "SAPHIR Pro"},
-        "subject": subject,
-        "content": [{"type": "text/plain", "value": body}]
+        "content": {
+            "from": _EMAIL_FROM,
+            "subject": subject,
+            "text": body
+        },
+        "recipients": [{"address": {"email": _EMAIL_TO}}]
     }).encode()
-    req = urllib.request.Request(
-        "https://api.sendgrid.com/v3/mail/send",
-        data=payload,
-        method="POST",
-    )
-    req.add_header("Authorization", f"Bearer {_EMAIL_API_KEY}")
+    url = f"https://email.eu-west-1.api.bird.com/api/workspaces/{_EMAIL_WORKSPACE}/reach/transmissions"
+    req = urllib.request.Request(url, data=payload, method="POST")
+    req.add_header("Authorization", f"AccessKey {_EMAIL_API_KEY}")
     req.add_header("Content-Type", "application/json")
     req.add_header("User-Agent", "Mozilla/5.0")
     try:
@@ -332,17 +332,20 @@ class _Handler(BaseHTTPRequestHandler):
             return self._json({"ok": True})
 
         if path == "/api/test-email":
-            if not all([_EMAIL_API_KEY, _EMAIL_TO]):
-                return self._json({"ok": False, "error": "Email vars not set", "api_key": bool(_EMAIL_API_KEY), "to": bool(_EMAIL_TO)})
+            if not all([_EMAIL_API_KEY, _EMAIL_WORKSPACE, _EMAIL_TO]):
+                return self._json({"ok": False, "error": "Email vars not set", "api_key": bool(_EMAIL_API_KEY), "workspace": bool(_EMAIL_WORKSPACE), "to": bool(_EMAIL_TO)})
             try:
                 payload = json.dumps({
-                    "personalizations": [{"to": [{"email": _EMAIL_TO}]}],
-                    "from": {"email": _EMAIL_FROM, "name": "SAPHIR Pro"},
-                    "subject": "[SAPHIR Pro] Test email",
-                    "content": [{"type": "text/plain", "value": "Test SAPHIR Pro - Email fonctionne !"}]
+                    "content": {
+                        "from": _EMAIL_FROM,
+                        "subject": "[SAPHIR Pro] Test email",
+                        "text": "Test SAPHIR Pro - Email Bird fonctionne !"
+                    },
+                    "recipients": [{"address": {"email": _EMAIL_TO}}]
                 }).encode()
-                req = urllib.request.Request("https://api.sendgrid.com/v3/mail/send", data=payload, method="POST")
-                req.add_header("Authorization", f"Bearer {_EMAIL_API_KEY}")
+                url = f"https://email.eu-west-1.api.bird.com/api/workspaces/{_EMAIL_WORKSPACE}/reach/transmissions"
+                req = urllib.request.Request(url, data=payload, method="POST")
+                req.add_header("Authorization", f"AccessKey {_EMAIL_API_KEY}")
                 req.add_header("Content-Type", "application/json")
                 req.add_header("User-Agent", "Mozilla/5.0")
                 resp = urllib.request.urlopen(req, timeout=10)
