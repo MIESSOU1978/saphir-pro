@@ -165,7 +165,8 @@ def _send_login_email(role: str, ip: str, email: str) -> None:
     msg["From"] = _EMAIL_FROM
     msg["To"] = _EMAIL_TO
     try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as s:
+        with smtplib.SMTP("smtp.gmail.com", 587, timeout=10) as s:
+            s.starttls()
             s.login(_EMAIL_FROM, _EMAIL_PASS)
             s.send_message(msg)
         print(f"[EMAIL] Sent to {_EMAIL_TO} for {role} login from {ip}")
@@ -409,7 +410,8 @@ class _Handler(BaseHTTPRequestHandler):
                 msg["Subject"] = "[SAPHIR Pro] Test email"
                 msg["From"] = _EMAIL_FROM
                 msg["To"] = _EMAIL_TO
-                with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=10) as s:
+                with smtplib.SMTP("smtp.gmail.com", 587, timeout=10) as s:
+                    s.starttls()
                     s.login(_EMAIL_FROM, _EMAIL_PASS)
                     s.send_message(msg)
                 return self._json({"ok": True, "message": "Email envoye avec succes"})
