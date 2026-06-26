@@ -119,15 +119,17 @@ def _record_failed_login(ip: str) -> None:
 
 
 def _send_login_sms(role: str, ip: str, email: str) -> None:
-    """Send SMS via Twilio on successful login (non-blocking)."""
+    """Send WhatsApp message via Twilio on successful login (non-blocking)."""
     if not all([_TWILIO_SID, _TWILIO_TOKEN, _TWILIO_FROM, _TWILIO_TO]):
         return
     now = time.strftime("%d/%m/%Y %H:%M:%S")
-    role_label = "Administrateur" if role == "admin" else "Élève"
-    body = f"[SAPHIR Pro] Connexion detectee\nRole: {role_label}\nIP: {ip}\nDate: {now}"
+    role_label = "Administrateur" if role == "admin" else "Eleve"
+    body = f"*[SAPHIR Pro] Connexion detectee*\nRole: {role_label}\nIP: {ip}\nDate: {now}"
     if email:
         body += f"\nEmail: {email}"
-    data = urllib.parse.urlencode({"From": _TWILIO_FROM, "To": _TWILIO_TO, "Body": body}).encode()
+    wa_from = "whatsapp:" + _TWILIO_FROM
+    wa_to = "whatsapp:" + _TWILIO_TO
+    data = urllib.parse.urlencode({"From": wa_from, "To": wa_to, "Body": body}).encode()
     req = urllib.request.Request(
         f"https://api.twilio.com/2010-04-01/Accounts/{_TWILIO_SID}/Messages.json",
         data=data,
@@ -136,7 +138,7 @@ def _send_login_sms(role: str, ip: str, email: str) -> None:
     req.add_header("Authorization", "Basic " + __import__("base64").b64encode(f"{_TWILIO_SID}:{_TWILIO_TOKEN}".encode()).decode())
     try:
         urllib.request.urlopen(req, timeout=10)
-        print(f"[TWILIO] SMS sent to {_TWILIO_TO} for {role} login from {ip}")
+        print(f"[TWILIO] WhatsApp sent to {_TWILIO_TO} for {role} login from {ip}")
     except Exception as e:
         print(f"[TWILIO ERROR] {e}")
 
