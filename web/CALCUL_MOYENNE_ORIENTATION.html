@@ -2779,25 +2779,30 @@ function buildBulletinHTML(h){
   let totalWeighted=0;
   const rows=MATIERES.map(m=>{
     const d=(h.matieres||{})[m.id]||{};
-    const mgaVal=d.mga!=null?d.mga:null;
-    const mga=mgaVal!=null?fmtNum(Number(mgaVal),2):'—';
-    let bepc,bepcDisplay,bepcSum;
+    const rawMga=d.mga!=null?Number(d.mga):null;
+    const mgaVal=Number.isFinite(rawMga)?rawMga:null;
+    const mga=mgaVal!=null?fmtNum(mgaVal,2):'—';
+    let bepc=0,bepcDisplay='',hasData=false;
     if(m.anglais){
-      const ecrit=d.bepc_ecrit!=null?Number(d.bepc_ecrit):null;
-      const oral=d.bepc_oral!=null?Number(d.bepc_oral):null;
+      const rawEcrit=d.bepc_ecrit!=null?Number(d.bepc_ecrit):null;
+      const rawOral=d.bepc_oral!=null?Number(d.bepc_oral):null;
+      const ecrit=Number.isFinite(rawEcrit)?rawEcrit:null;
+      const oral=Number.isFinite(rawOral)?rawOral:null;
       bepc=ecrit!=null&&oral!=null?(ecrit+oral)/2:0;
+      hasData=mgaVal!=null||ecrit!=null||oral!=null;
       const ecritS=ecrit!=null?fmtNum(ecrit,2):'—';
       const oralS=oral!=null?fmtNum(oral,2):'—';
       bepcDisplay=`<div class="bp-dual"><span class="bp-dual-item">${ecritS}<small>Écrit</small></span><span class="bp-dual-link"></span><span class="bp-dual-item">${oralS}<small>Oral</small></span></div>`;
     }else{
-      const b=d.bepc!=null?Number(d.bepc):null;
+      const rawB=d.bepc!=null?Number(d.bepc):null;
+      const b=Number.isFinite(rawB)?rawB:null;
       bepc=b!=null?b:0;
+      hasData=mgaVal!=null||b!=null;
       bepcDisplay=`<span class="bp-pill bp-pill-bepc">${b!=null?fmtNum(b,2):'—'}</span>`;
     }
-    const sum=mgaVal!=null?Number(mgaVal)+bepc:bepc;
+    const sum=mgaVal!=null?mgaVal+bepc:bepc;
     const prod=sum*m.coef;
     totalWeighted+=prod;
-    const hasData=mgaVal!=null||(m.anglais?(d.bepc_ecrit!=null||d.bepc_oral!=null):(d.bepc!=null));
     const sumS=hasData?fmtNum(sum,2):'—';
     const prodS=hasData?fmtNum(prod,2):'—';
     return `<tr><td class="bp-matiere">${m.label}</td><td><span class="bp-pill">${mga}</span></td><td>${bepcDisplay}</td><td class="bp-sum">${sumS}</td><td><span class="bp-coef">${m.coef}</span></td><td class="bp-result">${prodS}</td></tr>`;
