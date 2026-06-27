@@ -2251,14 +2251,17 @@ function updateMOProgress(count){
     else if(count>=1) fill.classList.add('fill-started');
   }
   if(msg) msg.classList.toggle('show',count===4);
-  if(count===4 && !_moCompletionLogged){
-    _moCompletionLogged=true;
-    logMOCompletion();
+  if(count===4){
+    const currentMO=document.getElementById('r-mo')?.textContent||'';
+    if(currentMO!==_lastLoggedMO){
+      _lastLoggedMO=currentMO;
+      logMOCompletion();
+    }
   }
-  if(count<4) _moCompletionLogged=false;
+  if(count<4) _lastLoggedMO='';
 }
 
-let _moCompletionLogged=false;
+let _lastLoggedMO='';
 
 function logMOCompletion(){
   const nom=(document.getElementById('mo-nom')?.value||'').trim()||'Non renseigné';
