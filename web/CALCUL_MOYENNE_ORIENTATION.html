@@ -706,6 +706,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .users-act-preview-btn,.users-act-save-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:5px 12px;min-height:28px;border:1.2px solid #B8CEC3;border-radius:6px;background:#fff;color:#064E3B;font-family:inherit;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;line-height:1;box-sizing:border-box;}
 .users-act-preview-btn:hover,.users-act-save-btn:hover{background:#EAF5F0;border-color:#064E3B;}
 .users-act-btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.users-email-tooltip{display:inline-block;margin-left:6px;padding:2px 8px;background:#EAF5F0;border:1px solid #B8CEC3;border-radius:4px;font-size:.7rem;font-weight:600;color:#064E3B;white-space:nowrap;vertical-align:middle;}
 .users-empty-state{text-align:center;padding:40px 20px;color:#9fb0a6;font-size:.85rem;}
 .users-empty-sub{font-size:.74rem;color:#b8c8be;margin-top:6px;}
 
@@ -1898,7 +1899,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         <thead>
           <tr>
             <th><input type="checkbox" id="users-select-all" onchange="toggleSelectAll(this)"></th>
-            <th>Email</th>
+            <th style="display:none;">Email</th>
             <th>Rôle</th>
             <th>Appareil</th>
             <th>Ville</th>
@@ -3311,8 +3312,8 @@ function renderUsers(sessions){
     const emailLabel=(email==='Utilisateur inconnu'&&(s.role==='admin'?'Administrateur local':null))||email;
     return `<tr title="${email} | ${s.os||''} | ${s.navigateur||''} | ${s.ip||''}">
       <td style="text-align:center;"><input type="checkbox" class="users-cb" value="${s.id}" onchange="updateDeleteBtn()"></td>
-      <td title="${email}">${esc(emailLabel)}</td>
-      <td><span class="users-role-badge ${roleCls}">${roleLabel}</span></td>
+      <td style="display:none;" class="users-email-cell">${esc(emailLabel)}</td>
+      <td style="cursor:pointer;" title="Cliquer pour voir l'email" onclick="toggleEmail(this)"><span class="users-role-badge ${roleCls}">${roleLabel}</span></td>
       <td title="${s.appareil||''}">${s.appareil||'—'} ${badge}</td>
       <td title="${ville}">${ville}</td>
       <td style="font-family:monospace;font-size:.72rem;" title="${s.ip||''}">${s.ip||'—'}</td>
@@ -3510,6 +3511,20 @@ async function showUserActivities(sessionId,email){
   }catch(e){
     list.innerHTML='<div class="users-empty-state">Erreur réseau</div>';
   }
+}
+
+let _visibleEmail=null;
+function toggleEmail(td){
+  const existing=td.querySelector('.users-email-tooltip');
+  if(existing){existing.remove();_visibleEmail=null;return;}
+  if(_visibleEmail) _visibleEmail.querySelector('.users-email-tooltip')?.remove();
+  const cell=td.closest('tr').querySelector('.users-email-cell');
+  if(!cell) return;
+  const tip=document.createElement('span');
+  tip.className='users-email-tooltip';
+  tip.textContent=cell.textContent||'Aucun email';
+  td.appendChild(tip);
+  _visibleEmail=td;
 }
 
 function closeActivityPanel(){
