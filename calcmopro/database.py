@@ -815,12 +815,12 @@ def clear_all_notifications() -> None:
 
 # ── KNOWN DEVICES ──────────────────────────────────────
 def is_device_known(fingerprint: str) -> bool:
-    """Check if a device fingerprint is known and trusted."""
+    """Check if a device fingerprint exists in the database (any trust level)."""
     if _turso_enabled():
-        rows = _turso_exec("SELECT id FROM known_devices WHERE fingerprint=? AND trusted=1 LIMIT 1", [fingerprint])
+        rows = _turso_exec("SELECT id FROM known_devices WHERE fingerprint=? LIMIT 1", [fingerprint])
         return len(rows) > 0
     conn = _connect()
-    row = conn.execute("SELECT id FROM known_devices WHERE fingerprint=? AND trusted=1 LIMIT 1", (fingerprint,)).fetchone()
+    row = conn.execute("SELECT id FROM known_devices WHERE fingerprint=? LIMIT 1", (fingerprint,)).fetchone()
     conn.close()
     return row is not None
 
