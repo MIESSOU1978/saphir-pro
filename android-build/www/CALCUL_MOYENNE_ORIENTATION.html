@@ -642,8 +642,8 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
   font-size:.62rem;font-weight:700;white-space:nowrap;vertical-align:middle;
 }
 .users-device-trusted{background:#EAF5F0;color:#064E3B;border:1px solid #B8CEC3;}
-.users-device-untrusted{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;}
-.users-device-unknown{background:#F3F4F6;color:#6B7280;border:1px solid #E5E7EB;}
+.users-device-untrusted{background:#FFF3D6;color:#A85B00;border:1px solid #F5A623;}
+.users-device-unknown{background:#FFF3D6;color:#A85B00;border:1px solid #F5A623;}
 .users-trust-btn{
   width:28px;height:28px;border-radius:6px;border:1px solid #D5E5DE;background:#fff;
   cursor:pointer;font-size:.78rem;font-weight:700;transition:all .18s ease;display:inline-flex;align-items:center;justify-content:center;
@@ -653,6 +653,11 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .users-trust-remove{color:#991B1B;}
 .users-trust-remove:hover{background:#FEF2F2;border-color:#FECACA;}
 
+.users-devices-alert{
+  display:flex;align-items:center;gap:8px;padding:10px 16px;
+  background:#FFF3D6;border:1px solid #F5A623;border-radius:10px;
+  font-size:.8rem;font-weight:600;color:#A85B00;
+}
 .users-devices-section{
   margin-top:20px;border:1.5px solid #d5e5de;border-radius:12px;
   background:#fff;overflow:hidden;
@@ -1846,6 +1851,11 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
           Exporter
         </button>
       </div>
+    </div>
+
+    <div class="users-devices-alert" id="users-devices-alert" style="display:none;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A85B00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span id="users-devices-alert-text"></span>
     </div>
 
     <div class="users-devices-section" id="users-devices-section">
@@ -3173,14 +3183,19 @@ function renderKnownDevices(){
     return;
   }
   countEl.textContent=devices.length+' appareil'+(devices.length>1?'s':'');
+  const unknownCount=devices.filter(d=>!d.kd||!d.kd.trusted).length;
+  const alertEl=document.getElementById('users-devices-alert');
+  const alertText=document.getElementById('users-devices-alert-text');
+  if(unknownCount>0){alertEl.style.display='flex';alertText.textContent=unknownCount+' appareil'+(unknownCount>1?'s':'')+' inconnu'+(unknownCount>1?'s':'')+' détecté'+(unknownCount>1?'s':'');}
+  else{alertEl.style.display='none';}
   container.innerHTML=devices.map(d=>{
     const kd=d.kd;
     const trusted=kd?!!kd.trusted:false;
     const badge=kd
       ?(trusted
         ?'<span class="users-device-badge users-device-trusted">&#10003; Fiable</span>'
-        :'<span class="users-device-badge users-device-untrusted">&#9888; Non reconnu</span>')
-      :'<span class="users-device-badge users-device-unknown">&#10067; Inconnu</span>';
+        :'<span class="users-device-badge users-device-untrusted">&#9888; Appareil inconnu</span>')
+      :'<span class="users-device-badge users-device-untrusted">&#9888; Nouvel appareil</span>';
     let actions='';
     if(kd){
       actions=`
@@ -3235,9 +3250,9 @@ function renderUsers(sessions){
     if(kd){
       badge=kd.trusted
         ?'<span class="users-device-badge users-device-trusted" title="Appareil fiable">&#10003; Fiable</span>'
-        :'<span class="users-device-badge users-device-untrusted" title="Appareil non reconnu">&#9888; Non reconnu</span>';
+        :'<span class="users-device-badge users-device-untrusted" title="Appareil inconnu">&#9888; Appareil inconnu</span>';
     }else{
-      badge='<span class="users-device-badge users-device-unknown" title="Appareil inconnu">&#10067; Inconnu</span>';
+      badge='<span class="users-device-badge users-device-untrusted" title="Nouvel appareil détecté">&#9888; Nouvel appareil</span>';
     }
     let trustBtn='';
     if(kd){
@@ -3269,6 +3284,7 @@ function renderUsers(sessions){
 
 function toggleDeviceTrust(deviceId, trusted) {
   console.log('[Trust] toggleDeviceTrust called', deviceId, trusted);
+  if(trusted && !confirm('Voulez-vous vraiment marquer cet appareil comme fiable ?')) return;
   const action = trusted ? 'trust' : 'untrust';
   const label = trusted ? 'fiable' : 'non reconnu';
   toast('Mise à jour en cours…');
@@ -3288,6 +3304,7 @@ function toggleDeviceTrust(deviceId, trusted) {
 
 function trustNewDevice(fingerprint, label) {
   console.log('[Trust] trustNewDevice called', fingerprint, label);
+  if(!confirm('Voulez-vous vraiment marquer cet appareil comme fiable ?')) return;
   toast('Enregistrement en cours…');
   fetch(API + '/api/known-devices', {
     method: 'POST', credentials: 'same-origin',
