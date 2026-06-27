@@ -608,11 +608,10 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .users-filter-select:hover{background:#F3F8F5;border-color:#8FB7A4;}
 .users-filter-select:focus{background:#EEF7F2;border-color:#0B6B50;outline:none;}
 .users-table-wrap{overflow-x:auto;overflow-y:visible;border:1px solid #d9e5de;border-radius:10px;}
-.users-table{width:100%;min-width:800px;border-collapse:collapse;font-size:.78rem;table-layout:fixed;}
+.users-table{width:100%;min-width:960px;border-collapse:collapse;font-size:.78rem;table-layout:auto;}
 .users-table th{
   padding:10px 10px;background:#f4f8f6;color:#064E3B;font-weight:700;font-size:.7rem;
   text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #d5e5de;text-align:left;white-space:nowrap;
-  overflow:hidden;text-overflow:ellipsis;
 }
 .users-table td{
   padding:9px 10px;border-bottom:1px solid #eef3f0;color:#1a3a2e;vertical-align:middle;
@@ -620,16 +619,6 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 }
 .users-table tbody tr:hover{background:#f8fbf9;}
 .users-table tbody tr:last-child td{border-bottom:none;}
-.users-table colgroup .col-cb{width:36px;}
-.users-table colgroup .col-email{width:16%;}
-.users-table colgroup .col-role{width:11%;}
-.users-table colgroup .col-device{width:16%;}
-.users-table colgroup .col-ville{width:14%;}
-.users-table colgroup .col-ip{width:10%;}
-.users-table colgroup .col-login{width:10%;}
-.users-table colgroup .col-logout{width:10%;}
-.users-table colgroup .col-status{width:8%;}
-.users-table colgroup .col-actions{width:12%;}
 .users-role-badge{
   display:inline-block;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700;
   white-space:nowrap;
@@ -1890,18 +1879,6 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 
     <div class="users-table-wrap">
       <table class="users-table">
-        <colgroup>
-          <col class="col-cb">
-          <col class="col-email">
-          <col class="col-role">
-          <col class="col-device">
-          <col class="col-ville">
-          <col class="col-ip">
-          <col class="col-login">
-          <col class="col-logout">
-          <col class="col-status">
-          <col class="col-actions">
-        </colgroup>
         <thead>
           <tr>
             <th><input type="checkbox" id="users-select-all" onchange="toggleSelectAll(this)"></th>
