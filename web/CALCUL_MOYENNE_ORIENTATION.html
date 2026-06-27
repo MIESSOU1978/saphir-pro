@@ -1841,8 +1841,8 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         </div>
       </div>
       <div class="users-header-right">
-        <button class="btn btn-reset" id="users-delete-selected" onclick="deleteSelectedUsers()" style="display:none;" title="Supprimer la sélection">
-          <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+        <button class="btn btn-reset users-btn-danger" id="users-delete-selected" onclick="deleteSelectedUsers()" style="display:none;" title="Supprimer la sélection">
+          <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#991B1B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
           Supprimer
         </button>
         <button class="btn btn-reset users-btn-danger" id="users-delete-all" onclick="clearAllUsers()" title="Tout supprimer">
@@ -3247,7 +3247,7 @@ function renderKnownDevices(){
       const trustIcon=trusted?'&#10005; &#10003;':'&#10003; Fiable';
       actions=`
         <button class="btn btn-reset" onclick="toggleDeviceTrust(${kd.id},${trusted?0:1})" title="${trustLabel}" style="min-height:32px;padding:5px 14px;font-size:.76rem;">${trusted?'&#10005; Retirer':'&#10003; Fiable'}</button>
-        <button class="btn btn-reset" onclick="deleteKnownDevice(${kd.id})" title="Supprimer" style="min-height:32px;padding:5px 10px;font-size:.76rem;color:#991B1B;border-color:#E7A6A0;">&#128465;</button>`;
+        <button class="btn btn-reset users-btn-danger" onclick="deleteKnownDevice(${kd.id})" title="Supprimer" style="min-height:32px;padding:5px 10px;font-size:.76rem;">&#128465;</button>`;
     }else{
       actions=`<button class="btn btn-reset" onclick="trustNewDevice('${d.fingerprint}','${(d.label||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer comme fiable" style="min-height:32px;padding:5px 14px;font-size:.76rem;">&#10003; Fiable</button>`;
     }
@@ -3323,7 +3323,7 @@ function renderUsers(sessions){
       <td style="display:flex;gap:6px;align-items:center;flex-wrap:nowrap;">
         ${trustBtn}
         <button class="btn btn-reset" onclick="showUserActivities(${s.id},'${email.replace(/'/g,"\\'")}')" style="min-height:28px;padding:3px 10px;font-size:.7rem;white-space:nowrap;">Activités</button>
-        <button class="btn btn-reset" onclick="deleteSession(${s.id})" title="Supprimer cette session" style="min-height:28px;padding:3px 8px;font-size:.7rem;color:#991B1B;border-color:#E7A6A0;">&#128465;</button>
+        <button class="btn btn-reset users-btn-danger" onclick="deleteSession(${s.id})" title="Supprimer cette session" style="min-height:28px;padding:3px 8px;font-size:.7rem;">&#128465;</button>
       </td>
     </tr>`;
   }).join('');
