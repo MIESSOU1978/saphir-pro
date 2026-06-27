@@ -3519,23 +3519,23 @@ function closeActivityPanel(){
 function downloadBulletinFromAct(idx){
   const d=_actBulletinData[idx];
   if(!d){toast('Données bulletin introuvables.',true);return;}
-  const html=buildBulletinHTML(d);
-  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
-  const win=window.open('','_blank','width=900,height=700');
-  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Bulletin — ${esc(d.nom||'')} — SAPHIR Pro</title>
-${styles}
-<style>
-  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
-  body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
-  .bulletin-sheet{page-break-after:auto;margin:0;padding:0;}
-  @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
-</style></head><body>${html}</body></html>`);
-  win.document.close();
-  setTimeout(()=>{win.print();},600);
-  toast('Enregistrement du bulletin pour '+d.nom);
-  logActivity('Enregistrement bulletin','Calcul MO',d.nom||'');
+  const nom=(d.nom||'').trim();
+  if(!nom){toast('Nom de l\'élève manquant.',true);return;}
+  const matieres={};
+  MATIERES.forEach(m=>{
+    const src=(d.matieres||{})[m.id]||{};
+    const dd={mga:src.mga!=null?src.mga:null};
+    if(m.anglais){dd.bepc_ecrit=src.bepc_ecrit!=null?src.bepc_ecrit:null;dd.bepc_oral=src.bepc_oral!=null?src.bepc_oral:null;}
+    else{dd.bepc=src.bepc!=null?src.bepc:null;}
+    matieres[m.id]=dd;
+  });
+  const total=parseFloat(String(d.total||'0').replace(',','.'))||0;
+  const mo=parseFloat(String(d.mo||'0').replace(',','.'))||0;
+  const payload={nom,matricule:d.matricule||'—',classe:d.classe||'—',etablissement:d.etablissement||'—',annee_scolaire:d.annee_scolaire||'—',annee_scolaire:d.annee_scolaire||'—',total,mo,mention:d.mention||'—',matieres};
+  fetch(API+'/api/eleves',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify(payload)})
+    .then(r=>{if(!r.ok) throw r;return r.json();})
+    .then(()=>{toast('Bulletin enregistré dans l\'historique ✔');loadHistory();logActivity('Enregistrement bulletin','Calcul MO',nom+' — '+d.classe,'succes');})
+    .catch(()=>{toast('Erreur lors de l\'enregistrement.',true);logActivity('Enregistrement bulletin','Calcul MO',nom,'echec');});
 }
 
 function previewBulletinFromAct(idx){
