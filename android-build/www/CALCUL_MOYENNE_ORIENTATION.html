@@ -3314,7 +3314,7 @@ function renderUsers(sessions){
       <td style="font-size:.72rem;">${logoutDisplay}</td>
       <td><span class="users-status ${statusCls}"><span class="users-status-dot"></span>${statusLabel}</span></td>
       <td style="display:flex;gap:6px;align-items:center;flex-wrap:nowrap;">
-        <button class="btn btn-reset" onclick="showUserActivities(${s.id},'${email.replace(/'/g,"\\'")}')" title="Voir les activités" style="min-height:28px;padding:3px 10px;font-size:.7rem;white-space:nowrap;">Activités</button>
+        <button class="btn btn-reset" onclick="showUserActivities(${s.id},'${email.replace(/'/g,"\\'")}')" title="Voir les activités" style="min-height:28px;padding:3px 10px;font-size:.7rem;white-space:nowrap;">activités</button>
         <button class="btn-icon-danger" onclick="deleteSession(${s.id})" title="Supprimer cette session"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
       </td>
     </tr>`;
@@ -3447,7 +3447,7 @@ async function showUserActivities(sessionId,email){
   const title=document.getElementById('users-activity-title');
   const list=document.getElementById('users-activity-list');
   _actBulletinData=[];
-  title.textContent='Activités — '+(email||'Session #'+sessionId);
+  title.textContent='activités — '+(email||'Session #'+sessionId);
   panel.style.display='block';
   list.innerHTML='<div class="users-empty-state">Chargement...</div>';
   try{
