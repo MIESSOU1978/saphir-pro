@@ -3209,15 +3209,13 @@ async function toggleDeviceTrust(deviceId, trusted) {
     const r = await fetch(API + '/api/known-devices/' + deviceId + '/' + action, {
       method: 'POST', credentials: 'same-origin'
     });
+    const data = await r.json().catch(()=>({}));
     if (r.ok) {
-      sendNotification(
-        trusted ? 'Appareil marqué fiable' : 'Confiance retirée',
-        trusted ? 'Cet appareil est maintenant reconnu comme fiable.' : 'La confiance pour cet appareil a été retirée.',
-        trusted ? 'success' : 'warning'
-      );
       await loadUsers();
+    } else {
+      console.error('[Trust]', r.status, data);
     }
-  } catch(e) {}
+  } catch(e) { console.error('[Trust error]', e); }
 }
 
 async function trustNewDevice(fingerprint, label) {
@@ -3227,11 +3225,13 @@ async function trustNewDevice(fingerprint, label) {
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({fingerprint, label, trusted: 1})
     });
+    const data = await r.json().catch(()=>({}));
     if (r.ok) {
-      sendNotification('Appareil marqué fiable', 'Cet appareil est maintenant reconnu.', 'success');
       await loadUsers();
+    } else {
+      console.error('[TrustNew]', r.status, data);
     }
-  } catch(e) {}
+  } catch(e) { console.error('[TrustNew error]', e); }
 }
 
 function filterUsers(){
