@@ -3035,7 +3035,9 @@ function toast(msg,isErr=false){
 
 /* ── ROLE-BASED UI ── */
 function doLogout(){
+  const sid=localStorage.getItem('saphir_session_id');
   logActivity('Déconnexion','Authentification','Déconnexion utilisateur');
+  fetch(API+'/api/logout',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({session_id:sid?parseInt(sid):0})}).catch(()=>{});
   localStorage.removeItem('saphir_role');
   localStorage.removeItem('saphir_pwd');
   window.location.href='/login';

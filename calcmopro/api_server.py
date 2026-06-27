@@ -512,6 +512,13 @@ class _Handler(BaseHTTPRequestHandler):
             return self._json({"error": "Mot de passe incorrect"}, 401)
 
         if path == "/api/logout":
+            try:
+                body = self._read_body()
+                sess_id = body.get("session_id")
+                if sess_id:
+                    db.close_session(int(sess_id))
+            except Exception:
+                pass
             self.send_response(302)
             self.send_header("Location", "/login")
             self.send_header("Set-Cookie", "session=; Path=/; Max-Age=0")
