@@ -3419,6 +3419,7 @@ function getSelectedUserIds(){
 }
 
 async function deleteSession(id){
+  if(id===_sessionId){toast('Impossible de supprimer votre session active.',true);return;}
   if(!confirm('Supprimer cette session ?')) return;
   toast('Suppression…');
   try{
@@ -3430,23 +3431,25 @@ async function deleteSession(id){
 }
 
 async function deleteSelectedUsers(){
-  const ids=getSelectedUserIds();
-  if(!ids.length) return;
-  if(!confirm('Supprimer '+ids.length+' session(s) sélectionnée(s) ? Cette action est irréversible.')) return;
+  const ids=getSelectedUserIds().filter(id=>id!==_sessionId);
+  if(!ids.length){toast('Aucune session supprimable (session active exclue).',true);return;}
+  const skipped=getSelectedUserIds().length-ids.length;
+  if(!confirm('Supprimer '+ids.length+' session(s) sélectionnée(s) ?'+(skipped?' La session active sera conservée.':'')+' Cette action est irréversible.')) return;
   for(const id of ids){
     try{await fetch('/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});}catch(e){}
   }
-  toast(ids.length+' session(s) supprimée(s)');
+  toast(ids.length+' session(s) supprimée(s)'+(skipped?' (session active conservée)':''));
   await loadUsers();
 }
 
 async function clearAllUsers(){
-  if(!confirm('Voulez-vous vraiment supprimer toutes les sessions enregistrées ?\nCette action est irréversible.')) return;
-  try{
-    const r=await fetch('/api/sessions/clear',{method:'DELETE',credentials:'same-origin'});
-    if(r.ok) toast('Toutes les sessions ont été supprimées');
-    else toast('Erreur lors de la suppression',true);
-  }catch(e){toast('Erreur réseau',true);}
+  const ids=_allSessions.map(s=>s.id).filter(id=>id!==_sessionId);
+  if(!ids.length){toast('Aucune autre session à supprimer.',true);return;}
+  if(!confirm('Supprimer '+ids.length+' session(s) ?\nVotre session active sera conservée.\nCette action est irréversible.')) return;
+  for(const id of ids){
+    try{await fetch('/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});}catch(e){}
+  }
+  toast(ids.length+' session(s) supprimée(s) (session active conservée)');
   await loadUsers();
 }
 
