@@ -3330,8 +3330,8 @@ function renderUsers(sessions){
 }
 
 function toggleDeviceTrust(deviceId, trusted) {
-  console.log('[Trust] toggleDeviceTrust called', deviceId, trusted);
   if(trusted && !confirm('Voulez-vous vraiment marquer cet appareil comme fiable ?')) return;
+  if(!trusted && !confirm('Voulez-vous vraiment retirer la confiance de cet appareil ?')) return;
   const action = trusted ? 'trust' : 'untrust';
   const label = trusted ? 'fiable' : 'non reconnu';
   toast('Mise à jour en cours…');
@@ -3344,13 +3344,11 @@ function toggleDeviceTrust(deviceId, trusted) {
       loadUsers();
     } else {
       toast('Erreur : ' + (data.error || r.status));
-      console.error('[Trust]', r.status, data);
     }
-  })).catch(e => { toast('Erreur réseau'); console.error('[Trust error]', e); });
+  })).catch(e => { toast('Erreur réseau'); });
 }
 
 function trustNewDevice(fingerprint, label) {
-  console.log('[Trust] trustNewDevice called', fingerprint, label);
   if(!confirm('Voulez-vous vraiment marquer cet appareil comme fiable ?')) return;
   toast('Enregistrement en cours…');
   fetch(API + '/api/known-devices', {
@@ -3364,9 +3362,8 @@ function trustNewDevice(fingerprint, label) {
       loadUsers();
     } else {
       toast('Erreur : ' + (data.error || r.status));
-      console.error('[TrustNew]', r.status, data);
     }
-  })).catch(e => { toast('Erreur réseau'); console.error('[TrustNew error]', e); });
+  })).catch(e => { toast('Erreur réseau'); });
 }
 
 function deleteKnownDevice(deviceId) {
