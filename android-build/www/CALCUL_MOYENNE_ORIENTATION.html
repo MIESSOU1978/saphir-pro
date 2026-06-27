@@ -664,6 +664,31 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .users-trust-add:hover{background:#F0F7F3;border-color:#064E3B;}
 .users-trust-remove{color:#991B1B;}
 .users-trust-remove:hover{background:#FEF2F2;border-color:#FECACA;}
+
+.users-devices-section{
+  margin-top:20px;border:1.5px solid #d5e5de;border-radius:12px;
+  background:#fff;overflow:hidden;
+}
+.users-devices-header{
+  display:flex;align-items:center;gap:8px;padding:14px 18px;
+  background:linear-gradient(180deg,#f6f9f5 0%,#eaf3eb 100%);
+  border-bottom:1px solid #d5e5de;
+}
+.users-devices-title{font-size:.88rem;font-weight:700;color:#003b32;flex:1;}
+.users-devices-count{font-size:.72rem;color:#60736d;font-weight:600;background:#EAF5F0;padding:2px 8px;border-radius:8px;}
+.users-devices-list{padding:0;max-height:320px;overflow-y:auto;}
+.users-device-card{
+  display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;
+  padding:12px 18px;border-bottom:1px solid #eef3f0;transition:background .15s;
+}
+.users-device-card:last-child{border-bottom:none;}
+.users-device-card:hover{background:#f8faf9;}
+.users-device-info{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.users-device-label{font-size:.82rem;font-weight:600;color:#003b32;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.users-device-fp{font-size:.68rem;color:#9aa79f;font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.users-device-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.users-device-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.users-devices-empty{text-align:center;padding:30px 16px;color:#60736d;font-size:.8rem;}
 .users-activity-panel{
   margin-top:20px;border:1px solid #d5e5de;border-radius:12px;
   background:#fafcfb;padding:18px 20px;
@@ -1833,6 +1858,15 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
           Exporter
         </button>
       </div>
+    </div>
+
+    <div class="users-devices-section" id="users-devices-section">
+      <div class="users-devices-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <span class="users-devices-title">Appareils connus</span>
+        <span class="users-devices-count" id="users-devices-count">0 appareil(s)</span>
+      </div>
+      <div class="users-devices-list" id="users-devices-list"></div>
     </div>
 
     <div class="users-filters">
@@ -3133,7 +3167,65 @@ async function loadUsers(){
     _allSessions=await r.json();
     _knownDevices=rd.ok?await rd.json():[];
     renderUsers(_allSessions);
+    renderKnownDevices();
   }catch(e){}
+}
+
+function renderKnownDevices(){
+  const container=document.getElementById('users-devices-list');
+  const countEl=document.getElementById('users-devices-count');
+  const section=document.getElementById('users-devices-section');
+  if(!container||!section){return;}
+  section.style.display='block';
+  const knownMap={};
+  _knownDevices.forEach(d=>{knownMap[d.fingerprint]=d;});
+  const deviceMap={};
+  _allSessions.forEach(s=>{
+    const ua=s.user_agent||'';
+    let fp='';
+    try{
+      let h=0x811c9dc5;
+      for(let i=0;i<ua.length;i++){h^=ua.charCodeAt(i);h=(h*0x01000193)>>>0;}
+      fp=h.toString(16).padStart(8,'0').substring(0,16);
+    }catch(e){fp='';}
+    if(!fp) return;
+    if(!deviceMap[fp]){
+      deviceMap[fp]={fingerprint:fp,label:s.appareil||'',os:s.os||'',navigateur:s.navigateur||'',ip:s.ip||'',kd:knownMap[fp]||null,sessions:[]};
+    }
+    deviceMap[fp].sessions.push(s);
+  });
+  const devices=Object.values(deviceMap);
+  if(!devices.length){
+    countEl.textContent='0 appareil(s)';
+    container.innerHTML='<div class="users-devices-empty">Aucun appareil connecté</div>';
+    return;
+  }
+  countEl.textContent=devices.length+' appareil'+(devices.length>1?'s':'');
+  container.innerHTML=devices.map(d=>{
+    const kd=d.kd;
+    const trusted=kd?!!kd.trusted:false;
+    const badge=kd
+      ?(trusted
+        ?'<span class="users-device-badge users-device-trusted">&#10003; Fiable</span>'
+        :'<span class="users-device-badge users-device-untrusted">&#9888; Non reconnu</span>')
+      :'<span class="users-device-badge users-device-unknown">&#10067; Inconnu</span>';
+    let actions='';
+    if(kd){
+      actions=`
+        <button class="btn btn-reset" onclick="toggleDeviceTrust(${kd.id},${trusted?0:1})" title="${trusted?'Retirer la confiance':'Marquer comme fiable'}" style="min-height:32px;padding:5px 14px;font-size:.76rem;">${trusted?'&#10005; Retirer':'&#10003; Fiable'}</button>
+        <button class="btn btn-reset" onclick="deleteKnownDevice(${kd.id})" title="Supprimer" style="min-height:32px;padding:5px 10px;font-size:.76rem;color:#991B1B;border-color:#E7A6A0;">&#128465;</button>`;
+    }else{
+      actions=`<button class="btn btn-reset" onclick="trustNewDevice('${d.fingerprint}','${(d.label||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer comme fiable" style="min-height:32px;padding:5px 14px;font-size:.76rem;">&#10003; Fiable</button>`;
+    }
+    const sessionsInfo=d.sessions.map(s=>s.email||'').join(', ');
+    return `<div class="users-device-card">
+      <div class="users-device-info">
+        <div class="users-device-label">${esc(d.label||'Appareil inconnu')} ${badge}</div>
+        <div class="users-device-fp">${esc(d.os||'')} · ${esc(d.navigateur||'')} · ${sessionsInfo}</div>
+      </div>
+      <div class="users-device-actions">${actions}</div>
+    </div>`;
+  }).join('');
 }
 
 function renderUsers(sessions){
@@ -3181,7 +3273,7 @@ function renderUsers(sessions){
         ?`<button class="users-trust-btn users-trust-remove" onclick="toggleDeviceTrust(${kd.id},0)" title="Retirer la confiance">&#10005;</button>`
         :`<button class="users-trust-btn users-trust-add" onclick="toggleDeviceTrust(${kd.id},1)" title="Marquer comme fiable">&#10003;</button>`;
     }else{
-      trustBtn=`<button class="users-trust-btn users-trust-add" onclick="trustNewDevice('${fp}','${esc(s.appareil||'')}')" title="Marquer cet appareil comme fiable">&#10003;</button>`;
+      trustBtn=`<button class="users-trust-btn users-trust-add" onclick="trustNewDevice('${fp}','${(s.appareil||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer cet appareil comme fiable">&#10003;</button>`;
     }
     return `<tr title="${email} | ${s.os||''} | ${s.navigateur||''} | ${s.ip||''}">
       <td style="text-align:center;"><input type="checkbox" class="users-cb" value="${s.id}" onchange="updateDeleteBtn()"></td>
@@ -3203,35 +3295,57 @@ function renderUsers(sessions){
   }).join('');
 }
 
-async function toggleDeviceTrust(deviceId, trusted) {
+function toggleDeviceTrust(deviceId, trusted) {
+  console.log('[Trust] toggleDeviceTrust called', deviceId, trusted);
   const action = trusted ? 'trust' : 'untrust';
-  try {
-    const r = await fetch(API + '/api/known-devices/' + deviceId + '/' + action, {
-      method: 'POST', credentials: 'same-origin'
-    });
-    const data = await r.json().catch(()=>({}));
+  const label = trusted ? 'fiable' : 'non reconnu';
+  toast('Mise à jour en cours…');
+  fetch(API + '/api/known-devices/' + deviceId + '/' + action, {
+    method: 'POST', credentials: 'same-origin'
+  }).then(r => r.json().catch(()=>({})).then(data => {
     if (r.ok) {
-      await loadUsers();
+      toast('Appareil marqué comme ' + label + ' ✔');
+      sendNotification('Sécurité', 'Appareil marqué comme ' + label, 'info');
+      loadUsers();
     } else {
+      toast('Erreur : ' + (data.error || r.status));
       console.error('[Trust]', r.status, data);
     }
-  } catch(e) { console.error('[Trust error]', e); }
+  })).catch(e => { toast('Erreur réseau'); console.error('[Trust error]', e); });
 }
 
-async function trustNewDevice(fingerprint, label) {
-  try {
-    const r = await fetch(API + '/api/known-devices', {
-      method: 'POST', credentials: 'same-origin',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({fingerprint, label, trusted: 1})
-    });
-    const data = await r.json().catch(()=>({}));
+function trustNewDevice(fingerprint, label) {
+  console.log('[Trust] trustNewDevice called', fingerprint, label);
+  toast('Enregistrement en cours…');
+  fetch(API + '/api/known-devices', {
+    method: 'POST', credentials: 'same-origin',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({fingerprint: fingerprint, label: label, trusted: 1})
+  }).then(r => r.json().catch(()=>({})).then(data => {
     if (r.ok) {
-      await loadUsers();
+      toast('Appareil marqué comme fiable ✔');
+      sendNotification('Sécurité', 'Nouvel appareil enregistré : ' + (label || 'inconnu'), 'success');
+      loadUsers();
     } else {
+      toast('Erreur : ' + (data.error || r.status));
       console.error('[TrustNew]', r.status, data);
     }
-  } catch(e) { console.error('[TrustNew error]', e); }
+  })).catch(e => { toast('Erreur réseau'); console.error('[TrustNew error]', e); });
+}
+
+function deleteKnownDevice(deviceId) {
+  if(!confirm('Supprimer cet appareil de la liste ?')) return;
+  toast('Suppression…');
+  fetch(API + '/api/known-devices/' + deviceId, {
+    method: 'DELETE', credentials: 'same-origin'
+  }).then(r => r.json().catch(()=>({})).then(data => {
+    if (r.ok) {
+      toast('Appareil supprimé ✔');
+      loadUsers();
+    } else {
+      toast('Erreur : ' + (data.error || r.status));
+    }
+  })).catch(e => { toast('Erreur réseau'); });
 }
 
 function filterUsers(){
