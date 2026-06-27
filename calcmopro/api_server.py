@@ -207,20 +207,21 @@ def _parse_user_agent(ua: str) -> dict:
 
 
 def _check_unknown_device(ua: str, ip: str, email: str, role: str) -> None:
-    """Check if login is from an unknown device and send notification."""
+    """Check if login is from an unknown device. Register it and notify admin."""
     fp = _device_fingerprint(ua)
     if not db.is_device_known(fp):
-        _parse_user_agent(ua)
-        now = time.strftime("%d/%m/%Y %H:%M:%S")
         info = _parse_user_agent(ua)
+        label = f"{info['device']} — {info['os']} / {info['browser']}"
+        db.add_known_device(fp, label, trusted=0)
+        now = time.strftime("%d/%m/%Y %H:%M:%S")
         msg = (
-            f"Nouvelle connexion depuis un appareil non reconnu.\n"
+            f"Nouvel appareil détecté.\n"
             f"Role: {role}\nAppareil: {info['device']} | {info['os']}\n"
             f"Navigateur: {info['browser']}\nIP: {ip}\nDate: {now}"
         )
         if email:
             msg += f"\nEmail: {email}"
-        db.add_notification("Appareil non reconnu", msg, "warning")
+        db.add_notification("Nouvel appareil", msg, "warning")
 
 
 class _Handler(BaseHTTPRequestHandler):
