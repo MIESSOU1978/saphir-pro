@@ -700,6 +700,11 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .users-activity-result{font-weight:600;text-align:right;font-size:.72rem;}
 .users-activity-result.ok{color:#16a34a;}
 .users-activity-result.fail{color:#B42318;}
+.users-activity-module{color:#9fb0a6;font-weight:400;font-size:.72rem;}
+.users-act-label{color:#60736d;font-weight:600;font-size:.72rem;min-width:90px;display:inline-block;}
+.users-activity-detail{display:flex;flex-direction:column;gap:3px;margin-top:4px;}
+.users-act-preview-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:5px 12px;border:1.2px solid #B8CEC3;border-radius:6px;background:#fff;color:#064E3B;font-family:inherit;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;}
+.users-act-preview-btn:hover{background:#EAF5F0;border-color:#064E3B;}
 .users-empty-state{text-align:center;padding:40px 20px;color:#9fb0a6;font-size:.85rem;}
 .users-empty-sub{font-size:.74rem;color:#b8c8be;margin-top:6px;}
 
@@ -2246,6 +2251,35 @@ function updateMOProgress(count){
     else if(count>=1) fill.classList.add('fill-started');
   }
   if(msg) msg.classList.toggle('show',count===4);
+  if(count===4 && !_moCompletionLogged){
+    _moCompletionLogged=true;
+    logMOCompletion();
+  }
+  if(count<4) _moCompletionLogged=false;
+}
+
+let _moCompletionLogged=false;
+
+function logMOCompletion(){
+  const nom=(document.getElementById('mo-nom')?.value||'').trim()||'Non renseigné';
+  const matricule=(document.getElementById('mo-matricule')?.value||'').trim()||'—';
+  const classe=(document.getElementById('mo-classe')?.value||'').trim()||'—';
+  const etab=(document.getElementById('mo-etablissement')?.value||'').trim()||'—';
+  const anneeScolaire=(document.getElementById('mo-annee_scolaire')?.value||'').trim()||'—';
+  const mo=document.getElementById('r-mo')?.textContent||'—';
+  const mention=document.getElementById('r-mention')?.textContent||'—';
+  const total=document.getElementById('r-total')?.textContent||'—';
+  const matieres={};
+  MATIERES.forEach(m=>{
+    const d={mga:parseNoteValue(document.getElementById(m.id+'_mga')?.value),label:m.label,coef:m.coef};
+    if(m.anglais){d.bepc_ecrit=parseNoteValue(document.getElementById(m.id+'_bepc_e')?.value);d.bepc_oral=parseNoteValue(document.getElementById(m.id+'_bepc_o')?.value);}
+    else{d.bepc=parseNoteValue(document.getElementById(m.id+'_bepc')?.value);}
+    matieres[m.id]=d;
+  });
+  const payload={nom,matricule,classe,etablissement:etab,annee_scolaire:anneeScolaire,mo,mention,total,matieres};
+  const detail=JSON.stringify(payload);
+  logActivity('Saisie complète des matières dans Calcul MO','Calcul MO',detail,'succes');
+  sendNotification('Calcul MO terminé','Saisie complète des matières pour '+nom+' — '+classe,'success');
 }
 
 function setMOColor(mo){
@@ -3110,6 +3144,7 @@ window.addEventListener('resize',setVH);
 let _sessionId=parseInt(localStorage.getItem('saphir_session_id')||'0',10);
 let _allSessions=[];
 let _knownDevices=[];
+let _actBulletinData=[];
 
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
@@ -3409,6 +3444,7 @@ async function showUserActivities(sessionId,email){
   const panel=document.getElementById('users-activity-panel');
   const title=document.getElementById('users-activity-title');
   const list=document.getElementById('users-activity-list');
+  _actBulletinData=[];
   title.textContent='Activités — '+(email||'Session #'+sessionId);
   panel.style.display='block';
   list.innerHTML='<div class="users-empty-state">Chargement...</div>';
@@ -3421,9 +3457,38 @@ async function showUserActivities(sessionId,email){
       const dateStr=(l.created_at||'').replace('T',' ').substring(0,16);
       const resCls=l.resultat==='succes'?'ok':'fail';
       const resLabel=l.resultat==='succes'?'Succès':'Échec';
+      let detailHtml='';
+      let bulletinBtn='';
+      if(l.action==='Saisie complète des matières dans Calcul MO'){
+        try{
+          const d=JSON.parse(l.detail||'{}');
+          detailHtml=`<div class="users-activity-detail">
+            <div><span class="users-act-label">Élève :</span> <b>${esc(d.nom||'—')}</b></div>
+            <div><span class="users-act-label">Matricule :</span> ${esc(d.matricule||'—')}</div>
+            <div><span class="users-act-label">Classe :</span> ${esc(d.classe||'—')}</div>
+            <div><span class="users-act-label">Établissement :</span> ${esc(d.etablissement||'—')}</div>
+            <div><span class="users-act-label">Année scolaire :</span> ${esc(d.annee_scolaire||'—')}</div>
+            <div><span class="users-act-label">Moyenne :</span> <b>${esc(d.mo||'—')}</b></div>
+            <div><span class="users-act-label">Mention :</span> ${esc(d.mention||'—')}</div>
+            <div><span class="users-act-label">Total pondéré :</span> ${esc(d.total||'—')}</div>
+          </div>`;
+          _actBulletinData.push(d);
+          const idx=_actBulletinData.length-1;
+          bulletinBtn=`<button class="users-act-preview-btn" onclick="previewBulletinFromAct(${idx})" title="Aperçu du bulletin">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Aperçu bulletin
+          </button>`;
+        }catch(e){}
+      } else {
+        detailHtml=l.detail?'<div class="users-activity-detail">'+l.detail+'</div>':'';
+      }
       return `<div class="users-activity-item">
         <div class="users-activity-date">${dateStr}</div>
-        <div><div class="users-activity-action">${l.action||'—'}</div>${l.detail?'<div class="users-activity-detail">'+l.detail+'</div>':''}</div>
+        <div>
+          <div class="users-activity-action">${l.action||'—'}${l.module?' <span class="users-activity-module">('+esc(l.module)+')</span>':''}</div>
+          ${detailHtml}
+          ${bulletinBtn}
+        </div>
         <div class="users-activity-result ${resCls}">${resLabel}</div>
       </div>`;
     }).join('');
@@ -3434,6 +3499,26 @@ async function showUserActivities(sessionId,email){
 
 function closeActivityPanel(){
   document.getElementById('users-activity-panel').style.display='none';
+}
+
+function previewBulletinFromAct(idx){
+  const d=_actBulletinData[idx];
+  if(!d){toast('Données bulletin introuvables.',true);return;}
+  const html=buildBulletinHTML(d);
+  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Aperçu bulletin — ${esc(d.nom||'')} — SAPHIR Pro</title>
+${styles}
+<style>
+  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+  body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
+  .bulletin-sheet{margin:0;padding:0;}
+  @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
+</style></head><body>${html}</body></html>`);
+  win.document.close();
+  toast('Aperçu bulletin pour '+d.nom);
 }
 
 function exportUsersPDF(){
