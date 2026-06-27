@@ -622,18 +622,17 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .users-table tbody tr:last-child td{border-bottom:none;}
 .users-table colgroup .col-cb{width:36px;}
 .users-table colgroup .col-email{width:16%;}
-.users-table colgroup .col-role{width:8%;}
-.users-table colgroup .col-device{width:8%;}
-.users-table colgroup .col-os{width:10%;}
-.users-table colgroup .col-browser{width:9%;}
-.users-table colgroup .col-ville{width:12%;}
+.users-table colgroup .col-role{width:11%;}
+.users-table colgroup .col-device{width:16%;}
+.users-table colgroup .col-ville{width:14%;}
 .users-table colgroup .col-ip{width:10%;}
 .users-table colgroup .col-login{width:10%;}
 .users-table colgroup .col-logout{width:10%;}
-.users-table colgroup .col-status{width:7%;}
-.users-table colgroup .col-actions{width:8%;}
+.users-table colgroup .col-status{width:8%;}
+.users-table colgroup .col-actions{width:12%;}
 .users-role-badge{
   display:inline-block;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700;
+  white-space:nowrap;
 }
 .users-role-admin{background:#EAF5F0;color:#064E3B;border:1px solid #b8d4c7;}
 .users-role-student{background:#FFF7ED;color:#B45309;border:1px solid #FDBA74;}
@@ -3215,7 +3214,7 @@ function renderKnownDevices(){
     }else{
       actions=`<button class="btn btn-reset" onclick="trustNewDevice('${d.fingerprint}','${(d.label||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer comme fiable" style="min-height:32px;padding:5px 14px;font-size:.76rem;">&#10003; Fiable</button>`;
     }
-    const sessionsInfo=d.sessions.map(s=>s.email||'').join(', ');
+    const sessionsInfo=d.sessions.map(s=>s.email||'').filter(Boolean).join(', ')||'Session active';
     return `<div class="users-device-card">
       <div class="users-device-info">
         <div class="users-device-label">${esc(d.label||'Appareil inconnu')} ${badge}</div>
@@ -3248,7 +3247,7 @@ function renderUsers(sessions){
     const statusCls=isOnline?'users-status-online':'users-status-offline';
     const statusLabel=isOnline?'En ligne':'Déconnecté';
     const email=s.email||'Utilisateur inconnu';
-    const ville=s.ville||'—';
+    const ville=(s.ville||'—').replace(/Ivoiry Coast|Ivory Coast/g,'Côte d\'Ivoire');
     const ua=s.user_agent||'';
     let fp='';
     try{
@@ -3268,14 +3267,15 @@ function renderUsers(sessions){
     let trustBtn='';
     if(kd){
       trustBtn=kd.trusted
-        ?`<button class="users-trust-btn users-trust-remove" onclick="toggleDeviceTrust(${kd.id},0)" title="Retirer la confiance">&#10005;</button>`
-        :`<button class="users-trust-btn users-trust-add" onclick="toggleDeviceTrust(${kd.id},1)" title="Marquer comme fiable">&#10003;</button>`;
+        ?`<button class="btn btn-reset" onclick="toggleDeviceTrust(${kd.id},0)" title="Retirer la confiance" style="min-height:28px;padding:3px 10px;font-size:.7rem;white-space:nowrap;">&#10005; Retirer</button>`
+        :`<button class="btn btn-reset" onclick="toggleDeviceTrust(${kd.id},1)" title="Marquer comme fiable" style="min-height:28px;padding:3px 10px;font-size:.7rem;white-space:nowrap;">&#10003; Fiable</button>`;
     }else{
-      trustBtn=`<button class="users-trust-btn users-trust-add" onclick="trustNewDevice('${fp}','${(s.appareil||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer cet appareil comme fiable">&#10003;</button>`;
+      trustBtn=`<button class="btn btn-reset" onclick="trustNewDevice('${fp}','${(s.appareil||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer cet appareil comme fiable" style="min-height:28px;padding:3px 10px;font-size:.7rem;white-space:nowrap;">&#10003; Fiable</button>`;
     }
+    const emailLabel=(email==='Utilisateur inconnu'&&(s.role==='admin'?'Administrateur local':null))||email;
     return `<tr title="${email} | ${s.os||''} | ${s.navigateur||''} | ${s.ip||''}">
       <td style="text-align:center;"><input type="checkbox" class="users-cb" value="${s.id}" onchange="updateDeleteBtn()"></td>
-      <td title="${email}">${email}</td>
+      <td title="${email}">${esc(emailLabel)}</td>
       <td><span class="users-role-badge ${roleCls}">${roleLabel}</span></td>
       <td title="${s.appareil||''}">${s.appareil||'—'} ${badge}</td>
       <td title="${ville}">${ville}</td>
@@ -3283,9 +3283,10 @@ function renderUsers(sessions){
       <td style="font-size:.72rem;">${loginDisplay}</td>
       <td style="font-size:.72rem;">${logoutDisplay}</td>
       <td><span class="users-status ${statusCls}"><span class="users-status-dot"></span>${statusLabel}</span></td>
-      <td style="display:flex;gap:4px;align-items:center;">
+      <td style="display:flex;gap:6px;align-items:center;flex-wrap:nowrap;">
         ${trustBtn}
-        <button class="users-activity-btn" onclick="showUserActivities(${s.id},'${email.replace(/'/g,"\\'")}')">Activités</button>
+        <button class="btn btn-reset" onclick="showUserActivities(${s.id},'${email.replace(/'/g,"\\'")}')" style="min-height:28px;padding:3px 10px;font-size:.7rem;white-space:nowrap;">Activités</button>
+        <button class="btn btn-reset" onclick="deleteSession(${s.id})" title="Supprimer cette session" style="min-height:28px;padding:3px 8px;font-size:.7rem;color:#991B1B;border-color:#E7A6A0;">&#128465;</button>
       </td>
     </tr>`;
   }).join('');
@@ -3376,6 +3377,17 @@ function updateDeleteBtn(){
 
 function getSelectedUserIds(){
   return Array.from(document.querySelectorAll('.users-cb:checked')).map(c=>parseInt(c.value));
+}
+
+async function deleteSession(id){
+  if(!confirm('Supprimer cette session ?')) return;
+  toast('Suppression…');
+  try{
+    const r=await fetch(API+'/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});
+    const data=await r.json().catch(()=>({}));
+    if(r.ok){toast('Session supprimée ✔');loadUsers();}
+    else{toast('Erreur : '+(data.error||r.status));}
+  }catch(e){toast('Erreur réseau');}
 }
 
 async function deleteSelectedUsers(){

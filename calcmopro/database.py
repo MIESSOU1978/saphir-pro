@@ -595,6 +595,7 @@ def create_session(role: str, ip: str = "", user_agent: str = "", email: str = "
                 geo = json.loads(resp.read())
                 city = geo.get("city", "")
                 country = geo.get("country", "")
+                country = "Côte d'Ivoire" if country in ("Ivory Coast", "Ivoiry Coast") else country
                 ville = f"{city}, {country}" if city else country
         except Exception:
             pass
