@@ -175,6 +175,54 @@ def _send_login_email(role: str, ip: str, email: str) -> None:
         print(f"[EMAIL ERROR] {e}")
 
 
+def _device_fingerprint(ua: str) -> str:
+    """Generate a device fingerprint from User-Agent string (matches frontend FNV-1a)."""
+    h = 0x811c9dc5
+    for c in ua:
+        h ^= ord(c)
+        h = (h * 0x01000193) & 0xFFFFFFFF
+    return format(h, '08x')[:16]
+
+
+def _parse_user_agent(ua: str) -> dict:
+    """Parse User-Agent string to extract OS, browser, device type."""
+    os_name = "Inconnu"
+    browser = "Inconnu"
+    device = "Ordinateur"
+    ua_lower = ua.lower()
+    if "windows" in ua_lower: os_name = "Windows"
+    elif "mac os" in ua_lower or "macos" in ua_lower: os_name = "macOS"
+    elif "linux" in ua_lower: os_name = "Linux"
+    elif "android" in ua_lower: os_name = "Android"
+    elif "iphone" in ua_lower or "ipad" in ua_lower: os_name = "iOS"
+    if "edg/" in ua_lower: browser = "Edge"
+    elif "chrome" in ua_lower and "edg" not in ua_lower: browser = "Chrome"
+    elif "firefox" in ua_lower: browser = "Firefox"
+    elif "safari" in ua_lower and "chrome" not in ua_lower: browser = "Safari"
+    if "mobile" in ua_lower or "android" in ua_lower or "iphone" in ua_lower:
+        device = "Téléphone"
+    elif "ipad" in ua_lower or "tablet" in ua_lower:
+        device = "Tablette"
+    return {"os": os_name, "browser": browser, "device": device}
+
+
+def _check_unknown_device(ua: str, ip: str, email: str, role: str) -> None:
+    """Check if login is from an unknown device and send notification."""
+    fp = _device_fingerprint(ua)
+    if not db.is_device_known(fp):
+        _parse_user_agent(ua)
+        now = time.strftime("%d/%m/%Y %H:%M:%S")
+        info = _parse_user_agent(ua)
+        msg = (
+            f"Nouvelle connexion depuis un appareil non reconnu.\n"
+            f"Role: {role}\nAppareil: {info['device']} | {info['os']}\n"
+            f"Navigateur: {info['browser']}\nIP: {ip}\nDate: {now}"
+        )
+        if email:
+            msg += f"\nEmail: {email}"
+        db.add_notification("Appareil non reconnu", msg, "warning")
+
+
 class _Handler(BaseHTTPRequestHandler):
     """Route requests between the HTML file and /api/* endpoints."""
 
@@ -444,6 +492,11 @@ class _Handler(BaseHTTPRequestHandler):
         if path == "/api/annees-scolaires":
             return self._json(db.list_annees_scolaires())
 
+        if path == "/api/known-devices":
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            return self._json(db.list_known_devices())
+
         self.send_error(404)
 
     def do_HEAD(self) -> None:
@@ -481,12 +534,14 @@ class _Handler(BaseHTTPRequestHandler):
                     sid = db.create_session("student", ip, ua, email)
                     threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
                     threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
+                    threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student"), daemon=True).start()
                     return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("admin", ip, ua, email)
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
+                threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "admin"), daemon=True).start()
                 return self._json({"ok": True, "role": "admin", "session_id": sid})
 
             if _hash_password(pwd) == _hash_password(_APP_PASSWORD):
@@ -496,6 +551,7 @@ class _Handler(BaseHTTPRequestHandler):
                 sid = db.create_session("admin", ip, ua, email)
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
+                threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "admin"), daemon=True).start()
                 return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid}, "session", token)
 
             if _STUDENT_PASSWORD and _hash_password(pwd) == _hash_password(_STUDENT_PASSWORD):
@@ -505,6 +561,7 @@ class _Handler(BaseHTTPRequestHandler):
                 sid = db.create_session("student", ip, ua, email)
                 threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
+                threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student"), daemon=True).start()
                 return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
 
             # Record failed attempt for rate limiting
@@ -636,6 +693,38 @@ class _Handler(BaseHTTPRequestHandler):
             db.add_notification("Archivage", f"{count} calcul(s) archivé(s) pour {annee}", "info")
             return self._json({"ok": True, "archived": count})
 
+        if path == "/api/known-devices":
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            body = self._read_body()
+            fp = (body.get("fingerprint") or "").strip()
+            label = (body.get("label") or "").strip()
+            trusted = body.get("trusted", 1)
+            if not fp:
+                return self._json({"error": "fingerprint requis"}, 400)
+            nid = db.add_known_device(fp, label, trusted)
+            return self._json({"ok": True, "id": nid}, 201)
+
+        if path.startswith("/api/known-devices/") and path.endswith("/trust"):
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                did = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            db.trust_device(did)
+            return self._json({"ok": True})
+
+        if path.startswith("/api/known-devices/") and path.endswith("/untrust"):
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                did = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            db.untrust_device(did)
+            return self._json({"ok": True})
+
         self.send_error(404)
 
     def do_DELETE(self) -> None:
@@ -699,6 +788,16 @@ class _Handler(BaseHTTPRequestHandler):
                 db.delete_session(sid)
             except Exception as exc:
                 return self._json({"error": str(exc)}, 500)
+            return self._json({"ok": True})
+
+        if path.startswith("/api/known-devices/"):
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                did = int(path.split("/")[-1])
+            except ValueError:
+                return self._json({"error": "id invalide"}, 400)
+            db.delete_known_device(did)
             return self._json({"ok": True})
 
         self.send_error(404)

@@ -230,6 +230,15 @@ def init_db() -> None:
                 created_at  TEXT DEFAULT (datetime('now','localtime'))
             )
         """)
+        _turso_exec("""
+            CREATE TABLE IF NOT EXISTS known_devices (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                fingerprint TEXT NOT NULL,
+                label       TEXT DEFAULT '',
+                trusted     INTEGER DEFAULT 1,
+                created_at  TEXT DEFAULT (datetime('now','localtime'))
+            )
+        """)
         # Add missing columns for existing tables
         for col, typ, default in [
             ("annee_scolaire", "TEXT", "''"),
@@ -295,6 +304,13 @@ def init_db() -> None:
             message     TEXT DEFAULT '',
             type        TEXT DEFAULT 'info',
             lu          INTEGER DEFAULT 0,
+            created_at  TEXT DEFAULT (datetime('now','localtime'))
+        );
+        CREATE TABLE IF NOT EXISTS known_devices (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            fingerprint TEXT NOT NULL,
+            label       TEXT DEFAULT '',
+            trusted     INTEGER DEFAULT 1,
             created_at  TEXT DEFAULT (datetime('now','localtime'))
         );
     """)
@@ -793,6 +809,80 @@ def clear_all_notifications() -> None:
         return
     conn = _connect()
     conn.execute("DELETE FROM notifications")
+    conn.commit()
+    conn.close()
+
+
+# ── KNOWN DEVICES ──────────────────────────────────────
+def is_device_known(fingerprint: str) -> bool:
+    """Check if a device fingerprint is known and trusted."""
+    if _turso_enabled():
+        rows = _turso_exec("SELECT id FROM known_devices WHERE fingerprint=? AND trusted=1 LIMIT 1", [fingerprint])
+        return len(rows) > 0
+    conn = _connect()
+    row = conn.execute("SELECT id FROM known_devices WHERE fingerprint=? AND trusted=1 LIMIT 1", (fingerprint,)).fetchone()
+    conn.close()
+    return row is not None
+
+
+def add_known_device(fingerprint: str, label: str = "", trusted: int = 1) -> int:
+    """Add a known device."""
+    if _turso_enabled():
+        nid = _turso_exec_insert(
+            "INSERT INTO known_devices (fingerprint, label, trusted) VALUES (?, ?, ?)",
+            [fingerprint, label, trusted],
+        )
+        return nid
+    conn = _connect()
+    cur = conn.execute(
+        "INSERT INTO known_devices (fingerprint, label, trusted) VALUES (?, ?, ?)",
+        (fingerprint, label, trusted),
+    )
+    nid = cur.lastrowid
+    conn.commit()
+    conn.close()
+    return nid
+
+
+def list_known_devices() -> list[dict]:
+    """List all known devices."""
+    if _turso_enabled():
+        return _turso_exec("SELECT * FROM known_devices ORDER BY id DESC")
+    conn = _connect()
+    rows = conn.execute("SELECT * FROM known_devices ORDER BY id DESC").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def trust_device(device_id: int) -> None:
+    """Mark a device as trusted."""
+    if _turso_enabled():
+        _turso_exec_write("UPDATE known_devices SET trusted=1 WHERE id=?", [device_id])
+        return
+    conn = _connect()
+    conn.execute("UPDATE known_devices SET trusted=1 WHERE id=?", (device_id,))
+    conn.commit()
+    conn.close()
+
+
+def untrust_device(device_id: int) -> None:
+    """Mark a device as untrusted."""
+    if _turso_enabled():
+        _turso_exec_write("UPDATE known_devices SET trusted=0 WHERE id=?", [device_id])
+        return
+    conn = _connect()
+    conn.execute("UPDATE known_devices SET trusted=0 WHERE id=?", (device_id,))
+    conn.commit()
+    conn.close()
+
+
+def delete_known_device(device_id: int) -> None:
+    """Delete a known device."""
+    if _turso_enabled():
+        _turso_exec_write("DELETE FROM known_devices WHERE id=?", [device_id])
+        return
+    conn = _connect()
+    conn.execute("DELETE FROM known_devices WHERE id=?", (device_id,))
     conn.commit()
     conn.close()
 

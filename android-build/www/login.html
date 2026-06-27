@@ -194,6 +194,9 @@ body{font-family:'Ebrima','Segoe UI',sans-serif;min-height:100vh;display:flex;ba
       <p>Entrez votre mot de passe pour accéder à SAPHIR Pro.</p>
     </div>
     <form id="loginForm">
+      <div class="form-group" style="margin-bottom:12px;">
+        <input type="email" id="email" placeholder="Adresse email (optionnel)" autocomplete="email" style="width:100%;padding:10px 14px;border:1.5px solid #AFC6BA;border-radius:10px;font-size:.88rem;color:#064E3B;background:#FDFEFE;font-family:'Ebrima','Segoe UI',Arial,sans-serif;box-sizing:border-box;">
+      </div>
       <div class="form-group">
         <label for="pwd">Mot de passe</label>
         <div class="input-wrap" id="pwdWrap">
@@ -261,27 +264,35 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
   const errMsg=document.getElementById('errMsg');
   const errText=document.getElementById('errText');
   const pwd=pwdInput.value;
+  const email=(document.getElementById('email')?.value||'').trim();
   const remember=document.getElementById('rememberMe').checked;
   if(!pwd){errText.textContent='Veuillez entrer le mot de passe';errMsg.classList.add('show');return}
   btn.disabled=true;btn.textContent='Connexion...';errMsg.classList.remove('show');pwdWrap.classList.remove('error');
   try{
-    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({password:pwd})});
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({password:pwd,email:email})});
     const d=await r.json();
     if(d.ok){
       const role=(pwd==='RECEPTIOn8@2025')?'student':'admin';
       localStorage.setItem('saphir_role',role);
+      if(d.session_id) localStorage.setItem('saphir_session_id',d.session_id);
       if(remember) localStorage.setItem('saphir_pwd',pwd);
       else localStorage.removeItem('saphir_pwd');
+      try{await fetch('/api/log-activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({action:'Connexion',module:'Authentification',detail:'Connexion réussie',resultat:'succes',session_id:d.session_id||0})});}catch(e){}
       window.location.href='/';
     }else{
       errText.textContent='Mot de passe incorrect. Veuillez réessayer.';
       errMsg.classList.add('show');
       pwdWrap.classList.add('error');
+      try{await fetch('/api/log-activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({action:'Erreur de connexion',module:'Authentification',detail:'Mot de passe incorrect',resultat:'echec',session_id:0})});}catch(e){}
+      try{await fetch('/api/notifications',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({titre:'Tentative échouée',message:'Mot de passe incorrect — connexion refusée',type:'error'})});}catch(e){}
+      try{const arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');arr.unshift({id:Date.now(),titre:'Tentative échouée',message:'Mot de passe incorrect — connexion refusée',type:'error',lu:0,created_at:new Date().toISOString()});localStorage.setItem('saphir_notifs',JSON.stringify(arr));}catch(e){}
       btn.disabled=false;btn.textContent='Se connecter';
     }
   }catch(ex){
     errText.textContent='Erreur de connexion au serveur';
     errMsg.classList.add('show');
+    try{await fetch('/api/log-activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({action:'Erreur de connexion',module:'Authentification',detail:'Erreur réseau: '+ex.message,resultat:'echec',session_id:0})});}catch(e){}
+    try{await fetch('/api/notifications',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({titre:'Erreur serveur',message:'Impossible de joindre le serveur — '+ex.message,type:'error'})});}catch(e){}
     btn.disabled=false;btn.textContent='Se connecter';
   }
 });
