@@ -705,6 +705,9 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .users-activity-detail{display:flex;flex-direction:column;gap:3px;margin-top:4px;}
 .users-act-preview-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:5px 12px;border:1.2px solid #B8CEC3;border-radius:6px;background:#fff;color:#064E3B;font-family:inherit;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;}
 .users-act-preview-btn:hover{background:#EAF5F0;border-color:#064E3B;}
+.users-act-btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.users-act-save-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border:1.2px solid #B8CEC3;border-radius:6px;background:#fff;color:#064E3B;font-family:inherit;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;}
+.users-act-save-btn:hover{background:#EAF5F0;border-color:#064E3B;}
 .users-empty-state{text-align:center;padding:40px 20px;color:#9fb0a6;font-size:.85rem;}
 .users-empty-sub{font-size:.74rem;color:#b8c8be;margin-top:6px;}
 
@@ -3482,10 +3485,16 @@ async function showUserActivities(sessionId,email){
           </div>`;
           _actBulletinData.push(d);
           const idx=_actBulletinData.length-1;
-          bulletinBtn=`<button class="users-act-preview-btn" onclick="previewBulletinFromAct(${idx})" title="Aperçu du bulletin">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            Aperçu bulletin
-          </button>`;
+          bulletinBtn=`<div class="users-act-btns">
+            <button class="users-act-preview-btn" onclick="previewBulletinFromAct(${idx})" title="Aperçu du bulletin">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              Aperçu bulletin
+            </button>
+            <button class="users-act-save-btn" onclick="downloadBulletinFromAct(${idx})" title="Enregistrer le bulletin">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Enregistrer
+            </button>
+          </div>`;
         }catch(e){}
       } else {
         detailHtml=l.detail?'<div class="users-activity-detail">'+l.detail+'</div>':'';
@@ -3507,6 +3516,28 @@ async function showUserActivities(sessionId,email){
 
 function closeActivityPanel(){
   document.getElementById('users-activity-panel').style.display='none';
+}
+
+function downloadBulletinFromAct(idx){
+  const d=_actBulletinData[idx];
+  if(!d){toast('Données bulletin introuvables.',true);return;}
+  const html=buildBulletinHTML(d);
+  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Bulletin — ${esc(d.nom||'')} — SAPHIR Pro</title>
+${styles}
+<style>
+  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+  body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
+  .bulletin-sheet{page-break-after:auto;margin:0;padding:0;}
+  @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
+</style></head><body>${html}</body></html>`);
+  win.document.close();
+  setTimeout(()=>{win.print();},600);
+  toast('Enregistrement du bulletin pour '+d.nom);
+  logActivity('Enregistrement bulletin','Calcul MO',d.nom||'');
 }
 
 function previewBulletinFromAct(idx){
