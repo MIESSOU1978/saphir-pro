@@ -1896,8 +1896,6 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
           <col class="col-email">
           <col class="col-role">
           <col class="col-device">
-          <col class="col-os">
-          <col class="col-browser">
           <col class="col-ville">
           <col class="col-ip">
           <col class="col-login">
@@ -1911,8 +1909,6 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
             <th>Email</th>
             <th>Rôle</th>
             <th>Appareil</th>
-            <th>Système</th>
-            <th>Navigateur</th>
             <th>Ville</th>
             <th>IP</th>
             <th>Connexion</th>
@@ -3235,7 +3231,7 @@ function renderUsers(sessions){
   const ct=document.getElementById('users-count');
   if(!sessions.length){
     ct.textContent='Aucune session enregistrée';
-    tb.innerHTML='<tr><td colspan="12" class="users-empty-state">Aucune session enregistrée<div class="users-empty-sub">Les connexions des utilisateurs apparaîtront ici.</div></td></tr>';
+    tb.innerHTML='<tr><td colspan="10" class="users-empty-state">Aucune session enregistrée<div class="users-empty-sub">Les connexions des utilisateurs apparaîtront ici.</div></td></tr>';
     return;
   }
   const n=sessions.length;
@@ -3282,8 +3278,6 @@ function renderUsers(sessions){
       <td title="${email}">${email}</td>
       <td><span class="users-role-badge ${roleCls}">${roleLabel}</span></td>
       <td title="${s.appareil||''}">${s.appareil||'—'} ${badge}</td>
-      <td title="${s.os||''}">${s.os||'—'}</td>
-      <td title="${s.navigateur||''}">${s.navigateur||'—'}</td>
       <td title="${ville}">${ville}</td>
       <td style="font-family:monospace;font-size:.72rem;" title="${s.ip||''}">${s.ip||'—'}</td>
       <td style="font-size:.72rem;">${loginDisplay}</td>
@@ -3445,8 +3439,6 @@ function exportUsersPDF(){
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.email||'Utilisateur inconnu'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.role==='admin'?'Administrateur':'Élève'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.appareil||'—'}</td>
-      <td style="padding:8px;border-bottom:1px solid #eee;">${s.os||'—'}</td>
-      <td style="padding:8px;border-bottom:1px solid #eee;">${s.navigateur||'—'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.ville||'—'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;font-family:monospace;font-size:.72rem;">${s.ip||'—'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${(s.login_at||'').substring(0,16)}</td>
@@ -3463,7 +3455,7 @@ function exportUsersPDF(){
     </style></head><body>
     <h1>Liste des utilisateurs — SAPHIR Pro</h1>
     <p>${_allSessions.length} session(s) • Exporté le ${new Date().toLocaleDateString('fr-FR')}</p>
-    <table><thead><tr><th>Email</th><th>Rôle</th><th>Appareil</th><th>Système</th><th>Navigateur</th><th>Ville</th><th>IP</th><th>Connexion</th><th>Déconnexion</th><th>État</th></tr></thead><tbody>${rows}</tbody></table>
+    <table><thead><tr><th>Email</th><th>Rôle</th><th>Appareil</th><th>Ville</th><th>IP</th><th>Connexion</th><th>Déconnexion</th><th>État</th></tr></thead><tbody>${rows}</tbody></table>
     </body></html>`;
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
