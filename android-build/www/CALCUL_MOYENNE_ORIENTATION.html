@@ -1877,7 +1877,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       <input type="text" class="users-search" id="users-search" placeholder="Rechercher..." oninput="filterUsers()">
       <select class="users-filter-select" id="users-filter-role" onchange="filterUsers()">
         <option value="">Tous les rôles</option>
-        <option value="admin">Administrateur</option>
+        <option value="admin">Admin</option>
         <option value="student">Élève</option>
       </select>
       <select class="users-filter-select" id="users-filter-device" onchange="filterUsers()">
@@ -3278,7 +3278,7 @@ function renderUsers(sessions){
     const isOnline=!logoutAt;
     const loginDisplay=(s.login_at||'').replace('T',' ').substring(0,16);
     const logoutDisplay=logoutAt?logoutAt.replace('T',' ').substring(0,16):'—';
-    const roleLabel=s.role==='admin'?'Administrateur':'Élève';
+    const roleLabel=s.role==='admin'?'Admin':'Élève';
     const roleCls=s.role==='admin'?'users-role-admin':'users-role-student';
     const statusCls=isOnline?'users-status-online':'users-status-offline';
     const statusLabel=isOnline?'En ligne':'Déconnecté';
@@ -3300,7 +3300,7 @@ function renderUsers(sessions){
     }else{
       badge='<span class="users-device-badge users-device-untrusted" title="Nouvel appareil détecté">&#9888; Nouvel appareil</span>';
     }
-    const emailLabel=(email==='Utilisateur inconnu'&&(s.role==='admin'?'Administrateur local':null))||email;
+    const emailLabel=(email==='Utilisateur inconnu'&&(s.role==='admin'?'Admin local':null))||email;
     return `<tr title="${email} | ${s.os||''} | ${s.navigateur||''} | ${s.ip||''}">
       <td style="text-align:center;"><input type="checkbox" class="users-cb" value="${s.id}" onchange="updateDeleteBtn()"></td>
       <td title="${email}">${esc(emailLabel)}</td>
@@ -3556,7 +3556,7 @@ function exportUsersPDF(){
     const status=s.logout_at?'Déconnecté':'En ligne';
     return `<tr>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.email||'Utilisateur inconnu'}</td>
-      <td style="padding:8px;border-bottom:1px solid #eee;">${s.role==='admin'?'Administrateur':'Élève'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${s.role==='admin'?'Admin':'Élève'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.appareil||'—'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.ville||'—'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;font-family:monospace;font-size:.72rem;">${s.ip||'—'}</td>
