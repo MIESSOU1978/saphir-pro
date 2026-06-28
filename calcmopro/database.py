@@ -903,10 +903,27 @@ def add_known_device(fingerprint: str, label: str = "", trusted: int = 1) -> int
     return nid
 
 
+def update_known_device_label(fingerprint: str, label: str) -> None:
+    """Update the label of a known device if it changed."""
+    if not label:
+        return
+    if _turso_enabled():
+        _turso_exec_write("UPDATE known_devices SET label=? WHERE fingerprint=? AND (label IS NULL OR label='' OR label!=?)", [label, fingerprint, label])
+        return
+    conn = _connect()
+    conn.execute("UPDATE known_devices SET label=? WHERE fingerprint=? AND (label IS NULL OR label='' OR label!=?)", (label, fingerprint, label))
+    conn.commit()
+    conn.close()
+
+
 def list_known_devices() -> list[dict]:
     """List all known devices."""
     if _turso_enabled():
-        return _turso_exec("SELECT * FROM known_devices ORDER BY id DESC")
+        rows = _turso_exec("SELECT * FROM known_devices ORDER BY id DESC")
+        for r in rows:
+            r["trusted"] = int(r.get("trusted", 0))
+            r["id"] = int(r.get("id", 0))
+        return rows
     conn = _connect()
     rows = conn.execute("SELECT * FROM known_devices ORDER BY id DESC").fetchall()
     conn.close()

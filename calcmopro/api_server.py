@@ -231,48 +231,31 @@ def _send_login_email(role: str, ip: str, email: str) -> None:
 
 
 def _device_fingerprint(ua: str) -> str:
-    """Generate a device fingerprint from User-Agent string (matches frontend FNV-1a)."""
+    """Generate a stable device fingerprint from User-Agent (matches frontend FNV-1a).
+    Uses parsed OS+browser+device type only — immune to browser auto-updates."""
+    info = db._parse_user_agent(ua)
+    key = f"{info['os']}|{info['navigateur']}|{info['appareil']}"
     h = 0x811c9dc5
-    for c in ua:
+    for c in key:
         h ^= ord(c)
         h = (h * 0x01000193) & 0xFFFFFFFF
     return format(h, '08x')[:16]
 
 
-def _parse_user_agent(ua: str) -> dict:
-    """Parse User-Agent string to extract OS, browser, device type."""
-    os_name = "Inconnu"
-    browser = "Inconnu"
-    device = "Ordinateur"
-    ua_lower = ua.lower()
-    if "windows" in ua_lower: os_name = "Windows"
-    elif "mac os" in ua_lower or "macos" in ua_lower: os_name = "macOS"
-    elif "linux" in ua_lower: os_name = "Linux"
-    elif "android" in ua_lower: os_name = "Android"
-    elif "iphone" in ua_lower or "ipad" in ua_lower: os_name = "iOS"
-    if "edg/" in ua_lower: browser = "Edge"
-    elif "chrome" in ua_lower and "edg" not in ua_lower: browser = "Chrome"
-    elif "firefox" in ua_lower: browser = "Firefox"
-    elif "safari" in ua_lower and "chrome" not in ua_lower: browser = "Safari"
-    if "mobile" in ua_lower or "android" in ua_lower or "iphone" in ua_lower:
-        device = "Téléphone"
-    elif "ipad" in ua_lower or "tablet" in ua_lower:
-        device = "Tablette"
-    return {"os": os_name, "browser": browser, "device": device}
-
-
 def _check_unknown_device(ua: str, ip: str, email: str, role: str) -> None:
     """Check if login is from an unknown device. Register it and notify admin."""
     fp = _device_fingerprint(ua)
-    if not db.is_device_known(fp):
-        info = _parse_user_agent(ua)
-        label = f"{info['device']} — {info['os']} / {info['browser']}"
+    info = db._parse_user_agent(ua)
+    label = f"{info['appareil']} — {info['os']} / {info['navigateur']}"
+    if db.is_device_known(fp):
+        db.update_known_device_label(fp, label)
+    else:
         db.add_known_device(fp, label, trusted=0)
         now = time.strftime("%d/%m/%Y %H:%M:%S")
         msg = (
             f"Nouvel appareil détecté.\n"
-            f"Role: {role}\nAppareil: {info['device']} | {info['os']}\n"
-            f"Navigateur: {info['browser']}\nIP: {ip}\nDate: {now}"
+            f"Role: {role}\nAppareil: {info['appareil']} | {info['os']}\n"
+            f"Navigateur: {info['navigateur']}\nIP: {ip}\nDate: {now}"
         )
         if email:
             msg += f"\nEmail: {email}"
