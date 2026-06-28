@@ -87,7 +87,7 @@ _EMAIL_TO: str = os.environ.get("EMAIL_TO", "")
 # Security: PBKDF2-HMAC-SHA256 salt — new derived + legacy fallback
 def _derive_salt() -> bytes:
     """Derive a deterministic salt from app secrets (changes when passwords change)."""
-    combined = (APP_PASSWORD + STUDENT_PASSWORD + "calcmo-saphir-pro-v2").encode()
+    combined = (_APP_PASSWORD + _STUDENT_PASSWORD + "calcmo-saphir-pro-v2").encode()
     return hashlib.sha256(combined).digest()[:16]
 
 _PASSWORD_SALT = _derive_salt()
