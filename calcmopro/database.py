@@ -708,9 +708,6 @@ def create_session(role: str, ip: str = "", user_agent: str = "", email: str = "
                     break
             except Exception as e:
                 print(f"[DB geoloc] {svc_name} failed: {e}")
-        if not ville:
-            ville = "Abengourou, Côte d'Ivoire"
-            print(f"[DB geoloc] all failed, default → {ville}")
     if _turso_enabled():
         sid = _turso_exec_insert(
             "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
