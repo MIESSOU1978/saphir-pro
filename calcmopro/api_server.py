@@ -862,12 +862,17 @@ class _Handler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/notifications":
-            body = self._read_body()
-            titre = body.get("titre", "")
-            message = body.get("message", "")
-            ntype = body.get("type", "info")
-            nid = db.add_notification(titre, message, ntype)
-            return self._json({"ok": True, "id": nid}, 201)
+            try:
+                body = self._read_body()
+                titre = body.get("titre", "")
+                message = body.get("message", "")
+                ntype = body.get("type", "info")
+                nid = db.add_notification(titre, message, ntype)
+                return self._json({"ok": True, "id": nid}, 201)
+            except Exception as exc:
+                print(f"[ERROR] POST /api/notifications: {exc}")
+                import traceback; traceback.print_exc()
+                return self._json({"error": "Erreur interne du serveur"}, 500)
 
         if path == "/api/notifications/clear":
             db.clear_all_notifications()
