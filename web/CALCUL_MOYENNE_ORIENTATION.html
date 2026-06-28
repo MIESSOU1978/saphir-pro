@@ -581,7 +581,13 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .users-container{
   background:#fff;border:1px solid #d9e5de;border-radius:14px;
   padding:24px 26px 20px;box-shadow:0 1px 8px rgba(0,0,0,.04);
+  max-height:calc(100vh - 100px);overflow-y:auto;overflow-x:hidden;
+  scrollbar-width:thin;scrollbar-color:#c5d5cb #f4f8f6;
 }
+.users-container::-webkit-scrollbar{width:6px;}
+.users-container::-webkit-scrollbar-track{background:#f4f8f6;border-radius:3px;}
+.users-container::-webkit-scrollbar-thumb{background:#c5d5cb;border-radius:3px;transition:background .2s;}
+.users-container::-webkit-scrollbar-thumb:hover{background:#9fb0a6;}
 .users-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
 .users-header-left{display:flex;align-items:center;gap:10px;}
 .users-header-ico{width:36px;height:36px;border-radius:10px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;}
@@ -646,7 +652,8 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .users-table th{
   padding:10px 10px;background:#f4f8f6;color:#064E3B;font-weight:700;font-size:.7rem;
   text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #d5e5de;text-align:left;white-space:nowrap;
-  position:sticky;top:0;z-index:1;
+  position:sticky;top:0;z-index:3;
+  box-shadow:0 1px 0 #d5e5de;
 }
 .users-table td{
   padding:9px 10px;border-bottom:1px solid #eef3f0;color:#1a3a2e;vertical-align:middle;
@@ -771,7 +778,10 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 }
 .users-activity-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .users-activity-title{font-size:.88rem;font-weight:700;color:#003b32;}
-.users-activity-list{max-height:400px;overflow-y:auto;}
+.users-activity-list{max-height:400px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#c5d5cb #f4f8f6;}
+.users-activity-list::-webkit-scrollbar{width:5px;}
+.users-activity-list::-webkit-scrollbar-track{background:#f4f8f6;border-radius:3px;}
+.users-activity-list::-webkit-scrollbar-thumb{background:#c5d5cb;border-radius:3px;}
 .users-activity-item{
   display:grid;grid-template-columns:130px 1fr 100px;gap:10px;
   padding:10px 12px;border-bottom:1px solid #eef3f0;font-size:.76rem;align-items:start;
