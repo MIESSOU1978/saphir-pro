@@ -1105,9 +1105,11 @@ class _Handler(BaseHTTPRequestHandler):
                 eid = int(path.split("/")[-2])
             except (ValueError, IndexError):
                 return self._json({"error": "id invalide"}, 400)
+            print(f"[API] /api/eleves/{eid}/printed called by role={role}")
             try:
                 db.mark_printed(eid)
             except Exception as exc:
+                print(f"[ERROR] mark_printed: {exc}")
                 return self._json({"error": "Erreur interne du serveur"}, 500)
             return self._json({"ok": True})
 
