@@ -3404,7 +3404,7 @@ function _sseOnEvent(data){
     if(type==='new_message'&&evt.recipient){
       const myEmail=localStorage.getItem('saphir_email')||'';
       if(evt.recipient.toLowerCase()===myEmail.toLowerCase()){
-        showMsgPopup({message:evt.message,created_at:new Date().toLocaleString('fr-FR')});
+        showMsgPopup({id:evt.id,sender:evt.sender,message:evt.message,created_at:new Date().toLocaleString('fr-FR')});
       }
     }
     /* Show toast notification */
@@ -4140,17 +4140,20 @@ async function loadIncomingMessages(){
     const msgs=await r.json();
     const unread=msgs.filter(m=>!m.lu||m.lu==0||m.lu==='0');
     unread.forEach(m=>{
-      showMsgPopup({message:m.msg_content||m.message||'',created_at:m.created_at||''});
-      fetch(API+'/api/messages/'+m.id+'/read',{method:'POST',credentials:'same-origin'}).catch(()=>{});
+      showMsgPopup({id:m.id,sender:m.sender||'',msg_content:m.msg_content||m.message||'',created_at:m.created_at||''});
     });
   }catch(e){}
 }
 function showMsgPopup(m){
   let popup=document.createElement('div');
   popup.className='msg-popup';
-  popup.innerHTML=`<div class="msg-popup-header"><span class="msg-popup-icon">&#128172;</span><strong>Message de l'administration</strong><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;cursor:pointer;font-size:1rem;color:#60736D;">&#10005;</button></div><div class="msg-popup-body">${esc(m.message)}</div><div class="msg-popup-time">${m.created_at||''}</div>`;
+  popup.innerHTML=`<div class="msg-popup-header"><span class="msg-popup-icon">&#128172;</span><strong>${esc(m.sender||'Administration')}</strong><button class="msg-popup-close" title="Fermer">&#10005;</button></div><div class="msg-popup-body">${esc(m.msg_content||m.message||'')}</div><div class="msg-popup-time">${m.created_at||''}</div>`;
+  popup.querySelector('.msg-popup-close').onclick=function(){
+    if(m.id) fetch(API+'/api/messages/'+m.id+'/read',{method:'POST',credentials:'same-origin'}).catch(()=>{});
+    popup.remove();
+  };
   document.body.appendChild(popup);
-  setTimeout(()=>{if(popup.parentElement) popup.remove();},15000);
+  setTimeout(()=>{if(popup.parentElement){if(m.id) fetch(API+'/api/messages/'+m.id+'/read',{method:'POST',credentials:'same-origin'}).catch(()=>{}); popup.remove();}},15000);
 }
 
 function updateMsgPoll(){
