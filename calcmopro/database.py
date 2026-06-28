@@ -682,24 +682,35 @@ def create_session(role: str, ip: str = "", user_agent: str = "", email: str = "
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     ville = ""
     if ip and ip not in ("127.0.0.1", "::1", ""):
-        for svc_url, svc_parse in [
-            (f"https://ipwho.is/{ip}", lambda g: (g.get("city", ""), g.get("country", ""))),
-            (f"https://ip-api.com/json/{ip}?fields=city,country", lambda g: (g.get("city", ""), g.get("country", ""))),
-            (f"https://freeipapi.com/api/json/{ip}", lambda g: (g.get("cityName", ""), g.get("countryName", ""))),
-        ]:
+        _geo_services = [
+            (f"https://ipwho.is/{ip}", "ipwho"),
+            (f"https://ip-api.com/json/{ip}?fields=city,country", "ipapi"),
+            (f"https://freeipapi.com/api/json/{ip}", "freeipapi"),
+        ]
+        for svc_url, svc_name in _geo_services:
             try:
                 req = urllib.request.Request(svc_url, headers={"User-Agent": "SAPHIR-Pro/2.0"})
                 with urllib.request.urlopen(req, timeout=5) as resp:
                     geo = json.loads(resp.read())
-                city, country = svc_parse(geo)
+                if svc_name == "ipwho":
+                    city = geo.get("city", "")
+                    country = geo.get("country", "")
+                elif svc_name == "ipapi":
+                    city = geo.get("city", "")
+                    country = geo.get("country", "")
+                else:
+                    city = geo.get("cityName", "")
+                    country = geo.get("countryName", "")
                 if city:
                     country = "Côte d'Ivoire" if country in ("Ivory Coast", "Ivoiry Coast") else country
                     ville = f"{city}, {country}" if country else city
+                    print(f"[DB geoloc] {svc_name} → {ville}")
                     break
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"[DB geoloc] {svc_name} failed: {e}")
         if not ville:
             ville = "Abengourou, Côte d'Ivoire"
+            print(f"[DB geoloc] all failed, default → {ville}")
     if _turso_enabled():
         sid = _turso_exec_insert(
             "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
