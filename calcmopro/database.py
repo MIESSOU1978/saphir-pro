@@ -262,6 +262,15 @@ def init_db() -> None:
                 created_at  TEXT DEFAULT (datetime('now','localtime'))
             )
         """)
+        _turso_exec("""
+            CREATE TABLE IF NOT EXISTS message_status (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                message_id  INTEGER NOT NULL,
+                user_email  TEXT NOT NULL,
+                status      TEXT DEFAULT 'shown',
+                created_at  TEXT DEFAULT (datetime('now','localtime'))
+            )
+        """)
         # Add missing columns for existing tables
         for col, typ, default in [
             ("annee_scolaire", "TEXT", "''"),
@@ -353,6 +362,13 @@ def init_db() -> None:
             navigateur  TEXT DEFAULT '',
             raison      TEXT DEFAULT '',
             niveau      TEXT DEFAULT 'normal',
+            created_at  TEXT DEFAULT (datetime('now','localtime'))
+        );
+        CREATE TABLE IF NOT EXISTS message_status (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            message_id  INTEGER NOT NULL,
+            user_email  TEXT NOT NULL,
+            status      TEXT DEFAULT 'shown',
             created_at  TEXT DEFAULT (datetime('now','localtime'))
         );
     """)
@@ -1120,9 +1136,10 @@ def get_messages(recipient: str, unread_only: bool = False) -> list:
 
 
 def count_unread_messages(recipient: str) -> int:
-    """Count unread messages for a recipient."""
+    """Count unread messages for a recipient, excluding closed."""
+    closed = set(get_closed_message_ids(recipient))
     msgs = get_messages(recipient, unread_only=True)
-    return len(msgs)
+    return len([m for m in msgs if m["id"] not in closed])
 
 
 def mark_message_read(msg_id: int) -> None:
@@ -1135,6 +1152,86 @@ def mark_all_read(recipient: str) -> None:
     msgs = get_messages(recipient, unread_only=True)
     for m in msgs:
         mark_notification_read(m["id"])
+
+
+# ── Message status tracking (shown/closed/read per user) ──
+
+def mark_message_status(message_id: int, user_email: str, status: str) -> None:
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if _turso_enabled():
+        _turso_exec_insert(
+            "INSERT INTO message_status (message_id, user_email, status, created_at) VALUES (?, ?, ?, ?)",
+            [message_id, user_email, status, now],
+        )
+    else:
+        conn = _connect()
+        conn.execute(
+            "INSERT INTO message_status (message_id, user_email, status, created_at) VALUES (?, ?, ?, ?)",
+            (message_id, user_email, status, now),
+        )
+        conn.commit()
+        conn.close()
+
+
+def get_closed_message_ids(user_email: str) -> list[int]:
+    if _turso_enabled():
+        rows = _turso_exec(
+            "SELECT DISTINCT message_id FROM message_status WHERE user_email=? AND status IN ('closed','read')",
+            [user_email],
+        )
+        return [int(r["message_id"]) for r in rows]
+    else:
+        conn = _connect()
+        rows = conn.execute(
+            "SELECT DISTINCT message_id FROM message_status WHERE user_email=? AND status IN ('closed','read')",
+            (user_email,),
+        ).fetchall()
+        conn.close()
+        return [r[0] for r in rows]
+
+
+def get_message_delivery_status(message_id: int) -> dict:
+    if _turso_enabled():
+        rows = _turso_exec(
+            "SELECT status, user_email, created_at FROM message_status WHERE message_id=? ORDER BY id",
+            [message_id],
+        )
+    else:
+        conn = _connect()
+        rows = [dict(r) for r in conn.execute(
+            "SELECT status, user_email, created_at FROM message_status WHERE message_id=? ORDER BY id",
+            (message_id,),
+        ).fetchall()]
+        conn.close()
+    statuses = {}
+    for r in rows:
+        email = r.get("user_email", "")
+        statuses[r.get("status", "")] = {"email": email, "at": r.get("created_at", "")}
+    return statuses
+
+
+def get_all_message_statuses() -> list[dict]:
+    if _turso_enabled():
+        rows = _turso_exec(
+            """SELECT ms.message_id, ms.user_email, ms.status, ms.created_at,
+                      n.titre, n.message as msg_json
+               FROM message_status ms
+               JOIN notifications n ON n.id = ms.message_id
+               WHERE n.type='message'
+               ORDER BY ms.message_id DESC, ms.id"""
+        )
+    else:
+        conn = _connect()
+        rows = [dict(r) for r in conn.execute(
+            """SELECT ms.message_id, ms.user_email, ms.status, ms.created_at,
+                      n.titre, n.message as msg_json
+               FROM message_status ms
+               JOIN notifications n ON n.id = ms.message_id
+               WHERE n.type='message'
+               ORDER BY ms.message_id DESC, ms.id"""
+        ).fetchall()]
+        conn.close()
+    return rows
 
 
 # Auto-init on import

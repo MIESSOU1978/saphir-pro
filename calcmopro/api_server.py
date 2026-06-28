@@ -537,6 +537,26 @@ class _Handler(BaseHTTPRequestHandler):
             if is_unread:
                 return self._json({"count": db.count_unread_messages(email)})
             msgs = db.get_messages(email)
+            closed = set(db.get_closed_message_ids(email))
+            for m in msgs:
+                m["closed"] = m["id"] in closed
+            return self._json(msgs)
+
+        if path == "/api/messages/history":
+            email = ""
+            qs = parsed.query
+            if qs:
+                for p in qs.split("&"):
+                    if p.startswith("email="):
+                        email = urllib.parse.unquote(p.split("=", 1)[1])
+            if not email:
+                email = self._get_email()
+            if not email:
+                return self._json([], 401)
+            msgs = db.get_messages(email)
+            closed = set(db.get_closed_message_ids(email))
+            for m in msgs:
+                m["closed"] = m["id"] in closed
             return self._json(msgs)
 
         if path.startswith("/api/messages/") and path.endswith("/read"):
@@ -545,6 +565,27 @@ class _Handler(BaseHTTPRequestHandler):
             except (ValueError, IndexError):
                 return self._json({"error": "id invalide"}, 400)
             db.mark_message_read(nid)
+            email = self._get_email()
+            if email:
+                db.mark_message_status(nid, email, "read")
+            return self._json({"ok": True})
+
+        if path.startswith("/api/messages/") and path.endswith("/close"):
+            try:
+                nid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            email = ""
+            try:
+                body = self._read_body()
+                email = body.get("email", "").strip()
+            except Exception:
+                pass
+            if not email:
+                email = self._get_email()
+            if not email:
+                return self._json({"error": "Non authentifié"}, 401)
+            db.mark_message_status(nid, email, "closed")
             return self._json({"ok": True})
 
         if path == "/api/messages/read-all":
@@ -553,6 +594,12 @@ class _Handler(BaseHTTPRequestHandler):
                 return self._json({"error": "Non authentifié"}, 401)
             db.mark_all_read(email)
             return self._json({"ok": True})
+
+        if path == "/api/messages/admin-status":
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            statuses = db.get_all_message_statuses()
+            return self._json(statuses)
 
         if path == "/api/test-email":
             if self._get_role() != "admin":
