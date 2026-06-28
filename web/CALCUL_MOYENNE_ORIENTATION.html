@@ -1422,6 +1422,18 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 #page-mo .field-group select{height:42px;padding:9px 14px;border-color:#d1ddd6;font-size:.88rem;border-radius:8px;box-shadow:none;}
 #page-mga #etablissement,
 #page-mo #mo-etablissement{width:100%;}
+
+/* ── Établissement toggle ── */
+.etab-wrap{position:relative;display:flex;align-items:center;}
+.etab-wrap input{flex:1;padding-right:32px;}
+.etab-toggle{
+  position:absolute;right:4px;top:50%;transform:translateY(-50%);
+  width:26px;height:26px;border-radius:6px;border:1px solid #D5E5DE;background:#F4F8F6;
+  color:#60736D;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;transition:all .15s;line-height:1;
+}
+.etab-toggle:hover{background:#EAF5F0;border-color:#064E3B;color:#064E3B;}
+.etab-toggle.active{background:#064E3B;color:#fff;border-color:#064E3B;}
 #page-mga .field-group input:hover,
 #page-mga .field-group select:hover,
 #page-mo .field-group input:hover,
@@ -1753,7 +1765,10 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       </div>
       <div class="field-group">
         <label>ÉTABLISSEMENT</label>
-        <input type="text" id="etablissement" list="etablissement-list" placeholder="Saisir ou sélectionner...">
+        <div class="etab-wrap">
+          <input type="text" id="etablissement" placeholder="Saisir ou sélectionner...">
+          <button type="button" class="etab-toggle" onclick="toggleEtabList('etablissement',this)" title="Afficher les établissements">&#9660;</button>
+        </div>
         <datalist id="etablissement-list">
           <option>COLLÈGE DÉPARTEMENTAL AGNIBILÉKROU</option>
           <option>COLLÈGE MODERNE ABENGOUROU</option>
@@ -1923,7 +1938,10 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       </div>
       <div class="field-group">
         <label>ÉTABLISSEMENT</label>
-        <input type="text" id="mo-etablissement" list="etablissement-list" placeholder="Saisir ou sélectionner...">
+        <div class="etab-wrap">
+          <input type="text" id="mo-etablissement" placeholder="Saisir ou sélectionner...">
+          <button type="button" class="etab-toggle" onclick="toggleEtabList('mo-etablissement',this)" title="Afficher les établissements">&#9660;</button>
+        </div>
       </div>
     </div>
   </div>
@@ -3435,6 +3453,18 @@ let _knownDevices=[];
 let _bannedUsers=[];
 let _actBulletinData=[];
 
+function toggleEtabList(inputId, btn){
+  const input=document.getElementById(inputId);
+  if(!input) return;
+  if(input.getAttribute('list')){
+    input.removeAttribute('list');
+    btn.classList.remove('active');
+  }else{
+    input.setAttribute('list','etablissement-list');
+    btn.classList.add('active');
+    input.focus();
+  }
+}
 function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
 let _lastNotifId=0;
