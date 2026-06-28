@@ -581,13 +581,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .users-container{
   background:#fff;border:1px solid #d9e5de;border-radius:14px;
   padding:24px 26px 20px;box-shadow:0 1px 8px rgba(0,0,0,.04);
-  max-height:calc(100vh - 100px);overflow-y:auto;overflow-x:hidden;
-  scrollbar-width:thin;scrollbar-color:#c5d5cb #f4f8f6;
 }
-.users-container::-webkit-scrollbar{width:6px;}
-.users-container::-webkit-scrollbar-track{background:#f4f8f6;border-radius:3px;}
-.users-container::-webkit-scrollbar-thumb{background:#c5d5cb;border-radius:3px;transition:background .2s;}
-.users-container::-webkit-scrollbar-thumb:hover{background:#9fb0a6;}
 .users-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
 .users-header-left{display:flex;align-items:center;gap:10px;}
 .users-header-ico{width:36px;height:36px;border-radius:10px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;}
@@ -647,7 +641,16 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 }
 .users-filter-select:hover{background:#F3F8F5;border-color:#8FB7A4;}
 .users-filter-select:focus{background:#EEF7F2;border-color:#0B6B50;outline:none;}
-.users-table-wrap{overflow-x:auto;overflow-y:visible;border:1px solid #d9e5de;border-radius:10px;background:#fff;}
+.users-table-wrap{
+  overflow-x:auto;overflow-y:auto;
+  max-height:calc(100vh - 320px);
+  border:1px solid #d9e5de;border-radius:10px;background:#fff;
+  scrollbar-width:thin;scrollbar-color:#c5d5cb #f4f8f6;
+}
+.users-table-wrap::-webkit-scrollbar{width:6px;}
+.users-table-wrap::-webkit-scrollbar-track{background:#f4f8f6;border-radius:3px;}
+.users-table-wrap::-webkit-scrollbar-thumb{background:#c5d5cb;border-radius:3px;transition:background .2s;}
+.users-table-wrap::-webkit-scrollbar-thumb:hover{background:#9fb0a6;}
 .users-table{width:100%;min-width:1400px;border-collapse:separate;border-spacing:0;font-size:.78rem;table-layout:auto;}
 .users-table th{
   padding:10px 10px;background:#f4f8f6;color:#064E3B;font-weight:700;font-size:.7rem;
