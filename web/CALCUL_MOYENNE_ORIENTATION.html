@@ -3749,17 +3749,6 @@ function renderUsers(sessions){
     for(let i=0;i<key.length;i++){h^=key.charCodeAt(i);h=(h*0x01000193)>>>0;}
     return h.toString(16).padStart(8,'0').substring(0,16);
   }
-  /* Compute current device fingerprint */
-  let curFP='';
-  try{
-    const ua=navigator.userAgent||'';
-    const uaL=ua.toLowerCase();
-    let os='Inconnu',nav='Inconnu',device='Ordinateur';
-    if(uaL.includes('windows'))os='Windows';else if(uaL.includes('mac os')||uaL.includes('macos'))os='macOS';else if(uaL.includes('linux'))os='Linux';else if(uaL.includes('android'))os='Android';else if(uaL.includes('iphone')||uaL.includes('ipad'))os='iOS';
-    if(uaL.includes('edg/'))nav='Edge';else if(uaL.includes('chrome/')&&!uaL.includes('edg/'))nav='Chrome';else if(uaL.includes('firefox/'))nav='Firefox';else if(uaL.includes('safari/')&&!uaL.includes('chrome/'))nav='Safari';
-    if(uaL.includes('mobile')||uaL.includes('android')||uaL.includes('iphone'))device='Téléphone';else if(uaL.includes('ipad')||uaL.includes('tablet'))device='Tablette';
-    curFP=_stableFingerprint(os,nav,device);
-  }catch(e){curFP='';}
   tb.innerHTML=sessions.map(s=>{
     const logoutAt=s.logout_at||'';
     const isOnline=!logoutAt;
@@ -3778,10 +3767,10 @@ function renderUsers(sessions){
     const ville=(s.ville||'—').replace(/Ivoiry Coast|Ivory Coast/g,'Côte d\'Ivoire');
     const fp=_stableFingerprint(s.os,s.navigateur,s.appareil);
     const kd=knownMap[fp];
-    const isCurrentDevice=(fp===curFP&&fp!=='');
+    const isCurrentSession=(s.id===_sessionId);
     let badge='';
-    if(isCurrentDevice){
-      badge='<span class="users-device-badge users-device-current" title="Appareil actuel">&#9679; Cet appareil</span>';
+    if(isCurrentSession){
+      badge='<span class="users-device-badge users-device-current" title="Votre session active">&#9679; Cet appareil</span>';
     }else if(kd){
       badge=Number(kd.trusted)
         ?'<span class="users-device-badge users-device-trusted" title="Appareil fiable">&#10003; Fiable</span>'
