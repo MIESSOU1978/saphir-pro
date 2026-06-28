@@ -506,7 +506,7 @@ def list_eleves() -> list[dict[str, Any]]:
 def get_eleve(eleve_id: int) -> dict[str, Any] | None:
     if _turso_enabled():
         rows = _turso_exec("""
-            SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.created_by, e.created_at,
+            SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at,
                    r.total, r.mo, r.mention, r.matieres, r.printed, r.date_calc
             FROM eleves e
             LEFT JOIN resultats r ON r.eleve_id = e.id
@@ -525,7 +525,7 @@ def get_eleve(eleve_id: int) -> dict[str, Any] | None:
 
     conn = _connect()
     row = conn.execute("""
-        SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.created_by, e.created_at,
+        SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at,
                r.total, r.mo, r.mention, r.matieres, r.printed, r.date_calc
         FROM eleves e
         LEFT JOIN resultats r ON r.eleve_id = e.id
@@ -554,11 +554,8 @@ def update_eleve(eleve_id: int, nom: str, matricule: str = "", classe: str = "",
             [nom, matricule, classe, etablissement, annee, annee_scolaire, eleve_id],
         )
         _turso_exec_write(
-            "DELETE FROM resultats WHERE eleve_id=?", [eleve_id]
-        )
-        _turso_exec_write(
-            "INSERT INTO resultats (eleve_id, total, mo, mention, matieres, date_calc) VALUES (?, ?, ?, ?, ?, ?)",
-            [eleve_id, total, mo, mention, matieres_json, datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
+            "UPDATE resultats SET total=?, mo=?, mention=?, matieres=?, date_calc=? WHERE eleve_id=?",
+            [total, mo, mention, matieres_json, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), eleve_id],
         )
         return get_eleve(eleve_id)
 
@@ -567,10 +564,9 @@ def update_eleve(eleve_id: int, nom: str, matricule: str = "", classe: str = "",
         "UPDATE eleves SET nom=?, matricule=?, classe=?, etablissement=?, annee=?, annee_scolaire=? WHERE id=?",
         (nom, matricule, classe, etablissement, annee, annee_scolaire, eleve_id),
     )
-    conn.execute("DELETE FROM resultats WHERE eleve_id=?", (eleve_id,))
     conn.execute(
-        "INSERT INTO resultats (eleve_id, total, mo, mention, matieres, date_calc) VALUES (?, ?, ?, ?, ?, ?)",
-        (eleve_id, total, mo, mention, matieres_json, datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+        "UPDATE resultats SET total=?, mo=?, mention=?, matieres=?, date_calc=? WHERE eleve_id=?",
+        (total, mo, mention, matieres_json, datetime.now().strftime("%Y-%m-%d %H:%M:%S"), eleve_id),
     )
     conn.commit()
     row = conn.execute("SELECT * FROM eleves WHERE id=?", (eleve_id,)).fetchone()
