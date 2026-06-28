@@ -517,32 +517,24 @@ class _Handler(BaseHTTPRequestHandler):
             return self._json({"ok": True})
 
         # ── Messages ──
-        if path == "/api/messages" or path.startswith("/api/messages?"):
+        if path == "/api/messages" or path == "/api/messages/unread":
+            is_unread = path.endswith("/unread")
             email = ""
-            if "?" in path:
-                qs = path.split("?", 1)[1]
+            qs = parsed.query
+            if qs:
                 for p in qs.split("&"):
                     if p.startswith("email="):
                         email = urllib.parse.unquote(p.split("=", 1)[1])
             if not email:
                 email = self._get_email()
             if not email:
+                if is_unread:
+                    return self._json({"count": 0})
                 return self._json([], 401)
+            if is_unread:
+                return self._json({"count": db.count_unread_messages(email)})
             msgs = db.get_messages(email)
             return self._json(msgs)
-
-        if path == "/api/messages/unread" or path.startswith("/api/messages/unread?"):
-            email = ""
-            if "?" in path:
-                qs = path.split("?", 1)[1]
-                for p in qs.split("&"):
-                    if p.startswith("email="):
-                        email = urllib.parse.unquote(p.split("=", 1)[1])
-            if not email:
-                email = self._get_email()
-            if not email:
-                return self._json({"count": 0})
-            return self._json({"count": db.count_unread_messages(email)})
 
         if path.startswith("/api/messages/") and path.endswith("/read"):
             if self._get_role() != "admin":
