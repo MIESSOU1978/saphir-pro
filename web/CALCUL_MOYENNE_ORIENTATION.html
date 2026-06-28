@@ -3566,8 +3566,9 @@ function renderUsers(sessions){
     const logoutDisplay=logoutAt?logoutAt.replace('T',' ').substring(0,16):'—';
     const roleLabel=s.role==='admin'?'Admin':'Élève';
     const roleCls=s.role==='admin'?'users-role-admin':'users-role-student';
-    const email=s.email||'—';
-    const isBanned=_bannedUsers.some(b=>b.email&&email&&b.email.toLowerCase()===email.toLowerCase());
+    const rawEmail=s.email||'';
+    const email=rawEmail||'—';
+    const isBanned=_bannedUsers.some(b=>b.email&&rawEmail&&b.email.toLowerCase()===rawEmail.toLowerCase());
     const isSelf=s.id===_sessionId;
     let statutLabel,statutCls;
     if(isBanned){statutLabel='Banni';statutCls='users-statut-banned';}
@@ -3578,7 +3579,7 @@ function renderUsers(sessions){
     let fp='';
     try{
       let h=0x811c9dc5;
-      for(let i=0;i<ua.length;i++){h^=ua.charCodeAt(i);h=(h*0x01000193)>>>0;}
+      for(let i=0;i<ua.length;i++){h^=ua.charCodeAt(i);h=(h*0x0001000193)>>>0;}
       fp=h.toString(16).padStart(8,'0').substring(0,16);
     }catch(e){fp='';}
     const kd=knownMap[fp];
@@ -3593,16 +3594,16 @@ function renderUsers(sessions){
     }else{
       badge='<span class="users-device-badge users-device-untrusted" title="Nouvel appareil détecté">&#9888; Nouvel appareil</span>';
     }
-    const emailLabel=email||'—';
+    const emailLabel=email;
     const disconnectBtn=isOnline?`<button class="users-btn-disconnect" onclick="disconnectUser(${s.id},'${esc(email).replace(/'/g,"\\'")}')" title="Déconnecter cette session"><svg viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></button>`:'';
     const showBan=!isSelf;
     const showDelete=!isSelf||isOnline;
-    const showMsg=isOnline&&email;
+    const showMsg=!!rawEmail&&!isSelf;
     const hasDropdown=showBan||showDelete||showMsg;
     let dropdownHTML='';
     if(hasDropdown){
       let items='';
-      if(showMsg) items+=`<button class="dd-msg" onclick="openMsgModal('${esc(email).replace(/'/g,"\\'")}')" title="Envoyer un message"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Message</button>`;
+      if(showMsg) items+=`<button class="dd-msg" onclick="openMsgModal('${esc(rawEmail).replace(/'/g,"\\'")}')" title="Envoyer un message"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Message</button>`;
       if(showBan) items+=`<button class="dd-ban" onclick="banUser(${s.id},'${esc(email).replace(/'/g,"\\'")}')" title="Bannir cet utilisateur"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Bannir</button>`;
       if(showDelete) items+=`<button class="dd-delete" onclick="deleteSession(${s.id})" title="Supprimer cette session"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>Supprimer</button>`;
       dropdownHTML=`<div class="users-actions-wrap">
