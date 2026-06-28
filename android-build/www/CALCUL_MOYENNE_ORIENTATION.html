@@ -3401,26 +3401,33 @@ function _sseOnEvent(data){
     }
     /* Show toast notification */
     _sseShowToast(type,msg);
-    /* Refresh users page if visible */
-    const page=document.getElementById('page-users');
-    if(page&&page.classList.contains('active')){
-      /* Preserve scroll and selection */
-      const wrap=document.querySelector('.users-table-wrap');
-      const scrollLeft=wrap?wrap.scrollLeft:0;
-      const scrollTop=wrap?wrap.scrollTop:0;
-      const selected=[];
-      document.querySelectorAll('.users-cb:checked').forEach(cb=>selected.push(cb.value));
-      loadUsers().then(()=>{
-        if(wrap){wrap.scrollLeft=scrollLeft;wrap.scrollTop=scrollTop;}
-        selected.forEach(id=>{
-          const cb=document.querySelector('.users-cb[value="'+id+'"]:not(:disabled)');
-          if(cb){cb.checked=true;}
-        });
-        updateDeleteBtn();
-        _sseUpdateTimestamp();
-      });
-    }
+    /* Refresh users page if visible — debounced to avoid losing checkboxes */
+    _sseRefreshDebounced();
   }catch(e){console.error('SSE parse error:',e);}
+}
+
+let _sseRefreshTimer=null;
+function _sseRefreshDebounced(){
+  if(_sseRefreshTimer) clearTimeout(_sseRefreshTimer);
+  _sseRefreshTimer=setTimeout(()=>{
+    _sseRefreshTimer=null;
+    const page=document.getElementById('page-users');
+    if(!page||!page.classList.contains('active')) return;
+    const wrap=document.querySelector('.users-table-wrap');
+    const scrollLeft=wrap?wrap.scrollLeft:0;
+    const scrollTop=wrap?wrap.scrollTop:0;
+    const selected=[];
+    document.querySelectorAll('.users-cb:checked:not(:disabled)').forEach(cb=>selected.push(cb.value));
+    loadUsers().then(()=>{
+      if(wrap){wrap.scrollLeft=scrollLeft;wrap.scrollTop=scrollTop;}
+      selected.forEach(id=>{
+        const cb=document.querySelector('.users-cb[value="'+id+'"]:not(:disabled)');
+        if(cb){cb.checked=true;}
+      });
+      updateDeleteBtn();
+      _sseUpdateTimestamp();
+    });
+  },1500);
 }
 
 function _sseConnect(){
