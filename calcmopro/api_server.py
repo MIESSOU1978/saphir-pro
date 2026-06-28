@@ -84,15 +84,26 @@ _EMAIL_API_KEY: str = os.environ.get("SENDGRID_API_KEY", "")
 _EMAIL_FROM: str = os.environ.get("EMAIL_FROM", "miessou8@gmail.com")
 _EMAIL_TO: str = os.environ.get("EMAIL_TO", "")
 
-# Security: PBKDF2-HMAC-SHA256 salt (fixed, app-specific)
-_PASSWORD_SALT = b"calcmo-saphir-pro-salt-2024-v2"
+# Security: PBKDF2-HMAC-SHA256 salt — new derived + legacy fallback
+def _derive_salt() -> bytes:
+    """Derive a deterministic salt from app secrets (changes when passwords change)."""
+    combined = (APP_PASSWORD + STUDENT_PASSWORD + "calcmo-saphir-pro-v2").encode()
+    return hashlib.sha256(combined).digest()[:16]
+
+_PASSWORD_SALT = _derive_salt()
+_PASSWORD_SALT_LEGACY = b"calcmo-saphir-pro-salt-2024-v2"
 
 
-def _hash_password(pwd: str) -> str:
+def _hash_password(pwd: str, salt: bytes = None) -> str:
     """Hash password with PBKDF2-HMAC-SHA256 (100k iterations)."""
-    return hashlib.pbkdf2_hmac(
-        "sha256", pwd.encode(), _PASSWORD_SALT, 100000
-    ).hex()
+    s = salt or _PASSWORD_SALT
+    return hashlib.pbkdf2_hmac("sha256", pwd.encode(), s, 100000).hex()
+
+def _verify_password(pwd: str, stored_hash: str) -> bool:
+    """Verify password against stored hash, trying both new and legacy salt."""
+    if hmac.compare_digest(_hash_password(pwd), stored_hash):
+        return True
+    return hmac.compare_digest(_hash_password(pwd, _PASSWORD_SALT_LEGACY), stored_hash)
 
 
 def _create_session(role: str = "admin") -> str:
@@ -287,11 +298,20 @@ class _Handler(BaseHTTPRequestHandler):
         """Return CORS origin — restricted to Render domain."""
         return _CORS_ORIGIN
 
+    def _security_headers(self) -> None:
+        """Add common security headers."""
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
+        if _IS_RENDER:
+            self.send_header("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+
     def _json(self, data: object, status: int = 200) -> None:
         body = json.dumps(data, ensure_ascii=False, default=str).encode()
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", self._cors_header())
+        self._security_headers()
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -303,6 +323,7 @@ class _Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", self._cors_header())
         self.send_header("Set-Cookie", f"{cookie_name}={cookie_val}; Path=/; HttpOnly; SameSite=Lax{secure}; Max-Age={_SESSION_TTL}")
+        self._security_headers()
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -316,6 +337,7 @@ class _Handler(BaseHTTPRequestHandler):
         body = path.read_bytes()
         self.send_response(status)
         self.send_header("Content-Type", "text/html; charset=utf-8")
+        self._security_headers()
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0")
         self.send_header("Pragma", "no-cache")
@@ -327,6 +349,7 @@ class _Handler(BaseHTTPRequestHandler):
         body = path.read_bytes()
         self.send_response(status)
         self.send_header("Content-Type", "application/xml; charset=utf-8")
+        self._security_headers()
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -335,6 +358,7 @@ class _Handler(BaseHTTPRequestHandler):
         body = path.read_bytes()
         self.send_response(status)
         self.send_header("Content-Type", "text/plain; charset=utf-8")
+        self._security_headers()
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -382,7 +406,7 @@ class _Handler(BaseHTTPRequestHandler):
         except Exception as exc:
             print(f"[FATAL] do_GET: {exc}")
             try:
-                self._json({"error": str(exc)}, 500)
+                self._json({"error": "Erreur interne du serveur"}, 500)
             except Exception:
                 self.send_error(500)
 
@@ -467,8 +491,10 @@ class _Handler(BaseHTTPRequestHandler):
             return self._json({"ok": True})
 
         if path == "/api/test-email":
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
             if not all([_EMAIL_API_KEY, _EMAIL_TO]):
-                return self._json({"ok": False, "error": "Email vars not set", "api_key": bool(_EMAIL_API_KEY), "to": bool(_EMAIL_TO)})
+                return self._json({"ok": False, "error": "Variables email non configurées"})
             try:
                 payload = json.dumps({
                     "personalizations": [{"to": [{"email": _EMAIL_TO}]}],
@@ -483,7 +509,7 @@ class _Handler(BaseHTTPRequestHandler):
                 resp = urllib.request.urlopen(req, timeout=10)
                 return self._json({"ok": True, "message": "Email envoye avec succes"})
             except Exception as e:
-                return self._json({"ok": False, "error": str(e)})
+                return self._json({"ok": False, "error": "Erreur interne du serveur"})
 
         if not self._require_auth():
             return
@@ -528,6 +554,8 @@ class _Handler(BaseHTTPRequestHandler):
             })
 
         if path == "/api/debug":
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
             turso_on = db._turso_enabled()
             turso_url = db._TURSO_URL[:40] + "..." if db._TURSO_URL else ""
             count = db.count_eleves()
@@ -554,15 +582,15 @@ class _Handler(BaseHTTPRequestHandler):
                     pass
             return self._json({
                 "turso_enabled": turso_on,
-                "turso_url": turso_url,
                 "turso_status": turso_status,
-                "turso_error": turso_error,
                 "tables_exist": tables_exist,
                 "eleves_count": count,
                 "render_env": bool(os.environ.get("PORT")),
             })
 
         if path == "/api/init-tables":
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
             if not db._turso_enabled():
                 return self._json({"error": "Turso not enabled"})
             db.init_db()
@@ -607,7 +635,7 @@ class _Handler(BaseHTTPRequestHandler):
         except Exception as exc:
             print(f"[FATAL] do_POST: {exc}")
             try:
-                self._json({"error": str(exc)}, 500)
+                self._json({"error": "Erreur interne du serveur"}, 500)
             except Exception:
                 self.send_error(500)
 
@@ -643,7 +671,7 @@ class _Handler(BaseHTTPRequestHandler):
                 return self._json({"error": "Votre compte a été désactivé. Veuillez contacter l'administrateur."}, 403)
 
             if not _auth_required():
-                if _STUDENT_PASSWORD and _hash_password(pwd) == _hash_password(_STUDENT_PASSWORD):
+                if _STUDENT_PASSWORD and _verify_password(pwd, _hash_password(_STUDENT_PASSWORD)):
                     token = _create_session("student")
                     ip = self._get_real_ip()
                     ua = self.headers.get("User-Agent", "")
@@ -662,7 +690,7 @@ class _Handler(BaseHTTPRequestHandler):
                 _sse_emit("login_success", {"message": "Nouvelle connexion détectée", "user": email, "role": "admin", "ip": ip})
                 return self._json({"ok": True, "role": "admin", "session_id": sid})
 
-            if _hash_password(pwd) == _hash_password(_APP_PASSWORD):
+            if _verify_password(pwd, _hash_password(_APP_PASSWORD)):
                 token = _create_session("admin")
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
@@ -673,7 +701,7 @@ class _Handler(BaseHTTPRequestHandler):
                 _sse_emit("login_success", {"message": "Nouvelle connexion détectée", "user": email, "role": "admin", "ip": ip})
                 return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid}, "session", token)
 
-            if _STUDENT_PASSWORD and _hash_password(pwd) == _hash_password(_STUDENT_PASSWORD):
+            if _STUDENT_PASSWORD and _verify_password(pwd, _hash_password(_STUDENT_PASSWORD)):
                 token = _create_session("student")
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
@@ -709,7 +737,7 @@ class _Handler(BaseHTTPRequestHandler):
             ville = ""
             if client_ip and client_ip not in ("127.0.0.1", "::1", ""):
                 try:
-                    req = urllib.request.Request(f"http://ip-api.com/json/{client_ip}?fields=city,country")
+                    req = urllib.request.Request(f"https://ip-api.com/json/{client_ip}?fields=city,country")
                     with urllib.request.urlopen(req, timeout=3) as resp:
                         geo = json.loads(resp.read())
                         city = geo.get("city", "")
@@ -814,7 +842,7 @@ class _Handler(BaseHTTPRequestHandler):
                 return self._json(result, 201)
             except Exception as exc:
                 print(f"[ERROR] save_eleve: {exc}")
-                return self._json({"error": str(exc)}, 500)
+                return self._json({"error": "Erreur interne du serveur"}, 500)
 
         if path == "/api/eleves/delete-multiple":
             body = self._read_body()
@@ -826,7 +854,7 @@ class _Handler(BaseHTTPRequestHandler):
             try:
                 count = db.delete_multiple_eleves(ids)
             except Exception as exc:
-                return self._json({"error": str(exc)}, 500)
+                return self._json({"error": "Erreur interne du serveur"}, 500)
             return self._json({"ok": True, "deleted": count})
 
         if path.startswith("/api/eleves/") and path.endswith("/duplicate"):
@@ -837,7 +865,7 @@ class _Handler(BaseHTTPRequestHandler):
             try:
                 result = db.duplicate_eleve(eid)
             except Exception as exc:
-                return self._json({"error": str(exc)}, 500)
+                return self._json({"error": "Erreur interne du serveur"}, 500)
             if result is None:
                 return self._json({"error": "Calcul introuvable"}, 404)
             return self._json(result, 201)
@@ -927,7 +955,7 @@ class _Handler(BaseHTTPRequestHandler):
         except Exception as exc:
             print(f"[FATAL] do_DELETE: {exc}")
             try:
-                self._json({"error": str(exc)}, 500)
+                self._json({"error": "Erreur interne du serveur"}, 500)
             except Exception:
                 self.send_error(500)
 
@@ -946,7 +974,7 @@ class _Handler(BaseHTTPRequestHandler):
             try:
                 db.clear_all()
             except Exception as exc:
-                return self._json({"error": str(exc)}, 500)
+                return self._json({"error": "Erreur interne du serveur"}, 500)
             return self._json({"ok": True})
 
         if path.startswith("/api/eleves/"):
@@ -959,7 +987,7 @@ class _Handler(BaseHTTPRequestHandler):
             try:
                 db.delete_eleve(eid)
             except Exception as exc:
-                return self._json({"error": str(exc)}, 500)
+                return self._json({"error": "Erreur interne du serveur"}, 500)
             return self._json({"ok": True})
 
         if path == "/api/sessions/clear":
@@ -968,7 +996,7 @@ class _Handler(BaseHTTPRequestHandler):
             try:
                 db.clear_sessions()
             except Exception as exc:
-                return self._json({"error": str(exc)}, 500)
+                return self._json({"error": "Erreur interne du serveur"}, 500)
             _sse_emit("sessions_cleared", {"message": "Historique des sessions vidé"})
             return self._json({"ok": True})
 
@@ -983,7 +1011,7 @@ class _Handler(BaseHTTPRequestHandler):
             try:
                 db.close_session(sid)
             except Exception as exc:
-                return self._json({"error": str(exc)}, 500)
+                return self._json({"error": "Erreur interne du serveur"}, 500)
             _sse_emit("session_kicked", {"message": "Session déconnectée par l'administrateur", "session_id": sid})
             return self._json({"ok": True})
 
@@ -1009,7 +1037,7 @@ class _Handler(BaseHTTPRequestHandler):
                 db.ban_user(email, banned_by=admin_email, motif=motif)
                 db.close_session(sid)
             except Exception as exc:
-                return self._json({"error": str(exc)}, 500)
+                return self._json({"error": "Erreur interne du serveur"}, 500)
             _sse_emit("user_banned", {"message": "Utilisateur banni", "user": email, "motif": motif})
             return self._json({"ok": True})
 
@@ -1021,7 +1049,7 @@ class _Handler(BaseHTTPRequestHandler):
             try:
                 db.unban_user(email)
             except Exception as exc:
-                return self._json({"error": str(exc)}, 500)
+                return self._json({"error": "Erreur interne du serveur"}, 500)
             _sse_emit("user_unbanned", {"message": "Utilisateur débanni", "user": email})
             return self._json({"ok": True})
 
@@ -1032,7 +1060,7 @@ class _Handler(BaseHTTPRequestHandler):
             try:
                 banned = db.list_banned_users()
             except Exception as exc:
-                return self._json({"error": str(exc)}, 500)
+                return self._json({"error": "Erreur interne du serveur"}, 500)
             return self._json(banned)
 
         if path.startswith("/api/sessions/"):
@@ -1045,7 +1073,7 @@ class _Handler(BaseHTTPRequestHandler):
             try:
                 db.delete_session(sid)
             except Exception as exc:
-                return self._json({"error": str(exc)}, 500)
+                return self._json({"error": "Erreur interne du serveur"}, 500)
             _sse_emit("session_deleted", {"message": "Session supprimée", "session_id": sid})
             return self._json({"ok": True})
 
@@ -1074,7 +1102,7 @@ class _Handler(BaseHTTPRequestHandler):
         except Exception as exc:
             print(f"[FATAL] do_PUT: {exc}")
             try:
-                self._json({"error": str(exc)}, 500)
+                self._json({"error": "Erreur interne du serveur"}, 500)
             except Exception:
                 self.send_error(500)
 
@@ -1108,7 +1136,7 @@ class _Handler(BaseHTTPRequestHandler):
                     annee_scolaire=body.get("annee_scolaire", ""),
                 )
             except Exception as exc:
-                return self._json({"error": str(exc)}, 500)
+                return self._json({"error": "Erreur interne du serveur"}, 500)
             if result is None:
                 return self._json({"error": "Calcul introuvable"}, 404)
             return self._json(result)

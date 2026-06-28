@@ -2141,10 +2141,10 @@ const MATIERES = [
 const TOTAL_COEF = MATIERES.reduce((s,m)=>s+m.coef,0);
 
 /* ── NAVIGATION ── */
+let _role='guest';
 function showPage(id){
-  const role=localStorage.getItem('saphir_role');
-  if(id==='hist'&&role!=='admin') return;
-  if(id==='users'&&role!=='admin') return;
+  if(id==='hist'&&_role!=='admin') return;
+  if(id==='users'&&_role!=='admin') return;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
@@ -2806,7 +2806,7 @@ function renderHistory(){
     const timeDisplay=timePart?timePart.split('.')[0].substring(0,5):'';
     const checked=selectedIds.includes(h.id)?'checked':'';
     const yearBadge=h.annee_scolaire?'<span style="font-size:.66rem;font-weight:600;color:#064E3B;background:#EAF5F0;border:1px solid #B8CEC3;border-radius:5px;padding:1px 6px;margin-left:6px;">'+esc(h.annee_scolaire)+'</span>':'';
-    return '<div class="hist-card"><input type="checkbox" class="hist-select" '+checked+' onchange="toggleSelect('+h.id+',this)" title="Sélectionner"><div class="hist-card-info"><div class="hist-card-name" title="'+(h.nom||'\u2014')+'">'+(h.nom||'\u2014')+'</div><div class="hist-card-meta" title="'+(h.matricule||'\u2014')+' · '+(h.classe||'\u2014')+' · '+(h.etablissement||'\u2014')+'">'+(h.matricule||'\u2014')+' &middot; '+(h.classe||'\u2014')+' &middot; '+(h.etablissement||'\u2014')+'</div>'+(dateDisplay?'<div class="hist-card-date" title="Enregistr\u00e9 le '+dateStr+'">&#128197; '+dateDisplay+(timeDisplay?' &agrave; '+timeDisplay:'')+'</div>':'')+'</div><div class="hist-card-mo"><div class="mo-value">'+moDisplay+yearBadge+'</div><div class="mo-label">Moyenne</div></div><span class="hist-badge '+badgeClass+'">'+mention+'</span><div class="hist-actions"><button class="hist-btn-edit" onclick="editCalc('+h.id+')" title="Modifier ce calcul">&#9998; Modifier</button><button class="hist-btn-dup" onclick="duplicateCalc('+h.id+')" title="Dupliquer ce calcul">&#128203; Dupliquer</button><button class="hist-btn-icon" onclick="previewBulletinPDF('+h.id+')" title="Aperçu du bulletin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button class="hist-btn-icon" onclick="downloadBulletinPDF('+h.id+')" title="T\u00e9l\u00e9charger le bulletin en PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button><button class="hist-btn-icon hist-btn-icon-del" onclick="confirmDelHistory('+h.id+',this)" title="Supprimer ce calcul"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></div>';
+    return '<div class="hist-card"><input type="checkbox" class="hist-select" '+checked+' onchange="toggleSelect('+h.id+',this)" title="Sélectionner"><div class="hist-card-info"><div class="hist-card-name" title="'+esc(h.nom||'\u2014')+'">'+esc(h.nom||'\u2014')+'</div><div class="hist-card-meta" title="'+esc((h.matricule||'\u2014')+' · '+(h.classe||'\u2014')+' · '+(h.etablissement||'\u2014'))+'">'+esc(h.matricule||'\u2014')+' &middot; '+esc(h.classe||'\u2014')+' &middot; '+esc(h.etablissement||'\u2014')+'</div>'+(dateDisplay?'<div class="hist-card-date" title="Enregistr\u00e9 le '+dateStr+'">&#128197; '+dateDisplay+(timeDisplay?' &agrave; '+timeDisplay:'')+'</div>':'')+'</div><div class="hist-card-mo"><div class="mo-value">'+moDisplay+yearBadge+'</div><div class="mo-label">Moyenne</div></div><span class="hist-badge '+badgeClass+'">'+esc(mention)+'</span><div class="hist-actions"><button class="hist-btn-edit" onclick="editCalc('+h.id+')" title="Modifier ce calcul">&#9998; Modifier</button><button class="hist-btn-dup" onclick="duplicateCalc('+h.id+')" title="Dupliquer ce calcul">&#128203; Dupliquer</button><button class="hist-btn-icon" onclick="previewBulletinPDF('+h.id+')" title="Aperçu du bulletin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button class="hist-btn-icon" onclick="downloadBulletinPDF('+h.id+')" title="T\u00e9l\u00e9charger le bulletin en PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button><button class="hist-btn-icon hist-btn-icon-del" onclick="confirmDelHistory('+h.id+',this)" title="Supprimer ce calcul"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></div>';
   }).join('');
   updateSelBar();
 }
@@ -2823,7 +2823,7 @@ async function downloadBulletinPDF(id){
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Bulletin — ${h.nom||'Élève'} — SAPHIR Pro</title>
+<title>Bulletin — ${esc(h.nom||'Élève')} — SAPHIR Pro</title>
 ${styles}
 <style>
   body{margin:0;padding:0;background:#fff;}
@@ -2884,16 +2884,16 @@ ${styles}
 
 /* ════ IMPRESSION MULTIPLE ════ */
 function buildBulletinHTML(h){
-  const name=(h.nom||'NON RENSEIGNÉ').toUpperCase();
+  const name=esc((h.nom||'NON RENSEIGNÉ').toUpperCase());
   const initials=(()=>{
-    const parts=name.trim().split(/\s+/).filter(Boolean);
+    const parts=(h.nom||'').trim().split(/\s+/).filter(Boolean);
     const f=parts[0]?.[0]||'';const l=parts.length>1?parts[parts.length-1][0]:'';
-    return(f+l).toUpperCase()||'--';
+    return esc((f+l).toUpperCase()||'--');
   })();
-  const classe=h.classe||'-';
-  const school=h.etablissement||'NON RENSEIGNÉ';
-  const year=h.annee_scolaire||h.annee||'-';
-  const matricule=h.matricule||'-';
+  const classe=esc(h.classe||'-');
+  const school=esc(h.etablissement||'NON RENSEIGNÉ');
+  const year=esc(h.annee_scolaire||h.annee||'-');
+  const matricule=esc(h.matricule||'-');
   const today=new Date().toLocaleDateString('fr-FR');
   let totalWeighted=0;
   const rows=MATIERES.map(m=>{
@@ -3174,11 +3174,11 @@ function previewMO(){
   buildBulletin();
   const page=document.getElementById('bulletin-print').innerHTML;
   const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
-  const nom=(document.getElementById('mo-nom')?.value||'Élève').trim();
+  const nom=esc((document.getElementById('mo-nom')?.value||'Élève').trim());
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Aperçu — ${nom} — SAPHIR Pro</title>
+<title>Apercu — ${nom} — SAPHIR Pro</title>
 ${styles}
 <style>
   *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;box-sizing:border-box;}
@@ -3227,15 +3227,12 @@ function doLogout(){
   const sid=localStorage.getItem('saphir_session_id');
   logActivity('Déconnexion','Authentification','Déconnexion utilisateur');
   fetch(API+'/api/logout',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({session_id:sid?parseInt(sid):0})}).catch(()=>{});
-  localStorage.removeItem('saphir_role');
   localStorage.removeItem('saphir_session_id');
-  localStorage.removeItem('saphir_pwd');
   window.location.href='/login';
 }
 function applyRole(){
-  const role=localStorage.getItem('saphir_role');
   const isWeb=location.hostname!=='localhost'&&location.hostname!=='127.0.0.1';
-  if(role&&role!=='admin'){
+  if(_role&&_role!=='admin'){
     const nav=document.getElementById('nav-hist');
     const page=document.getElementById('page-hist');
     if(nav){nav.style.display='none';nav.removeAttribute('onclick');}
@@ -3415,8 +3412,7 @@ function _sseStartFallback(){
 }
 
 function _sseStart(){
-  const role=localStorage.getItem('saphir_role');
-  if(role!=='admin') return;
+  if(_role!=='admin') return;
   _sseConnect();
   /* Also start fallback polling as safety net */
   _sseStartFallback();
@@ -3428,8 +3424,6 @@ function _sseStop(){
   if(_sseFallbackTimer){clearInterval(_sseFallbackTimer);_sseFallbackTimer=null;}
 }
 
-/* Start SSE when page loads */
-setTimeout(_sseStart,1000);
 /* Restart SSE when showPage('users') is called */
 const _origShowPage=showPage;
 showPage=function(id){
@@ -4064,7 +4058,16 @@ function filterByYear(){
   renderHistory();
 }
 
-applyRole();
+/* ── INIT: fetch role from server first ── */
+(async function(){
+  try{
+    const r=await fetch(API+'/api/role',{credentials:'same-origin'});
+    const d=await r.json();
+    _role=d.role||'guest';
+  }catch(e){_role='guest';}
+  applyRole();
+  setTimeout(_sseStart,1000);
+})();
 requestNotifPermission();
 loadNotifications();
 _notifPoll=setInterval(loadNotifications,15000);

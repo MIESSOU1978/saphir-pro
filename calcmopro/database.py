@@ -632,7 +632,7 @@ def create_session(role: str, ip: str = "", user_agent: str = "", email: str = "
     ville = ""
     if ip and ip not in ("127.0.0.1", "::1", ""):
         try:
-            req = urllib.request.Request(f"http://ip-api.com/json/{ip}?fields=city,country")
+            req = urllib.request.Request(f"https://ip-api.com/json/{ip}?fields=city,country")
             with urllib.request.urlopen(req, timeout=3) as resp:
                 geo = json.loads(resp.read())
                 city = geo.get("city", "")

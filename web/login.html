@@ -312,10 +312,8 @@ emailInput.addEventListener('input',()=>{
 /* ── Restore saved credentials ── */
 (function(){
   const savedEmail=localStorage.getItem('saphir_email');
-  const savedPwd=localStorage.getItem('saphir_pwd');
   const chk=document.getElementById('rememberMe');
-  if(savedEmail){emailInput.value=savedEmail;}
-  if(savedPwd){pwdInput.value=savedPwd;chk.checked=true;}
+  if(savedEmail){emailInput.value=savedEmail;chk.checked=true;}
 })();
 
 /* ── Login submit ── */
@@ -366,15 +364,11 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
     const d=await r.json();
 
     if(d.ok){
-      const role=(d.role)||((pwd==='RECEPTIOn8@2025')?'student':'admin');
-      localStorage.setItem('saphir_role',role);
-      localStorage.setItem('saphir_email',email);
       if(d.session_id) localStorage.setItem('saphir_session_id',d.session_id);
       if(remember){
         localStorage.setItem('saphir_email',email);
-        localStorage.setItem('saphir_pwd',pwd);
       }else{
-        localStorage.removeItem('saphir_pwd');
+        localStorage.removeItem('saphir_email');
       }
       try{await fetch('/api/log-activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({action:'Connexion',module:'Authentification',detail:'Connexion réussie — '+email,resultat:'succes',session_id:d.session_id||0})});}catch(e){}
       window.location.href='/';
