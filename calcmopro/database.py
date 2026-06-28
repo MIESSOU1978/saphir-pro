@@ -682,16 +682,21 @@ def create_session(role: str, ip: str = "", user_agent: str = "", email: str = "
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     ville = ""
     if ip and ip not in ("127.0.0.1", "::1", ""):
-        try:
-            req = urllib.request.Request(f"https://ip-api.com/json/{ip}?fields=city,country")
-            with urllib.request.urlopen(req, timeout=3) as resp:
-                geo = json.loads(resp.read())
-                city = geo.get("city", "")
-                country = geo.get("country", "")
-                country = "Côte d'Ivoire" if country in ("Ivory Coast", "Ivoiry Coast") else country
-                ville = f"{city}, {country}" if city else country
-        except Exception:
-            pass
+        for svc_url, svc_parse in [
+            (f"https://ipwho.is/{ip}", lambda g: (g.get("city", ""), g.get("country", ""))),
+            (f"https://ip-api.com/json/{ip}?fields=city,country", lambda g: (g.get("city", ""), g.get("country", ""))),
+        ]:
+            try:
+                req = urllib.request.Request(svc_url, headers={"User-Agent": "SAPHIR-Pro/2.0"})
+                with urllib.request.urlopen(req, timeout=3) as resp:
+                    geo = json.loads(resp.read())
+                city, country = svc_parse(geo)
+                if city:
+                    country = "Côte d'Ivoire" if country in ("Ivory Coast", "Ivoiry Coast") else country
+                    ville = f"{city}, {country}" if country else city
+                    break
+            except Exception:
+                pass
     if _turso_enabled():
         sid = _turso_exec_insert(
             "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
