@@ -316,13 +316,16 @@ class _Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
-    def _json_with_cookie(self, data: object, cookie_name: str, cookie_val: str, status: int = 200) -> None:
+    def _json_with_cookie(self, data: object, cookie_name: str, cookie_val: str, status: int = 200, extra_cookies: dict | None = None) -> None:
         body = json.dumps(data, ensure_ascii=False, default=str).encode()
         secure = "; Secure" if _IS_RENDER else ""
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", self._cors_header())
         self.send_header("Set-Cookie", f"{cookie_name}={cookie_val}; Path=/; HttpOnly; SameSite=Lax{secure}; Max-Age={_SESSION_TTL}")
+        if extra_cookies:
+            for name, val in extra_cookies.items():
+                self.send_header("Set-Cookie", f"{name}={val}; Path=/; SameSite=Lax{secure}; Max-Age={_SESSION_TTL}")
         self._security_headers()
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
@@ -743,7 +746,7 @@ class _Handler(BaseHTTPRequestHandler):
                     threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
                     threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student"), daemon=True).start()
                     _sse_emit("login_success", {"message": "Nouvelle connexion détectée", "user": email, "role": "student", "ip": ip})
-                    return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
+                    return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token, extra_cookies={"saphir_session_id": str(sid)})
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("admin", ip, ua, email)
@@ -762,7 +765,7 @@ class _Handler(BaseHTTPRequestHandler):
                 threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "admin"), daemon=True).start()
                 _sse_emit("login_success", {"message": "Nouvelle connexion détectée", "user": email, "role": "admin", "ip": ip})
-                return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid}, "session", token)
+                return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid}, "session", token, extra_cookies={"saphir_session_id": str(sid)})
 
             if _STUDENT_PASSWORD and _verify_password(pwd, _hash_password(_STUDENT_PASSWORD)):
                 token = _create_session("student")
@@ -773,7 +776,7 @@ class _Handler(BaseHTTPRequestHandler):
                 threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
                 threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student"), daemon=True).start()
                 _sse_emit("login_success", {"message": "Nouvelle connexion détectée", "user": email, "role": "student", "ip": ip})
-                return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
+                return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token, extra_cookies={"saphir_session_id": str(sid)})
 
             # ── Failed attempt ──
             count = _record_failed_login(client_ip, email)
