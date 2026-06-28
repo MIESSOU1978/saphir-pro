@@ -13,6 +13,7 @@ import hashlib
 import hmac
 import json
 import os
+import re
 import secrets
 import threading
 import time
@@ -43,8 +44,10 @@ _HMAC_KEY = hashlib.sha256(
     (_APP_PASSWORD or "calcmo-default-key").encode()
 ).digest()
 _LOGIN_ATTEMPTS: dict[str, list[float]] = defaultdict(list)
+_EMAIL_ATTEMPTS: dict[str, list[float]] = defaultdict(list)
 _MAX_LOGIN_ATTEMPTS = 5
 _LOGIN_WINDOW = 300  # 5 minutes
+_EMAIL_RE = re.compile(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
 
 # Twilio SMS config
 _TWILIO_SID: str = os.environ.get("TWILIO_ACCOUNT_SID", "")
@@ -108,19 +111,36 @@ def _auth_required() -> bool:
     return bool(_APP_PASSWORD)
 
 
-def _is_rate_limited(ip: str) -> bool:
-    """Check if IP has exceeded login rate limit (only counts failures)."""
+def _is_rate_limited(ip: str, email: str = "") -> tuple[bool, int]:
+    """Check if IP or email has exceeded login rate limit. Returns (limited, attempt_count)."""
     now = time.time()
-    # Clean old entries
+    # Clean old IP entries
     _LOGIN_ATTEMPTS[ip] = [
         t for t in _LOGIN_ATTEMPTS[ip] if now - t < _LOGIN_WINDOW
     ]
-    return len(_LOGIN_ATTEMPTS[ip]) >= _MAX_LOGIN_ATTEMPTS
+    # Clean old email entries
+    if email:
+        _EMAIL_ATTEMPTS[email] = [
+            t for t in _EMAIL_ATTEMPTS[email] if now - t < _LOGIN_WINDOW
+        ]
+        email_count = len(_EMAIL_ATTEMPTS[email])
+    else:
+        email_count = 0
+    ip_count = len(_LOGIN_ATTEMPTS[ip])
+    if ip_count >= _MAX_LOGIN_ATTEMPTS:
+        return True, max(ip_count, email_count)
+    if email and email_count >= _MAX_LOGIN_ATTEMPTS:
+        return True, email_count
+    return False, max(ip_count, email_count)
 
 
-def _record_failed_login(ip: str) -> None:
-    """Record a failed login attempt for rate limiting."""
+def _record_failed_login(ip: str, email: str = "") -> int:
+    """Record a failed login attempt for rate limiting. Returns current count."""
     _LOGIN_ATTEMPTS[ip].append(time.time())
+    if email:
+        _EMAIL_ATTEMPTS[email].append(time.time())
+        return len(_EMAIL_ATTEMPTS[email])
+    return len(_LOGIN_ATTEMPTS[ip])
 
 
 def _send_login_sms(role: str, ip: str, email: str) -> None:
@@ -518,17 +538,30 @@ class _Handler(BaseHTTPRequestHandler):
         path = parsed.path.rstrip("/")
 
         if path == "/api/login":
-            # Rate limiting: max 5 attempts per IP per 5 minutes
             client_ip = self.client_address[0]
-            if _is_rate_limited(client_ip):
-                return self._json({"error": "Trop de tentatives. Réessayez dans 5 minutes."}, 429)
-
             body = self._read_body()
             pwd = body.get("password", "")
-            email = body.get("email", "")
+            email = (body.get("email") or "").strip().lower()
 
-            # Check if user is banned
-            if email and db.is_user_banned(email):
+            # ── Email is mandatory ──
+            if not email:
+                return self._json({"error": "Veuillez saisir votre adresse e-mail."}, 400)
+
+            # ── Email format validation ──
+            if not _EMAIL_RE.match(email):
+                return self._json({"error": "Veuillez saisir une adresse e-mail valide."}, 400)
+
+            # ── Password is mandatory ──
+            if not pwd:
+                return self._json({"error": "Veuillez entrer le mot de passe."}, 400)
+
+            # ── Rate limiting (IP + email) ──
+            limited, attempt_count = _is_rate_limited(client_ip, email)
+            if limited:
+                return self._json({"error": "Trop de tentatives. Réessayez dans 5 minutes.", "attempts": attempt_count}, 429)
+
+            # ── Banned check ──
+            if db.is_user_banned(email):
                 return self._json({"error": "Votre compte a été désactivé. Veuillez contacter l'administrateur."}, 403)
 
             if not _auth_required():
@@ -569,9 +602,12 @@ class _Handler(BaseHTTPRequestHandler):
                 threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student"), daemon=True).start()
                 return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
 
-            # Record failed attempt for rate limiting
-            _record_failed_login(client_ip)
-            return self._json({"error": "Mot de passe incorrect"}, 401)
+            # ── Failed attempt ──
+            count = _record_failed_login(client_ip, email)
+            msg = "Adresse e-mail ou mot de passe incorrect."
+            if count >= 3:
+                msg = "Plusieurs tentatives de connexion échouées ont été détectées pour cette adresse e-mail."
+            return self._json({"error": msg, "attempts": count}, 401)
 
         if path == "/api/logout":
             try:

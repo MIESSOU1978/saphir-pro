@@ -3121,6 +3121,7 @@ function doLogout(){
   logActivity('Déconnexion','Authentification','Déconnexion utilisateur');
   fetch(API+'/api/logout',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({session_id:sid?parseInt(sid):0})}).catch(()=>{});
   localStorage.removeItem('saphir_role');
+  localStorage.removeItem('saphir_session_id');
   localStorage.removeItem('saphir_pwd');
   window.location.href='/login';
 }
@@ -3291,8 +3292,8 @@ function renderUsers(sessions){
     const logoutDisplay=logoutAt?logoutAt.replace('T',' ').substring(0,16):'—';
     const roleLabel=s.role==='admin'?'Admin':'Élève';
     const roleCls=s.role==='admin'?'users-role-admin':'users-role-student';
-    const email=s.email||'Utilisateur inconnu';
-    const isBanned=_bannedUsers.some(b=>b.email===email.toLowerCase());
+    const email=s.email||'—';
+    const isBanned=_bannedUsers.some(b=>b.email&&email&&b.email.toLowerCase()===email.toLowerCase());
     const isSelf=s.id===_sessionId;
     let statutLabel,statutCls;
     if(isBanned){statutLabel='Banni';statutCls='users-statut-banned';}
@@ -3315,7 +3316,7 @@ function renderUsers(sessions){
     }else{
       badge='<span class="users-device-badge users-device-untrusted" title="Nouvel appareil détecté">&#9888; Nouvel appareil</span>';
     }
-    const emailLabel=(email==='Utilisateur inconnu'&&(s.role==='admin'?'Admin local':null))||email;
+    const emailLabel=email||'—';
     const disconnectBtn=isOnline?`<button class="btn btn-reset users-btn-disconnect" onclick="disconnectUser(${s.id},'${esc(email).replace(/'/g,"\\'")}')" title="Déconnecter cet utilisateur" style="min-height:28px;padding:3px 8px;font-size:.7rem;white-space:nowrap;">⏻ Déconnecter</button>`:'';
     const banBtn=!isSelf?`<button class="btn btn-reset users-btn-danger" onclick="banUser(${s.id},'${esc(email).replace(/'/g,"\\'")}')" title="Bannir définitivement" style="min-height:28px;padding:3px 8px;font-size:.7rem;white-space:nowrap;">&#128683; Bannir</button>`:'';
     return `<tr title="${email} | ${s.os||''} | ${s.navigateur||''} | ${s.ip||''}">
