@@ -456,7 +456,8 @@ def save_eleve(nom: str, matricule: str = "", classe: str = "",
 def mark_printed(eleve_id: int) -> None:
     """Mark a bulletin as printed."""
     if _turso_enabled():
-        _turso_exec_write("UPDATE resultats SET printed=1 WHERE eleve_id=?", [eleve_id])
+        n = _turso_exec_write("UPDATE resultats SET printed=1 WHERE eleve_id=?", [eleve_id])
+        print(f"[DB mark_printed] Turso UPDATE eleve_id={eleve_id} affected={n}")
         return
     conn = _connect()
     conn.execute("UPDATE resultats SET printed=1 WHERE eleve_id=?", (eleve_id,))

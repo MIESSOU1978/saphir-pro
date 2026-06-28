@@ -3017,9 +3017,10 @@ function renderHistory(){
 
 /* ════ MARK PRINTED ════ */
 function markPrinted(id){
-  fetch(API+'/api/eleves/'+id+'/printed',{method:'POST',credentials:'same-origin'})
+  fetch(API+'/api/eleves/'+id+'/printed',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin'})
+    .then(r=>{if(!r.ok) throw r;return r.json();})
     .then(()=>{const h=histData.find(x=>x.id===id);if(h)h.printed=1;renderHistory();})
-    .catch(()=>{});
+    .catch(e=>{console.error('markPrinted failed:',e);});
 }
 
 /* ════ TÉLÉCHARGEMENT PDF DEPUIS HISTORIQUE ════ */
