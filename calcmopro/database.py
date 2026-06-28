@@ -685,10 +685,11 @@ def create_session(role: str, ip: str = "", user_agent: str = "", email: str = "
         for svc_url, svc_parse in [
             (f"https://ipwho.is/{ip}", lambda g: (g.get("city", ""), g.get("country", ""))),
             (f"https://ip-api.com/json/{ip}?fields=city,country", lambda g: (g.get("city", ""), g.get("country", ""))),
+            (f"https://freeipapi.com/api/json/{ip}", lambda g: (g.get("cityName", ""), g.get("countryName", ""))),
         ]:
             try:
                 req = urllib.request.Request(svc_url, headers={"User-Agent": "SAPHIR-Pro/2.0"})
-                with urllib.request.urlopen(req, timeout=3) as resp:
+                with urllib.request.urlopen(req, timeout=5) as resp:
                     geo = json.loads(resp.read())
                 city, country = svc_parse(geo)
                 if city:
