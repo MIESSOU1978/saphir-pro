@@ -4055,7 +4055,7 @@ function downloadBulletinFromAct(idx){
   });
   const total=parseFloat(String(d.total||'0').replace(',','.'))||0;
   const mo=parseFloat(String(d.mo||'0').replace(',','.'))||0;
-  const payload={nom,matricule:d.matricule||'—',classe:d.classe||'—',etablissement:d.etablissement||'—',annee_scolaire:d.annee_scolaire||'—',annee_scolaire:d.annee_scolaire||'—',total,mo,mention:d.mention||'—',matieres};
+  const payload={nom,matricule:d.matricule||'—',classe:d.classe||'—',etablissement:d.etablissement||'—',annee_scolaire:d.annee_scolaire||'—',total,mo,mention:d.mention||'—',matieres,created_by:localStorage.getItem('saphir_email')||''};
   fetch(API+'/api/eleves',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify(payload)})
     .then(r=>{if(!r.ok) throw r;return r.json();})
     .then(()=>{toast('Bulletin enregistré dans l\'historique ✔');loadHistory();logActivity('Enregistrement bulletin','Calcul MO',nom+' — '+d.classe,'succes');})
