@@ -581,7 +581,7 @@ class _Handler(BaseHTTPRequestHandler):
             return self._html(_html_path)
 
         if path == "/api/role":
-            return self._json({"role": self._get_role()})
+            return self._json({"role": self._get_role(), "email": self._get_email()})
 
         if path == "/api/login-attempts":
             if self._get_role() != "admin":

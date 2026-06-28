@@ -4184,6 +4184,7 @@ function filterByYear(){
     const r=await fetch(API+'/api/role',{credentials:'same-origin'});
     const d=await r.json();
     _role=d.role||'guest';
+    if(d.email) localStorage.setItem('saphir_email',d.email);
   }catch(e){_role='guest';}
   applyRole();
   setTimeout(_sseStart,1000);
