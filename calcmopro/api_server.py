@@ -385,6 +385,32 @@ class _Handler(BaseHTTPRequestHandler):
         role = _get_session_role(token)
         return role or "guest"
 
+    def _get_email(self) -> str:
+        """Get email from the current session."""
+        token = self._get_cookie("session")
+        if not token:
+            return ""
+        try:
+            parts = token.split("|")
+            if len(parts) >= 2:
+                expiry = int(parts[1])
+                if expiry < int(time.time()):
+                    return ""
+        except (ValueError, IndexError):
+            return ""
+        # Find session by looking at the cookie session ID
+        sid = self._get_cookie("saphir_session_id")
+        if not sid:
+            return ""
+        try:
+            sessions = db.list_sessions()
+            for s in sessions:
+                if str(s.get("id")) == str(sid):
+                    return s.get("email", "")
+        except Exception:
+            pass
+        return ""
+
     def _extract_session_token(self) -> str | None:
         """Extract session token from cookie."""
         return self._get_cookie("session")
@@ -488,6 +514,37 @@ class _Handler(BaseHTTPRequestHandler):
 
         if path == "/api/notifications/read-all":
             db.mark_all_notifications_read()
+            return self._json({"ok": True})
+
+        # ── Messages ──
+        if path == "/api/messages":
+            email = self._get_email()
+            if not email:
+                return self._json([], 401)
+            msgs = db.get_messages(email)
+            return self._json(msgs)
+
+        if path == "/api/messages/unread":
+            email = self._get_email()
+            if not email:
+                return self._json({"count": 0})
+            return self._json({"count": db.count_unread_messages(email)})
+
+        if path.startswith("/api/messages/") and path.endswith("/read"):
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                nid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            db.mark_message_read(nid)
+            return self._json({"ok": True})
+
+        if path == "/api/messages/read-all":
+            email = self._get_email()
+            if not email:
+                return self._json({"error": "Non authentifié"}, 401)
+            db.mark_all_read(email)
             return self._json({"ok": True})
 
         if path == "/api/test-email":
@@ -801,6 +858,20 @@ class _Handler(BaseHTTPRequestHandler):
         if path == "/api/notifications/clear":
             db.clear_all_notifications()
             return self._json({"ok": True})
+
+        # ── Send message to user (admin only) ──
+        if path == "/api/messages/send":
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            body = self._read_body()
+            recipient = body.get("recipient", "").strip()
+            message = body.get("message", "").strip()
+            if not recipient or not message:
+                return self._json({"error": "Destinataire et message requis"}, 400)
+            sender = self._get_email() or "admin"
+            mid = db.send_message(sender, recipient, message)
+            _sse_emit("new_message", {"id": mid, "sender": sender, "recipient": recipient, "message": message})
+            return self._json({"ok": True, "id": mid}, 201)
 
         # ── CHECK BANNED (must be before auth) ──
         if path == "/api/check-banned":

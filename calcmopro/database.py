@@ -262,6 +262,16 @@ def init_db() -> None:
                 created_at  TEXT DEFAULT (datetime('now','localtime'))
             )
         """)
+        _turso_exec("""
+            CREATE TABLE IF NOT EXISTS messages (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                sender      TEXT DEFAULT '',
+                recipient   TEXT NOT NULL,
+                message     TEXT NOT NULL,
+                lu          INTEGER DEFAULT 0,
+                created_at  TEXT DEFAULT (datetime('now','localtime'))
+            )
+        """)
         # Add missing columns for existing tables
         for col, typ, default in [
             ("annee_scolaire", "TEXT", "''"),
@@ -353,6 +363,14 @@ def init_db() -> None:
             navigateur  TEXT DEFAULT '',
             raison      TEXT DEFAULT '',
             niveau      TEXT DEFAULT 'normal',
+            created_at  TEXT DEFAULT (datetime('now','localtime'))
+        );
+        CREATE TABLE IF NOT EXISTS messages (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            sender      TEXT DEFAULT '',
+            recipient   TEXT NOT NULL,
+            message     TEXT NOT NULL,
+            lu          INTEGER DEFAULT 0,
             created_at  TEXT DEFAULT (datetime('now','localtime'))
         );
     """)
@@ -1081,6 +1099,76 @@ def archive_eleves(annee_scolaire: str) -> int:
     conn.commit()
     conn.close()
     return count
+
+
+# ══════════════════════════════════════════════════════════════
+#  MESSAGES
+# ══════════════════════════════════════════════════════════════
+
+def send_message(sender: str, recipient: str, message: str) -> int:
+    """Send a message from admin to a user (by email)."""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if _turso_enabled():
+        nid = _turso_exec_insert(
+            "INSERT INTO messages (sender, recipient, message, lu, created_at) VALUES (?, ?, ?, 0, ?)",
+            [sender, recipient, message, now],
+        )
+        return nid
+    conn = _connect()
+    cur = conn.execute(
+        "INSERT INTO messages (sender, recipient, message, lu, created_at) VALUES (?, ?, ?, 0, ?)",
+        (sender, recipient, message, now),
+    )
+    nid = cur.lastrowid
+    conn.commit()
+    conn.close()
+    return nid
+
+
+def get_messages(recipient: str, unread_only: bool = False) -> list:
+    """Get messages for a recipient."""
+    where = "WHERE recipient=?" + (" AND lu=0" if unread_only else "")
+    params = [recipient]
+    if _turso_enabled():
+        return _turso_exec(f"SELECT * FROM messages {where} ORDER BY id DESC LIMIT 50", params)
+    conn = _connect()
+    rows = conn.execute(f"SELECT * FROM messages {where} ORDER BY id DESC LIMIT 50", params).fetchall()
+    result = [dict(r) for r in rows]
+    conn.close()
+    return result
+
+
+def count_unread_messages(recipient: str) -> int:
+    """Count unread messages for a recipient."""
+    if _turso_enabled():
+        rows = _turso_exec("SELECT COUNT(*) as n FROM messages WHERE recipient=? AND lu=0", [recipient])
+        return rows[0]["n"] if rows else 0
+    conn = _connect()
+    row = conn.execute("SELECT COUNT(*) as n FROM messages WHERE recipient=? AND lu=0", (recipient,)).fetchone()
+    conn.close()
+    return row["n"] if row else 0
+
+
+def mark_message_read(msg_id: int) -> None:
+    """Mark a message as read."""
+    if _turso_enabled():
+        _turso_exec_write("UPDATE messages SET lu=1 WHERE id=?", [msg_id])
+        return
+    conn = _connect()
+    conn.execute("UPDATE messages SET lu=1 WHERE id=?", (msg_id,))
+    conn.commit()
+    conn.close()
+
+
+def mark_all_read(recipient: str) -> None:
+    """Mark all messages as read for a recipient."""
+    if _turso_enabled():
+        _turso_exec_write("UPDATE messages SET lu=1 WHERE recipient=? AND lu=0", [recipient])
+        return
+    conn = _connect()
+    conn.execute("UPDATE messages SET lu=1 WHERE recipient=? AND lu=0", (recipient,))
+    conn.commit()
+    conn.close()
 
 
 # Auto-init on import
