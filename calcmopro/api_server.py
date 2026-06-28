@@ -49,6 +49,30 @@ _MAX_LOGIN_ATTEMPTS = 5
 _LOGIN_WINDOW = 300  # 5 minutes
 _EMAIL_RE = re.compile(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
 
+# ── SSE (Server-Sent Events) ──
+import queue
+_sse_clients: list[queue.Queue] = []
+_sse_lock = threading.Lock()
+_sse_event_counter = 0
+
+def _sse_emit(event_type: str, data: dict) -> None:
+    """Push an event to all connected SSE clients."""
+    global _sse_event_counter
+    _sse_event_counter += 1
+    payload = json.dumps({"id": _sse_event_counter, "type": event_type, **data})
+    dead = []
+    with _sse_lock:
+        for q in _sse_clients:
+            try:
+                q.put_nowait(payload)
+            except queue.Full:
+                dead.append(q)
+        for q in dead:
+            try:
+                _sse_clients.remove(q)
+            except ValueError:
+                pass
+
 # Twilio SMS config
 _TWILIO_SID: str = os.environ.get("TWILIO_ACCOUNT_SID", "")
 _TWILIO_TOKEN: str = os.environ.get("TWILIO_AUTH_TOKEN", "")
@@ -242,6 +266,7 @@ def _check_unknown_device(ua: str, ip: str, email: str, role: str) -> None:
         if email:
             msg += f"\nEmail: {email}"
         db.add_notification("Nouvel appareil", msg, "warning")
+        _sse_emit("unknown_device", {"message": "Nouvel appareil détecté", "user": email, "device": label, "ip": ip})
 
 
 class _Handler(BaseHTTPRequestHandler):
@@ -336,6 +361,10 @@ class _Handler(BaseHTTPRequestHandler):
         role = _get_session_role(token)
         return role or "guest"
 
+    def _extract_session_token(self) -> str | None:
+        """Extract session token from cookie."""
+        return self._get_cookie("session")
+
     def _get_real_ip(self) -> str:
         """Get real client IP from X-Forwarded-For or X-Real-IP headers."""
         forwarded = self.headers.get("X-Forwarded-For", "")
@@ -377,6 +406,47 @@ class _Handler(BaseHTTPRequestHandler):
             if rt.exists():
                 return self._text(rt)
             return self.send_error(404)
+
+        # ── SSE endpoint (admin only, before auth check) ──
+        if path == "/api/admin/events/stream":
+            token = self._extract_session_token()
+            role = _get_session_role(token) if token else None
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            # Set SSE headers
+            self.send_response(200)
+            self.send_header("Content-Type", "text/event-stream")
+            self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+            self.send_header("Connection", "keep-alive")
+            self.send_header("X-Accel-Buffering", "no")
+            self._send_cors_headers()
+            self.end_headers()
+            # Create client queue
+            client_q = queue.Queue(maxsize=100)
+            with _sse_lock:
+                _sse_clients.append(client_q)
+            try:
+                # Send initial keepalive
+                self.wfile.write(b": ok\n\n")
+                self.wfile.flush()
+                while True:
+                    try:
+                        data = client_q.get(timeout=30)
+                        self.wfile.write(f"data: {data}\n\n".encode())
+                        self.wfile.flush()
+                    except queue.Empty:
+                        # Send keepalive comment
+                        self.wfile.write(b": keepalive\n\n")
+                        self.wfile.flush()
+            except (BrokenPipeError, ConnectionResetError, OSError):
+                pass
+            finally:
+                with _sse_lock:
+                    try:
+                        _sse_clients.remove(client_q)
+                    except ValueError:
+                        pass
+            return
 
         if path == "/api/notifications":
             return self._json(db.list_notifications())
@@ -573,6 +643,7 @@ class _Handler(BaseHTTPRequestHandler):
                     threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
                     threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
                     threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student"), daemon=True).start()
+                    _sse_emit("login_success", {"message": "Nouvelle connexion détectée", "user": email, "role": "student", "ip": ip})
                     return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
@@ -580,6 +651,7 @@ class _Handler(BaseHTTPRequestHandler):
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "admin"), daemon=True).start()
+                _sse_emit("login_success", {"message": "Nouvelle connexion détectée", "user": email, "role": "admin", "ip": ip})
                 return self._json({"ok": True, "role": "admin", "session_id": sid})
 
             if _hash_password(pwd) == _hash_password(_APP_PASSWORD):
@@ -590,6 +662,7 @@ class _Handler(BaseHTTPRequestHandler):
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "admin"), daemon=True).start()
+                _sse_emit("login_success", {"message": "Nouvelle connexion détectée", "user": email, "role": "admin", "ip": ip})
                 return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid}, "session", token)
 
             if _STUDENT_PASSWORD and _hash_password(pwd) == _hash_password(_STUDENT_PASSWORD):
@@ -600,6 +673,7 @@ class _Handler(BaseHTTPRequestHandler):
                 threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
                 threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student"), daemon=True).start()
+                _sse_emit("login_success", {"message": "Nouvelle connexion détectée", "user": email, "role": "student", "ip": ip})
                 return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token)
 
             # ── Failed attempt ──
@@ -607,6 +681,7 @@ class _Handler(BaseHTTPRequestHandler):
             msg = "Adresse e-mail ou mot de passe incorrect."
             if count >= 3:
                 msg = "Plusieurs tentatives de connexion échouées ont été détectées pour cette adresse e-mail."
+            _sse_emit("login_failed", {"message": "Tentative de connexion échouée", "user": email, "ip": client_ip, "attempts": count})
             return self._json({"error": msg, "attempts": count}, 401)
 
         if path == "/api/logout":
@@ -615,6 +690,7 @@ class _Handler(BaseHTTPRequestHandler):
                 sess_id = body.get("session_id")
                 if sess_id:
                     db.close_session(int(sess_id))
+                    _sse_emit("logout", {"message": "Déconnexion utilisateur", "session_id": int(sess_id)})
             except Exception:
                 pass
             self.send_response(302)
@@ -766,6 +842,7 @@ class _Handler(BaseHTTPRequestHandler):
             except (ValueError, IndexError):
                 return self._json({"error": "id invalide"}, 400)
             db.trust_device(did)
+            _sse_emit("device_trusted", {"message": "Appareil marqué comme fiable", "device_id": did})
             return self._json({"ok": True})
 
         if path.startswith("/api/known-devices/") and path.endswith("/untrust"):
@@ -776,6 +853,7 @@ class _Handler(BaseHTTPRequestHandler):
             except (ValueError, IndexError):
                 return self._json({"error": "id invalide"}, 400)
             db.untrust_device(did)
+            _sse_emit("device_removed", {"message": "Appareil retiré des appareils fiables", "device_id": did})
             return self._json({"ok": True})
 
         self.send_error(404)
@@ -828,6 +906,7 @@ class _Handler(BaseHTTPRequestHandler):
                 db.clear_sessions()
             except Exception as exc:
                 return self._json({"error": str(exc)}, 500)
+            _sse_emit("sessions_cleared", {"message": "Historique des sessions vidé"})
             return self._json({"ok": True})
 
         # ── DISCONNECT USER ──
@@ -842,6 +921,7 @@ class _Handler(BaseHTTPRequestHandler):
                 db.close_session(sid)
             except Exception as exc:
                 return self._json({"error": str(exc)}, 500)
+            _sse_emit("session_kicked", {"message": "Session déconnectée par l'administrateur", "session_id": sid})
             return self._json({"ok": True})
 
         # ── BAN USER ──
@@ -867,6 +947,7 @@ class _Handler(BaseHTTPRequestHandler):
                 db.close_session(sid)
             except Exception as exc:
                 return self._json({"error": str(exc)}, 500)
+            _sse_emit("user_banned", {"message": "Utilisateur banni", "user": email, "motif": motif})
             return self._json({"ok": True})
 
         # ── UNBAN USER ──
@@ -878,6 +959,7 @@ class _Handler(BaseHTTPRequestHandler):
                 db.unban_user(email)
             except Exception as exc:
                 return self._json({"error": str(exc)}, 500)
+            _sse_emit("user_unbanned", {"message": "Utilisateur débanni", "user": email})
             return self._json({"ok": True})
 
         # ── LIST BANNED USERS ──
@@ -901,6 +983,7 @@ class _Handler(BaseHTTPRequestHandler):
                 db.delete_session(sid)
             except Exception as exc:
                 return self._json({"error": str(exc)}, 500)
+            _sse_emit("session_deleted", {"message": "Session supprimée", "session_id": sid})
             return self._json({"ok": True})
 
         if path.startswith("/api/known-devices/"):

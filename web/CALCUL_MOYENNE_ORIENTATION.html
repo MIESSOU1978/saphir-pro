@@ -1920,6 +1920,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         <div>
           <div class="users-title">Utilisateurs</div>
           <div class="users-subtitle" id="users-count">Aucune session enregistrée</div>
+          <div id="users-sse-timestamp" style="font-size:.65rem;color:#9fb0a6;margin-top:2px;">Mise à jour automatique activée</div>
         </div>
       </div>
       <div class="users-header-right">
@@ -3281,6 +3282,127 @@ async function loadUsers(){
     renderKnownDevices();
   }catch(e){}
 }
+
+/* ════ SSE (Server-Sent Events) — Real-time updates ════ */
+let _sseSource=null;
+let _sseReconnectTimer=null;
+let _sseFallbackTimer=null;
+let _sseConnected=false;
+const _sseEventLabels={
+  login_success:'🟢 Nouvelle connexion',
+  login_failed:'🔴 Tentative échouée',
+  logout:'⚪ Déconnexion',
+  unknown_device:'🟠 Nouvel appareil détecté',
+  device_trusted:'🟢 Appareil marqué fiable',
+  device_removed:'🟠 Appareil retiré des fiables',
+  session_kicked:'🔴 Session déconnectée',
+  user_banned:'🔴 Utilisateur banni',
+  user_unbanned:'🟢 Utilisateur débanni',
+  session_deleted:'🔴 Session supprimée',
+  sessions_cleared:'🔴 Historique vidé'
+};
+const _sseToastColors={
+  login_success:'#064E3B',login_failed:'#B42318',logout:'#6B7280',
+  unknown_device:'#A85B00',device_trusted:'#064E3B',device_removed:'#A85B00',
+  session_kicked:'#B42318',user_banned:'#B42318',user_unbanned:'#064E3B',
+  session_deleted:'#D92D20',sessions_cleared:'#D92D20'
+};
+
+function _sseUpdateTimestamp(){
+  const el=document.getElementById('users-sse-timestamp');
+  if(el) el.textContent='Dernière mise à jour : '+new Date().toLocaleTimeString('fr-FR');
+}
+
+function _sseShowToast(type,message){
+  const label=_sseEventLabels[type]||type;
+  const color=_sseToastColors[type]||'#064E3B';
+  const c=document.createElement('div');
+  c.style.cssText='position:fixed;bottom:20px;right:20px;z-index:10000;background:#fff;border-left:4px solid '+color+';border-radius:8px;padding:10px 16px;box-shadow:0 4px 20px rgba(0,0,0,.15);font-size:.78rem;color:#1a3a2e;display:flex;align-items:center;gap:8px;max-width:360px;animation:fadeUp .3s ease;transition:opacity .3s;';
+  c.innerHTML='<strong style="white-space:nowrap;">'+label+'</strong><span style="color:#60736D;">'+esc(message)+'</span>';
+  document.body.appendChild(c);
+  setTimeout(()=>{c.style.opacity='0';setTimeout(()=>c.remove(),300);},4000);
+}
+
+function _sseOnEvent(data){
+  try{
+    const evt=JSON.parse(data);
+    const type=evt.type||'';
+    const msg=evt.message||'';
+    /* Show toast notification */
+    _sseShowToast(type,msg);
+    /* Refresh users page if visible */
+    const page=document.getElementById('page-users');
+    if(page&&page.classList.contains('active')){
+      /* Preserve scroll and selection */
+      const wrap=document.querySelector('.users-table-wrap');
+      const scrollLeft=wrap?wrap.scrollLeft:0;
+      const scrollTop=wrap?wrap.scrollTop:0;
+      const selected=[];
+      document.querySelectorAll('.users-cb:checked').forEach(cb=>selected.push(cb.value));
+      loadUsers().then(()=>{
+        if(wrap){wrap.scrollLeft=scrollLeft;wrap.scrollTop=scrollTop;}
+        selected.forEach(id=>{
+          const cb=document.querySelector('.users-cb[value="'+id+'"]');
+          if(cb){cb.checked=true;}
+        });
+        updateDeleteBtn();
+        _sseUpdateTimestamp();
+      });
+    }
+  }catch(e){console.error('SSE parse error:',e);}
+}
+
+function _sseConnect(){
+  if(_sseSource){try{_sseSource.close();}catch(e){}}
+  if(_sseFallbackTimer){clearInterval(_sseFallbackTimer);_sseFallbackTimer=null;}
+  try{
+    _sseSource=new EventSource(API+'/api/admin/events/stream',{withCredentials:true});
+    _sseSource.onopen=()=>{_sseConnected=true;};
+    _sseSource.onmessage=(e)=>{if(e.data&&e.data!==': ok'&&e.data!==': keepalive') _sseOnEvent(e.data);};
+    _sseSource.onerror=()=>{
+      _sseConnected=false;
+      _sseSource.close();
+      _sseSource=null;
+      /* Fallback: poll every 8s */
+      _sseStartFallback();
+    };
+  }catch(e){
+    _sseStartFallback();
+  }
+}
+
+function _sseStartFallback(){
+  if(_sseFallbackTimer) return;
+  _sseFallbackTimer=setInterval(()=>{
+    const page=document.getElementById('page-users');
+    if(page&&page.classList.contains('active')){
+      loadUsers().then(()=>_sseUpdateTimestamp());
+    }
+  },8000);
+}
+
+function _sseStart(){
+  const role=localStorage.getItem('saphir_role');
+  if(role!=='admin') return;
+  _sseConnect();
+  /* Also start fallback polling as safety net */
+  _sseStartFallback();
+}
+
+function _sseStop(){
+  if(_sseSource){try{_sseSource.close();}catch(e){}_sseSource=null;}
+  if(_sseReconnectTimer){clearTimeout(_sseReconnectTimer);_sseReconnectTimer=null;}
+  if(_sseFallbackTimer){clearInterval(_sseFallbackTimer);_sseFallbackTimer=null;}
+}
+
+/* Start SSE when page loads */
+setTimeout(_sseStart,1000);
+/* Restart SSE when showPage('users') is called */
+const _origShowPage=showPage;
+showPage=function(id){
+  _origShowPage(id);
+  if(id==='users'&&!_sseConnected) _sseConnect();
+};
 
 function renderKnownDevices(){
   const container=document.getElementById('users-devices-list');
