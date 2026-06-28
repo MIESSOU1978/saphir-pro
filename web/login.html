@@ -280,12 +280,13 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
       try{await fetch('/api/log-activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({action:'Connexion',module:'Authentification',detail:'Connexion réussie',resultat:'succes',session_id:d.session_id||0})});}catch(e){}
       window.location.href='/';
     }else{
-      errText.textContent='Mot de passe incorrect. Veuillez réessayer.';
+      const errMsg2=d.error||'Mot de passe incorrect. Veuillez réessayer.';
+      errText.textContent=errMsg2;
       errMsg.classList.add('show');
       pwdWrap.classList.add('error');
-      try{await fetch('/api/log-activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({action:'Erreur de connexion',module:'Authentification',detail:'Mot de passe incorrect',resultat:'echec',session_id:0})});}catch(e){}
-      try{await fetch('/api/notifications',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({titre:'Tentative échouée',message:'Mot de passe incorrect — connexion refusée',type:'error'})});}catch(e){}
-      try{const arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');arr.unshift({id:Date.now(),titre:'Tentative échouée',message:'Mot de passe incorrect — connexion refusée',type:'error',lu:0,created_at:new Date().toISOString()});localStorage.setItem('saphir_notifs',JSON.stringify(arr));}catch(e){}
+      try{await fetch('/api/log-activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({action:'Erreur de connexion',module:'Authentification',detail:errMsg2,resultat:'echec',session_id:0})});}catch(e){}
+      try{await fetch('/api/notifications',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({titre:'Tentative échouée',message:errMsg2,type:'error'})});}catch(e){}
+      try{const arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');arr.unshift({id:Date.now(),titre:'Tentative échouée',message:errMsg2,type:'error',lu:0,created_at:new Date().toISOString()});localStorage.setItem('saphir_notifs',JSON.stringify(arr));}catch(e){}
       btn.disabled=false;btn.textContent='Se connecter';
     }
   }catch(ex){

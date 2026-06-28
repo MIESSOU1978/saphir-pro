@@ -527,6 +527,10 @@ class _Handler(BaseHTTPRequestHandler):
             pwd = body.get("password", "")
             email = body.get("email", "")
 
+            # Check if user is banned
+            if email and db.is_user_banned(email):
+                return self._json({"error": "Votre compte a été désactivé. Veuillez contacter l'administrateur."}, 403)
+
             if not _auth_required():
                 if _STUDENT_PASSWORD and _hash_password(pwd) == _hash_password(_STUDENT_PASSWORD):
                     token = _create_session("student")
@@ -777,6 +781,78 @@ class _Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 return self._json({"error": str(exc)}, 500)
             return self._json({"ok": True})
+
+        # ── DISCONNECT USER ──
+        if path.startswith("/api/sessions/") and path.endswith("/disconnect"):
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                sid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            try:
+                db.close_session(sid)
+            except Exception as exc:
+                return self._json({"error": str(exc)}, 500)
+            return self._json({"ok": True})
+
+        # ── BAN USER ──
+        if path.startswith("/api/sessions/") and path.endswith("/ban"):
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                sid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            body = self._read_body()
+            email = body.get("email", "").strip().lower()
+            motif = body.get("motif", "")
+            if not email:
+                return self._json({"error": "Email requis"}, 400)
+            try:
+                sessions = db.list_sessions()
+                target = next((s for s in sessions if s["id"] == sid), None)
+                if not target:
+                    return self._json({"error": "Session introuvable"}, 404)
+                admin_email = target.get("email", "admin")
+                db.ban_user(email, banned_by=admin_email, motif=motif)
+                db.close_session(sid)
+            except Exception as exc:
+                return self._json({"error": str(exc)}, 500)
+            return self._json({"ok": True})
+
+        # ── UNBAN USER ──
+        if path.startswith("/api/banned-users/") and path.endswith("/unban"):
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            email = path.split("/")[-2]
+            try:
+                db.unban_user(email)
+            except Exception as exc:
+                return self._json({"error": str(exc)}, 500)
+            return self._json({"ok": True})
+
+        # ── LIST BANNED USERS ──
+        if path == "/api/banned-users":
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                banned = db.list_banned_users()
+            except Exception as exc:
+                return self._json({"error": str(exc)}, 500)
+            return self._json(banned)
+
+        # ── CHECK BANNED (before auth) ──
+        if path == "/api/check-banned":
+            body = self._read_body()
+            email = body.get("email", "").strip().lower()
+            if not email:
+                return self._json({"banned": False})
+            try:
+                banned = db.is_user_banned(email)
+            except Exception:
+                banned = False
+            return self._json({"banned": banned})
 
         if path.startswith("/api/sessions/"):
             if role != "admin":

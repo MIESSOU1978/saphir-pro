@@ -239,6 +239,15 @@ def init_db() -> None:
                 created_at  TEXT DEFAULT (datetime('now','localtime'))
             )
         """)
+        _turso_exec("""
+            CREATE TABLE IF NOT EXISTS banned_users (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                email       TEXT NOT NULL,
+                banned_by   TEXT DEFAULT '',
+                motif       TEXT DEFAULT '',
+                created_at  TEXT DEFAULT (datetime('now','localtime'))
+            )
+        """)
         # Add missing columns for existing tables
         for col, typ, default in [
             ("annee_scolaire", "TEXT", "''"),
@@ -311,6 +320,13 @@ def init_db() -> None:
             fingerprint TEXT NOT NULL,
             label       TEXT DEFAULT '',
             trusted     INTEGER DEFAULT 1,
+            created_at  TEXT DEFAULT (datetime('now','localtime'))
+        );
+        CREATE TABLE IF NOT EXISTS banned_users (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            email       TEXT NOT NULL,
+            banned_by   TEXT DEFAULT '',
+            motif       TEXT DEFAULT '',
             created_at  TEXT DEFAULT (datetime('now','localtime'))
         );
     """)
@@ -886,6 +902,58 @@ def delete_known_device(device_id: int) -> None:
     conn.execute("DELETE FROM known_devices WHERE id=?", (device_id,))
     conn.commit()
     conn.close()
+
+
+# ── BANNED USERS ──────────────────────────────────────
+def is_user_banned(email: str) -> bool:
+    """Check if a user email is banned."""
+    if not email:
+        return False
+    if _turso_enabled():
+        rows = _turso_exec("SELECT id FROM banned_users WHERE email=?", [email.lower().strip()])
+        return len(rows) > 0
+    conn = _connect()
+    row = conn.execute("SELECT id FROM banned_users WHERE email=?", (email.lower().strip(),)).fetchone()
+    conn.close()
+    return row is not None
+
+
+def ban_user(email: str, banned_by: str = '', motif: str = '') -> None:
+    """Ban a user by email."""
+    email = email.lower().strip()
+    if not email:
+        return
+    if _turso_enabled():
+        _turso_exec_write("INSERT INTO banned_users (email, banned_by, motif) VALUES (?, ?, ?)", [email, banned_by, motif])
+        return
+    conn = _connect()
+    conn.execute("INSERT INTO banned_users (email, banned_by, motif) VALUES (?, ?, ?)", (email, banned_by, motif))
+    conn.commit()
+    conn.close()
+
+
+def unban_user(email: str) -> None:
+    """Unban a user by email."""
+    email = email.lower().strip()
+    if not email:
+        return
+    if _turso_enabled():
+        _turso_exec_write("DELETE FROM banned_users WHERE email=?", [email])
+        return
+    conn = _connect()
+    conn.execute("DELETE FROM banned_users WHERE email=?", (email,))
+    conn.commit()
+    conn.close()
+
+
+def list_banned_users() -> list[dict]:
+    """List all banned users."""
+    if _turso_enabled():
+        return _turso_exec("SELECT * FROM banned_users ORDER BY id DESC")
+    conn = _connect()
+    rows = conn.execute("SELECT * FROM banned_users ORDER BY id DESC").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
 
 
 # ── ANNEES SCOLAIRES ──────────────────────────────────────
