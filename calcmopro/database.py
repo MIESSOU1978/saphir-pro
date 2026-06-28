@@ -167,9 +167,15 @@ def init_db() -> None:
                 etablissement TEXT DEFAULT '',
                 annee       TEXT DEFAULT '',
                 annee_scolaire TEXT DEFAULT '',
+                created_by  TEXT DEFAULT '',
                 created_at  TEXT DEFAULT (datetime('now','localtime'))
             )
         """)
+        # Add created_by column if missing (existing databases)
+        try:
+            _turso_exec("ALTER TABLE eleves ADD COLUMN created_by TEXT DEFAULT ''")
+        except Exception:
+            pass
         _turso_exec("""
             CREATE TABLE IF NOT EXISTS resultats (
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -294,6 +300,8 @@ def init_db() -> None:
             classe      TEXT DEFAULT '',
             etablissement TEXT DEFAULT '',
             annee       TEXT DEFAULT '',
+            annee_scolaire TEXT DEFAULT '',
+            created_by  TEXT DEFAULT '',
             created_at  TEXT DEFAULT (datetime('now','localtime'))
         );
         CREATE TABLE IF NOT EXISTS resultats (
@@ -383,6 +391,10 @@ def init_db() -> None:
         conn.execute("ALTER TABLE eleves ADD COLUMN annee_scolaire TEXT DEFAULT ''")
     except Exception:
         pass
+    try:
+        conn.execute("ALTER TABLE eleves ADD COLUMN created_by TEXT DEFAULT ''")
+    except Exception:
+        pass
     conn.close()
 
 
@@ -390,13 +402,14 @@ def save_eleve(nom: str, matricule: str = "", classe: str = "",
                etablissement: str = "", annee: str = "",
                total: float = 0, mo: float = 0, mention: str = "",
                matieres: dict | None = None,
-               annee_scolaire: str = "") -> dict[str, Any]:
+               annee_scolaire: str = "",
+               created_by: str = "") -> dict[str, Any]:
     matieres_json = json.dumps(matieres or {}, ensure_ascii=False)
 
     if _turso_enabled():
         eid = _turso_exec_insert(
-            "INSERT INTO eleves (nom, matricule, classe, etablissement, annee, annee_scolaire) VALUES (?, ?, ?, ?, ?, ?)",
-            [nom, matricule, classe, etablissement, annee, annee_scolaire],
+            "INSERT INTO eleves (nom, matricule, classe, etablissement, annee, annee_scolaire, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [nom, matricule, classe, etablissement, annee, annee_scolaire, created_by],
         )
         if not eid:
             print(f"[DB save_eleve] FAIL: INSERT returned id=0 for nom={nom}")
@@ -414,8 +427,8 @@ def save_eleve(nom: str, matricule: str = "", classe: str = "",
 
     conn = _connect()
     cur = conn.execute(
-        "INSERT INTO eleves (nom, matricule, classe, etablissement, annee, annee_scolaire) VALUES (?, ?, ?, ?, ?, ?)",
-        (nom, matricule, classe, etablissement, annee, annee_scolaire),
+        "INSERT INTO eleves (nom, matricule, classe, etablissement, annee, annee_scolaire, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (nom, matricule, classe, etablissement, annee, annee_scolaire, created_by),
     )
     eleve_id = cur.lastrowid
     conn.execute(
@@ -432,7 +445,7 @@ def save_eleve(nom: str, matricule: str = "", classe: str = "",
 def list_eleves() -> list[dict[str, Any]]:
     if _turso_enabled():
         rows = _turso_exec("""
-            SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_at,
+            SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at,
                    r.total, r.mo, r.mention, r.matieres, r.date_calc
             FROM eleves e
             LEFT JOIN resultats r ON r.eleve_id = e.id
@@ -450,7 +463,7 @@ def list_eleves() -> list[dict[str, Any]]:
 
     conn = _connect()
     rows = conn.execute("""
-        SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_at,
+        SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at,
                r.total, r.mo, r.mention, r.matieres, r.date_calc
         FROM eleves e
         LEFT JOIN resultats r ON r.eleve_id = e.id
