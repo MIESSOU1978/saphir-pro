@@ -248,6 +248,20 @@ def init_db() -> None:
                 created_at  TEXT DEFAULT (datetime('now','localtime'))
             )
         """)
+        _turso_exec("""
+            CREATE TABLE IF NOT EXISTS login_attempts (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                email       TEXT DEFAULT '',
+                ip          TEXT DEFAULT '',
+                ville       TEXT DEFAULT '',
+                appareil    TEXT DEFAULT '',
+                os          TEXT DEFAULT '',
+                navigateur  TEXT DEFAULT '',
+                raison      TEXT DEFAULT '',
+                niveau      TEXT DEFAULT 'normal',
+                created_at  TEXT DEFAULT (datetime('now','localtime'))
+            )
+        """)
         # Add missing columns for existing tables
         for col, typ, default in [
             ("annee_scolaire", "TEXT", "''"),
@@ -327,6 +341,18 @@ def init_db() -> None:
             email       TEXT NOT NULL,
             banned_by   TEXT DEFAULT '',
             motif       TEXT DEFAULT '',
+            created_at  TEXT DEFAULT (datetime('now','localtime'))
+        );
+        CREATE TABLE IF NOT EXISTS login_attempts (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            email       TEXT DEFAULT '',
+            ip          TEXT DEFAULT '',
+            ville       TEXT DEFAULT '',
+            appareil    TEXT DEFAULT '',
+            os          TEXT DEFAULT '',
+            navigateur  TEXT DEFAULT '',
+            raison      TEXT DEFAULT '',
+            niveau      TEXT DEFAULT 'normal',
             created_at  TEXT DEFAULT (datetime('now','localtime'))
         );
     """)
@@ -954,6 +980,65 @@ def list_banned_users() -> list[dict]:
     rows = conn.execute("SELECT * FROM banned_users ORDER BY id DESC").fetchall()
     conn.close()
     return [dict(r) for r in rows]
+
+
+# ── LOGIN ATTEMPTS ──────────────────────────────────────
+def save_login_attempt(email: str, ip: str, ville: str, appareil: str,
+                       os_name: str, navigateur: str, raison: str, niveau: str = "normal") -> int:
+    """Record a failed login attempt. Returns the attempt id."""
+    if _turso_enabled():
+        return _turso_exec_insert(
+            "INSERT INTO login_attempts (email, ip, ville, appareil, os, navigateur, raison, niveau) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [email, ip, ville, appareil, os_name, navigateur, raison, niveau],
+        )
+    conn = _connect()
+    cur = conn.execute(
+        "INSERT INTO login_attempts (email, ip, ville, appareil, os, navigateur, raison, niveau) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (email, ip, ville, appareil, os_name, navigateur, raison, niveau),
+    )
+    aid = cur.lastrowid
+    conn.commit()
+    conn.close()
+    return aid
+
+
+def list_login_attempts(limit: int = 100) -> list[dict]:
+    """List recent login attempts."""
+    if _turso_enabled():
+        rows = _turso_exec(f"SELECT * FROM login_attempts ORDER BY id DESC LIMIT {limit}")
+        for d in rows:
+            d["id"] = int(d["id"]) if d.get("id") is not None else d["id"]
+        return rows
+    conn = _connect()
+    rows = conn.execute("SELECT * FROM login_attempts ORDER BY id DESC LIMIT ?", (limit,)).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def count_login_attempts_by_email(email: str) -> int:
+    """Count failed login attempts for a given email in the last 24h."""
+    if not email:
+        return 0
+    if _turso_enabled():
+        rows = _turso_exec("SELECT COUNT(*) as n FROM login_attempts WHERE email=? AND created_at > datetime('now','-1 day')", [email])
+        return rows[0]["n"] if rows else 0
+    conn = _connect()
+    row = conn.execute("SELECT COUNT(*) as n FROM login_attempts WHERE email=? AND created_at > datetime('now','-1 day')", (email,)).fetchone()
+    conn.close()
+    return row["n"] if row else 0
+
+
+def count_login_attempts_by_ip(ip: str) -> int:
+    """Count failed login attempts from a given IP in the last 24h."""
+    if not ip:
+        return 0
+    if _turso_enabled():
+        rows = _turso_exec("SELECT COUNT(*) as n FROM login_attempts WHERE ip=? AND created_at > datetime('now','-1 day')", [ip])
+        return rows[0]["n"] if rows else 0
+    conn = _connect()
+    row = conn.execute("SELECT COUNT(*) as n FROM login_attempts WHERE ip=? AND created_at > datetime('now','-1 day')", (ip,)).fetchone()
+    conn.close()
+    return row["n"] if row else 0
 
 
 # ── ANNEES SCOLAIRES ──────────────────────────────────────

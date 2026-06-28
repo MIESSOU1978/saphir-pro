@@ -1458,13 +1458,13 @@ body.bulletin-preview>header,body.bulletin-preview>nav,body.bulletin-preview>mai
 body.bulletin-preview #bulletin-print{display:block;width:210mm;min-height:297mm;margin:0 auto;padding:8mm;background:#fff;box-shadow:0 18px 55px rgba(0,0,0,0.25);}
 body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-shadow:none;}
 
-.notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:340px;max-height:420px;background:#fff;border:1px solid #d9e5de;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.15);z-index:9999;overflow:hidden;display:none;}
+.notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:440px;max-height:520px;background:#fff;border:1px solid #d9e5de;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.15);z-index:9999;overflow:hidden;display:none;}
 .notif-panel.open{display:block;animation:fadeSlideDown .2s ease;}
 .notif-panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #e5ebe7;background:#f9fbfa;}
 .notif-panel-hdr h4{margin:0;font-size:.88rem;font-weight:700;color:#003b32;}
 .notif-panel-hdr button{background:none;border:none;cursor:pointer;color:#60736d;font-size:.72rem;font-weight:600;padding:4px 8px;border-radius:6px;transition:all .18s;}
 .notif-panel-hdr button:hover{background:#f0f4f1;color:#064e3b;}
-.notif-list{max-height:340px;overflow-y:auto;padding:6px;}
+.notif-list{max-height:430px;overflow-y:auto;padding:6px;}
 .notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all .18s;margin-bottom:2px;}
 .notif-item:hover{background:#f4f8f6;}
 .notif-item.unread{background:#eaf5f0;border-left:3px solid #064e3b;}
@@ -1473,11 +1473,31 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 .notif-icon.success{background:#d1fae5;color:#059669;}
 .notif-icon.warning{background:#fef3c7;color:#d97706;}
 .notif-icon.error{background:#fee2e2;color:#dc2626;}
+.notif-icon.critique{background:#fee2e2;color:#B42318;}
+.notif-icon.suspect{background:#FFF7ED;color:#A85B00;}
 .notif-text{flex:1;min-width:0;}
 .notif-text strong{font-size:.78rem;font-weight:600;color:#003b32;display:block;margin-bottom:2px;}
 .notif-text p{margin:0;font-size:.7rem;color:#60736d;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .notif-text .notif-time{font-size:.64rem;color:#9aa79f;margin-top:3px;}
 .notif-empty{text-align:center;padding:30px 16px;color:#60736d;font-size:.8rem;}
+/* ── Detailed attempt info ── */
+.notif-detail{margin-top:6px;padding:8px 10px;background:#f9fbfa;border-radius:8px;border:1px solid #e5ebe7;font-size:.68rem;line-height:1.6;}
+.notif-detail-row{display:flex;gap:6px;align-items:baseline;}
+.notif-detail-label{color:#60736d;font-weight:600;white-space:nowrap;min-width:70px;}
+.notif-detail-value{color:#1a3a2e;font-weight:500;}
+.notif-badge-niveau{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+.notif-badge-normal{background:#d1fae5;color:#059669;border:1px solid #6ee7b7;}
+.notif-badge-suspect{background:#FFF7ED;color:#A85B00;border:1px solid #F5A623;}
+.notif-badge-critique{background:#FEF2F2;color:#B42318;border:1px solid #FECACA;}
+.notif-actions{display:flex;gap:4px;margin-top:6px;}
+.notif-action-btn{
+  padding:3px 8px;border-radius:5px;border:1px solid #D5E5DE;background:#fff;
+  color:#064E3B;cursor:pointer;font-size:.64rem;font-weight:600;font-family:inherit;
+  transition:all .15s;display:inline-flex;align-items:center;gap:3px;
+}
+.notif-action-btn:hover{background:#F0F7F3;border-color:#064E3B;}
+.notif-action-btn.danger{color:#B42318;border-color:#FECACA;}
+.notif-action-btn.danger:hover{background:#FEF2F2;border-color:#B42318;}
 
 .hist-year-filter{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
 .hist-year-filter label{font-size:.78rem;font-weight:600;color:#60736d;}
@@ -3941,11 +3961,57 @@ function renderNotifications(list){
   if(!list||!list.length){el.innerHTML='<div class="notif-empty">Aucune notification</div>';return;}
   el.innerHTML=list.map(n=>{
     const cls=n.lu?'':'unread';
-    const iconCls=n.type==='error'?'error':n.type==='warning'?'warning':n.type==='success'?'success':'info';
-    const icon=n.type==='error'?'&#9888;':n.type==='warning'?'&#128276;':n.type==='success'?'&#10003;':'&#8505;';
-    const time=n.created_at?new Date(n.created_at+'Z').toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
-    return `<div class="notif-item ${cls}" onclick="markNotifRead(${n.id})"><div class="notif-icon ${iconCls}">${icon}</div><div class="notif-text"><strong>${esc(n.titre||'Notification')}</strong><p>${esc(n.message||'')}</p><div class="notif-time">${time}</div></div></div>`;
+    /* Parse JSON detail from message if present */
+    let d={};
+    try{d=JSON.parse(n.message||'{}');}catch(e){d={message:n.message||''};}
+    const isFailed=(n.titre||'').includes('connexion')||(n.titre||'').includes('Tentative')||(d.raison);
+    let iconCls,icon;
+    if(isFailed){
+      const niveau=d.niveau||n.type||'warning';
+      iconCls=niveau==='critique'?'critique':niveau==='suspect'?'suspect':'warning';
+      icon=niveau==='critique'?'&#128683;':niveau==='suspect'?'&#9888;':'&#128276;';
+    }else{
+      iconCls=n.type==='error'?'error':n.type==='warning'?'warning':n.type==='success'?'success':'info';
+      icon=n.type==='error'?'&#9888;':n.type==='warning'?'&#128276;':n.type==='success'?'&#10003;':'&#8505;';
+    }
+    const time=n.created_at?new Date(n.created_at.replace(' ','T')+'Z').toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+    const displayMsg=d.message||n.message||'';
+    let detail='';
+    if(isFailed&&(d.user||d.raison)){
+      const niveau=d.niveau||'normal';
+      const niveauCls=niveau==='critique'?'notif-badge-critique':niveau==='suspect'?'notif-badge-suspect':'notif-badge-normal';
+      detail=`<div class="notif-detail">
+        ${d.user?`<div class="notif-detail-row"><span class="notif-detail-label">E-mail :</span><span class="notif-detail-value">${esc(d.user)}</span></div>`:''}
+        ${d.raison?`<div class="notif-detail-row"><span class="notif-detail-label">Raison :</span><span class="notif-detail-value">${esc(d.raison)}</span></div>`:''}
+        ${d.ville?`<div class="notif-detail-row"><span class="notif-detail-label">Localisation :</span><span class="notif-detail-value">${esc(d.ville)}</span></div>`:''}
+        ${d.ip?`<div class="notif-detail-row"><span class="notif-detail-label">IP :</span><span class="notif-detail-value" style="font-family:monospace;">${esc(d.ip)}</span></div>`:''}
+        ${d.appareil||d.os||d.navigateur?`<div class="notif-detail-row"><span class="notif-detail-label">Appareil :</span><span class="notif-detail-value">${esc((d.appareil||'')+' '+(d.os||'')+' / '+(d.navigateur||''))}</span></div>`:''}
+        <div class="notif-detail-row"><span class="notif-detail-label">Niveau :</span><span class="notif-badge-niveau ${niveauCls}">${niveau==='critique'?'Critique':niveau==='suspect'?'Suspect':'Normal'}</span></div>
+        ${d.email_count?`<div class="notif-detail-row"><span class="notif-detail-label">Tentatives :</span><span class="notif-detail-value">${d.email_count} par e-mail${d.ip_count?' · '+d.ip_count+' par IP':''}</span></div>`:''}
+      </div>
+      <div class="notif-actions">
+        ${d.user?`<button class="notif-action-btn danger" onclick="event.stopPropagation();quickBan('${esc(d.user).replace(/'/g,"\\'")}')">⛔ Bannir</button>`:''}
+        <button class="notif-action-btn" onclick="event.stopPropagation();markNotifRead(${n.id})">✓ Marquer lu</button>
+      </div>`;
+    }
+    return `<div class="notif-item ${cls}" onclick="markNotifRead(${n.id})"><div class="notif-icon ${iconCls}">${icon}</div><div class="notif-text"><strong>${esc(n.titre||'Notification')}</strong><p>${esc(displayMsg)}</p><div class="notif-time">${time}</div>${detail}</div></div>`;
   }).join('');
+}
+async function quickBan(email){
+  if(!email) return;
+  if(!confirm('Bannir définitivement '+email+' ?')) return;
+  try{
+    const sessions=await fetch(API+'/api/sessions',{credentials:'same-origin'}).then(r=>r.json()).catch(()=>[]);
+    const target=sessions.find(s=>(s.email||'').toLowerCase()===email.toLowerCase());
+    if(target){
+      await fetch(API+'/api/sessions/'+target.id+'/ban',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({email,motif:'Banni depuis les notifications'})});
+    }else{
+      await fetch(API+'/api/banned-users',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({email,banned_by:'admin',motif:'Banni depuis les notifications'})});
+    }
+    toast(email+' a été banni ✔');
+    loadNotifications();
+    if(typeof loadUsers==='function') loadUsers();
+  }catch(e){toast('Erreur',true);}
 }
 function updateNotifBadge(count){
   const badge=document.getElementById('notif-badge');

@@ -494,6 +494,14 @@ class _Handler(BaseHTTPRequestHandler):
         if path == "/api/role":
             return self._json({"role": self._get_role()})
 
+        if path == "/api/login-attempts":
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                return self._json(db.list_login_attempts())
+            except Exception as exc:
+                return self._json([], 500)
+
         if path == "/api/eleves":
             try:
                 return self._json(db.list_eleves())
@@ -678,10 +686,65 @@ class _Handler(BaseHTTPRequestHandler):
 
             # ── Failed attempt ──
             count = _record_failed_login(client_ip, email)
+            email_count = len(_EMAIL_ATTEMPTS.get(email, []))
+            ip_count = len(_LOGIN_ATTEMPTS.get(client_ip, []))
             msg = "Adresse e-mail ou mot de passe incorrect."
-            if count >= 3:
+            raison = "Mot de passe incorrect"
+            if count >= 5:
+                msg = "Trop de tentatives. Réessayez dans 5 minutes."
+                raison = "Trop de tentatives échouées"
+            elif count >= 3:
                 msg = "Plusieurs tentatives de connexion échouées ont été détectées pour cette adresse e-mail."
-            _sse_emit("login_failed", {"message": "Tentative de connexion échouée", "user": email, "ip": client_ip, "attempts": count})
+            # Determine alert level
+            if count >= 5 or db.is_user_banned(email):
+                niveau = "critique"
+            elif count >= 3:
+                niveau = "suspect"
+            else:
+                niveau = "normal"
+            # Get device info from User-Agent
+            ua = self.headers.get("User-Agent", "")
+            info = _parse_user_agent(ua)
+            # Get city from IP
+            ville = ""
+            if client_ip and client_ip not in ("127.0.0.1", "::1", ""):
+                try:
+                    req = urllib.request.Request(f"http://ip-api.com/json/{client_ip}?fields=city,country")
+                    with urllib.request.urlopen(req, timeout=3) as resp:
+                        geo = json.loads(resp.read())
+                        city = geo.get("city", "")
+                        country = geo.get("country", "")
+                        country = "Côte d'Ivoire" if country in ("Ivory Coast", "Ivoiry Coast") else country
+                        ville = f"{city}, {country}" if city else country
+                except Exception:
+                    pass
+            # Record in login_attempts table
+            try:
+                db.save_login_attempt(
+                    email=email, ip=client_ip, ville=ville,
+                    appareil=info.get("device", ""), os_name=info.get("os", ""),
+                    navigateur=info.get("browser", ""), raison=raison, niveau=niveau,
+                )
+            except Exception as exc:
+                print(f"[ERROR] save_login_attempt: {exc}")
+            # Save detailed notification
+            try:
+                detail_data = json.dumps({
+                    "user": email, "ip": client_ip, "ville": ville,
+                    "appareil": info.get("device", ""), "os": info.get("os", ""),
+                    "navigateur": info.get("browser", ""), "raison": raison,
+                    "niveau": niveau, "email_count": email_count + 1, "ip_count": ip_count + 1,
+                }, ensure_ascii=False)
+                db.add_notification("Tentative de connexion échouée", detail_data, "error")
+            except Exception as exc:
+                print(f"[ERROR] add_notification login_failed: {exc}")
+            _sse_emit("login_failed", {
+                "message": "Tentative de connexion échouée",
+                "user": email, "ip": client_ip, "ville": ville,
+                "appareil": info.get("device", ""), "os": info.get("os", ""),
+                "navigateur": info.get("browser", ""), "raison": raison,
+                "niveau": niveau, "email_count": email_count + 1, "ip_count": ip_count + 1,
+            })
             return self._json({"error": msg, "attempts": count}, 401)
 
         if path == "/api/logout":
