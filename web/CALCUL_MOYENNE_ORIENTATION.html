@@ -2753,6 +2753,8 @@ async function loadHistory(){
       if(h.annee_scolaire==null) h.annee_scolaire='';
       if(h.etablissement!=null&&typeof h.etablissement==='object') h.etablissement=h.etablissement.value||'';
       if(h.etablissement==null) h.etablissement='';
+      if(h.printed!=null&&typeof h.printed==='object') h.printed=h.printed.value!=null?h.printed.value:0;
+      if(h.created_by!=null&&typeof h.created_by==='object') h.created_by=h.created_by.value!=null?h.created_by.value:'';
     });
   }catch(e){histData=[];}
   selectedIds=[];
