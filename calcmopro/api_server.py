@@ -517,15 +517,29 @@ class _Handler(BaseHTTPRequestHandler):
             return self._json({"ok": True})
 
         # ── Messages ──
-        if path == "/api/messages":
-            email = self._get_email()
+        if path == "/api/messages" or path.startswith("/api/messages?"):
+            email = ""
+            if "?" in path:
+                qs = path.split("?", 1)[1]
+                for p in qs.split("&"):
+                    if p.startswith("email="):
+                        email = urllib.parse.unquote(p.split("=", 1)[1])
+            if not email:
+                email = self._get_email()
             if not email:
                 return self._json([], 401)
             msgs = db.get_messages(email)
             return self._json(msgs)
 
-        if path == "/api/messages/unread":
-            email = self._get_email()
+        if path == "/api/messages/unread" or path.startswith("/api/messages/unread?"):
+            email = ""
+            if "?" in path:
+                qs = path.split("?", 1)[1]
+                for p in qs.split("&"):
+                    if p.startswith("email="):
+                        email = urllib.parse.unquote(p.split("=", 1)[1])
+            if not email:
+                email = self._get_email()
             if not email:
                 return self._json({"count": 0})
             return self._json({"count": db.count_unread_messages(email)})
@@ -868,7 +882,7 @@ class _Handler(BaseHTTPRequestHandler):
             message = body.get("message", "").strip()
             if not recipient or not message:
                 return self._json({"error": "Destinataire et message requis"}, 400)
-            sender = self._get_email() or "admin"
+            sender = "admin"
             mid = db.send_message(sender, recipient, message)
             _sse_emit("new_message", {"id": mid, "sender": sender, "recipient": recipient, "message": message})
             return self._json({"ok": True, "id": mid}, 201)

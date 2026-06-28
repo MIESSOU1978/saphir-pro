@@ -4098,7 +4098,8 @@ function startMsgPoll(){
   if(_msgPoll) return;
   _msgPoll=setInterval(async()=>{
     try{
-      const r=await fetch(API+'/api/messages/unread',{credentials:'same-origin'});
+      const email=localStorage.getItem('saphir_email')||'';
+      const r=await fetch(API+'/api/messages/unread?email='+encodeURIComponent(email),{credentials:'same-origin'});
       const d=await r.json();
       if(d.count>0) await loadIncomingMessages();
     }catch(e){}
@@ -4106,7 +4107,8 @@ function startMsgPoll(){
 }
 async function loadIncomingMessages(){
   try{
-    const r=await fetch(API+'/api/messages',{credentials:'same-origin'});
+    const email=localStorage.getItem('saphir_email')||'';
+    const r=await fetch(API+'/api/messages?email='+encodeURIComponent(email),{credentials:'same-origin'});
     const msgs=await r.json();
     const unread=msgs.filter(m=>!m.lu);
     unread.forEach(m=>{
