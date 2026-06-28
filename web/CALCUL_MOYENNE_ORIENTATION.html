@@ -4138,7 +4138,7 @@ async function loadIncomingMessages(){
     const email=localStorage.getItem('saphir_email')||'';
     const r=await fetch(API+'/api/messages?email='+encodeURIComponent(email),{credentials:'same-origin'});
     const msgs=await r.json();
-    const unread=msgs.filter(m=>!m.lu);
+    const unread=msgs.filter(m=>!m.lu||m.lu==0||m.lu==='0');
     unread.forEach(m=>{
       showMsgPopup({message:m.msg_content||m.message||'',created_at:m.created_at||''});
       fetch(API+'/api/messages/'+m.id+'/read',{method:'POST',credentials:'same-origin'}).catch(()=>{});

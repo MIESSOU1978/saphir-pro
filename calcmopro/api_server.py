@@ -540,8 +540,6 @@ class _Handler(BaseHTTPRequestHandler):
             return self._json(msgs)
 
         if path.startswith("/api/messages/") and path.endswith("/read"):
-            if self._get_role() != "admin":
-                return self._json({"error": "Accès refusé"}, 403)
             try:
                 nid = int(path.split("/")[-2])
             except (ValueError, IndexError):
