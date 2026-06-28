@@ -184,9 +184,15 @@ def init_db() -> None:
                 mo          REAL,
                 mention     TEXT DEFAULT '',
                 matieres    TEXT DEFAULT '{}',
+                printed     INTEGER DEFAULT 0,
                 date_calc   TEXT DEFAULT (datetime('now','localtime'))
             )
         """)
+        # Add printed column if missing (existing databases)
+        try:
+            _turso_exec("ALTER TABLE resultats ADD COLUMN printed INTEGER DEFAULT 0")
+        except Exception:
+            pass
         _turso_exec("""
             CREATE TABLE IF NOT EXISTS sessions (
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -311,6 +317,7 @@ def init_db() -> None:
             mo          REAL,
             mention     TEXT DEFAULT '',
             matieres    TEXT DEFAULT '{}',
+            printed     INTEGER DEFAULT 0,
             date_calc   TEXT DEFAULT (datetime('now','localtime'))
         );
         CREATE TABLE IF NOT EXISTS sessions (
@@ -395,6 +402,10 @@ def init_db() -> None:
         conn.execute("ALTER TABLE eleves ADD COLUMN created_by TEXT DEFAULT ''")
     except Exception:
         pass
+    try:
+        conn.execute("ALTER TABLE resultats ADD COLUMN printed INTEGER DEFAULT 0")
+    except Exception:
+        pass
     conn.close()
 
 
@@ -442,11 +453,22 @@ def save_eleve(nom: str, matricule: str = "", classe: str = "",
     return {"eleve": dict(row), "resultat": dict(res)}
 
 
+def mark_printed(eleve_id: int) -> None:
+    """Mark a bulletin as printed."""
+    if _turso_enabled():
+        _turso_exec_write("UPDATE resultats SET printed=1 WHERE eleve_id=?", [eleve_id])
+        return
+    conn = _connect()
+    conn.execute("UPDATE resultats SET printed=1 WHERE eleve_id=?", (eleve_id,))
+    conn.commit()
+    conn.close()
+
+
 def list_eleves() -> list[dict[str, Any]]:
     if _turso_enabled():
         rows = _turso_exec("""
             SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at,
-                   r.total, r.mo, r.mention, r.matieres, r.date_calc
+                   r.total, r.mo, r.mention, r.matieres, r.printed, r.date_calc
             FROM eleves e
             LEFT JOIN resultats r ON r.eleve_id = e.id
             ORDER BY e.id DESC
@@ -464,7 +486,7 @@ def list_eleves() -> list[dict[str, Any]]:
     conn = _connect()
     rows = conn.execute("""
         SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at,
-               r.total, r.mo, r.mention, r.matieres, r.date_calc
+               r.total, r.mo, r.mention, r.matieres, r.printed, r.date_calc
         FROM eleves e
         LEFT JOIN resultats r ON r.eleve_id = e.id
         ORDER BY e.id DESC

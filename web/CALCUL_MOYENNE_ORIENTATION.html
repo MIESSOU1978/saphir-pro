@@ -464,6 +464,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-card-meta{font-size:.72rem;color:#60736d;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .hist-card-date{font-size:.68rem;color:#064E3B;margin-top:5px;font-weight:600;display:inline-flex;align-items:center;gap:3px;background:#F4FAF7;padding:2px 8px;border-radius:6px;border:1px solid #D5E5DE;}
 .hist-card-author{font-size:.65rem;color:#60736d;margin-top:4px;font-weight:500;display:inline-flex;align-items:center;gap:3px;background:#F8F6F3;padding:2px 8px;border-radius:6px;border:1px solid #E0DDD8;}
+.hist-badge-printed{font-size:.65rem;font-weight:600;color:#064E3B;background:#EAF5F0;border:1px solid #B8CEC3;border-radius:5px;padding:2px 7px;display:inline-flex;align-items:center;gap:3px;}
 
 .hist-card-mo{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -3003,9 +3004,19 @@ function renderHistory(){
     const yearBadge=h.annee_scolaire?'<span style="font-size:.66rem;font-weight:600;color:#064E3B;background:#EAF5F0;border:1px solid #B8CEC3;border-radius:5px;padding:1px 6px;margin-left:6px;">'+esc(h.annee_scolaire)+'</span>':'';
     const rawCreatedBy=h.created_by!=null&&typeof h.created_by==='object'?(h.created_by.value!=null?h.created_by.value:null):h.created_by;
     const authorEmail=rawCreatedBy||'Non renseigné';
-    return '<div class="hist-card"><input type="checkbox" class="hist-select" '+checked+' onchange="toggleSelect('+h.id+',this)" title="Sélectionner"><div class="hist-card-info"><div class="hist-card-name" title="'+esc(h.nom||'\u2014')+'">'+esc(h.nom||'\u2014')+'</div><div class="hist-card-meta" title="'+esc((h.matricule||'\u2014')+' · '+(h.classe||'\u2014')+' · '+(h.etablissement||'\u2014'))+'">'+esc(h.matricule||'\u2014')+' &middot; '+esc(h.classe||'\u2014')+' &middot; '+esc(h.etablissement||'\u2014')+'</div>'+(dateDisplay?'<div class="hist-card-date" title="Enregistr\u00e9 le '+dateStr+'">&#128197; '+dateDisplay+(timeDisplay?' &agrave; '+timeDisplay:'')+'</div>':'')+'<div class="hist-card-author" title="Enregistr\u00e9 par">&#9993; '+esc(authorEmail)+'</div></div><div class="hist-card-mo"><div class="mo-value">'+moDisplay+yearBadge+'</div><div class="mo-label">Moyenne</div></div><span class="hist-badge '+badgeClass+'">'+esc(mention)+'</span><div class="hist-actions"><button class="hist-btn-edit" onclick="editCalc('+h.id+')" title="Modifier ce calcul">&#9998; Modifier</button><button class="hist-btn-dup" onclick="duplicateCalc('+h.id+')" title="Dupliquer ce calcul">&#128203; Dupliquer</button><button class="hist-btn-icon" onclick="previewBulletinPDF('+h.id+')" title="Aperçu du bulletin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button class="hist-btn-icon" onclick="downloadBulletinPDF('+h.id+')" title="T\u00e9l\u00e9charger le bulletin en PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button><button class="hist-btn-icon hist-btn-icon-del" onclick="confirmDelHistory('+h.id+',this)" title="Supprimer ce calcul"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></div>';
+    const rawPrinted=h.printed!=null&&typeof h.printed==='object'?(h.printed.value!=null?h.printed.value:null):h.printed;
+    const isPrinted=Number(rawPrinted)===1;
+    const printedBadge=isPrinted?'<span class="hist-badge-printed" title="Bulletin imprimé">&#128424; Imprimé</span>':'';
+    return '<div class="hist-card"><input type="checkbox" class="hist-select" '+checked+' onchange="toggleSelect('+h.id+',this)" title="Sélectionner"><div class="hist-card-info"><div class="hist-card-name" title="'+esc(h.nom||'\u2014')+'">'+esc(h.nom||'\u2014')+'</div><div class="hist-card-meta" title="'+esc((h.matricule||'\u2014')+' · '+(h.classe||'\u2014')+' · '+(h.etablissement||'\u2014'))+'">'+esc(h.matricule||'\u2014')+' &middot; '+esc(h.classe||'\u2014')+' &middot; '+esc(h.etablissement||'\u2014')+'</div>'+(dateDisplay?'<div class="hist-card-date" title="Enregistr\u00e9 le '+dateStr+'">&#128197; '+dateDisplay+(timeDisplay?' &agrave; '+timeDisplay:'')+'</div>':'')+'<div class="hist-card-author" title="Enregistr\u00e9 par">&#9993; '+esc(authorEmail)+'</div></div><div class="hist-card-mo"><div class="mo-value">'+moDisplay+yearBadge+'</div><div class="mo-label">Moyenne</div></div><span class="hist-badge '+badgeClass+'">'+esc(mention)+'</span>'+printedBadge+'<div class="hist-actions"><button class="hist-btn-edit" onclick="editCalc('+h.id+')" title="Modifier ce calcul">&#9998; Modifier</button><button class="hist-btn-dup" onclick="duplicateCalc('+h.id+')" title="Dupliquer ce calcul">&#128203; Dupliquer</button><button class="hist-btn-icon" onclick="previewBulletinPDF('+h.id+')" title="Aperçu du bulletin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button class="hist-btn-icon" onclick="downloadBulletinPDF('+h.id+')" title="T\u00e9l\u00e9charger le bulletin en PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button><button class="hist-btn-icon hist-btn-icon-del" onclick="confirmDelHistory('+h.id+',this)" title="Supprimer ce calcul"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></div>';
   }).join('');
   updateSelBar();
+}
+
+/* ════ MARK PRINTED ════ */
+function markPrinted(id){
+  fetch(API+'/api/eleves/'+id+'/printed',{method:'POST',credentials:'same-origin'})
+    .then(()=>{const h=histData.find(x=>x.id===id);if(h)h.printed=1;renderHistory();})
+    .catch(()=>{});
 }
 
 /* ════ TÉLÉCHARGEMENT PDF DEPUIS HISTORIQUE ════ */
@@ -3029,6 +3040,7 @@ ${styles}
 </style></head><body>${page}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
+  markPrinted(id);
   logActivity('Téléchargement PDF','Bulletin',h.nom||'');
 }
 
@@ -3076,6 +3088,7 @@ ${styles}
 </div>
 </body></html>`);
   win.document.close();
+  markPrinted(id);
   logActivity('Aperçu PDF','Bulletin',h.nom||'');
 }
 
@@ -3175,6 +3188,7 @@ ${styles}
 </style></head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>{win.print();},600);
+  items.forEach(h=>{if(h.id)markPrinted(h.id);});
   toast('Impression de '+items.length+' bulletin(s)...');
   logActivity('Impression multiple','Bulletin',histData.filter(h=>h.matieres).length+' bulletins');
 }
@@ -4058,7 +4072,7 @@ function downloadBulletinFromAct(idx){
   const payload={nom,matricule:d.matricule||'—',classe:d.classe||'—',etablissement:d.etablissement||'—',annee_scolaire:d.annee_scolaire||'—',total,mo,mention:d.mention||'—',matieres,created_by:localStorage.getItem('saphir_email')||''};
   fetch(API+'/api/eleves',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify(payload)})
     .then(r=>{if(!r.ok) throw r;return r.json();})
-    .then(()=>{toast('Bulletin enregistré dans l\'historique ✔');loadHistory();logActivity('Enregistrement bulletin','Calcul MO',nom+' — '+d.classe,'succes');})
+    .then(res=>{const nid=res.eleve&&res.eleve.id?res.eleve.id:null;if(nid)markPrinted(nid);toast('Bulletin enregistré dans l\'historique ✔');loadHistory();logActivity('Enregistrement bulletin','Calcul MO',nom+' — '+d.classe,'succes');})
     .catch(()=>{toast('Erreur lors de l\'enregistrement.',true);logActivity('Enregistrement bulletin','Calcul MO',nom,'echec');});
 }
 

@@ -1098,6 +1098,17 @@ class _Handler(BaseHTTPRequestHandler):
                 return self._json({"error": "Erreur interne du serveur"}, 500)
             return self._json({"ok": True})
 
+        if path.startswith("/api/eleves/") and path.endswith("/printed"):
+            try:
+                eid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            try:
+                db.mark_printed(eid)
+            except Exception as exc:
+                return self._json({"error": "Erreur interne du serveur"}, 500)
+            return self._json({"ok": True})
+
         if path.startswith("/api/eleves/"):
             if role != "admin":
                 return self._json({"error": "Accès refusé"}, 403)
