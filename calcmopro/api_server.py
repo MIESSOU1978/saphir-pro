@@ -599,6 +599,18 @@ class _Handler(BaseHTTPRequestHandler):
             db.clear_all_notifications()
             return self._json({"ok": True})
 
+        # ── CHECK BANNED (must be before auth) ──
+        if path == "/api/check-banned":
+            body = self._read_body()
+            email = body.get("email", "").strip().lower()
+            if not email:
+                return self._json({"banned": False})
+            try:
+                banned = db.is_user_banned(email)
+            except Exception:
+                banned = False
+            return self._json({"banned": banned})
+
         if not self._require_auth():
             return
 
@@ -841,18 +853,6 @@ class _Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 return self._json({"error": str(exc)}, 500)
             return self._json(banned)
-
-        # ── CHECK BANNED (before auth) ──
-        if path == "/api/check-banned":
-            body = self._read_body()
-            email = body.get("email", "").strip().lower()
-            if not email:
-                return self._json({"banned": False})
-            try:
-                banned = db.is_user_banned(email)
-            except Exception:
-                banned = False
-            return self._json({"banned": banned})
 
         if path.startswith("/api/sessions/"):
             if role != "admin":

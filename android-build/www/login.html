@@ -269,6 +269,14 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
   if(!pwd){errText.textContent='Veuillez entrer le mot de passe';errMsg.classList.add('show');return}
   btn.disabled=true;btn.textContent='Connexion...';errMsg.classList.remove('show');pwdWrap.classList.remove('error');
   try{
+    if(email){
+      const checkR=await fetch('/api/check-banned',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({email})});
+      const checkD=await checkR.json().catch(()=>({}));
+      if(checkD.banned){
+        errText.textContent='Votre compte a été désactivé. Veuillez contacter l\'administrateur.';
+        errMsg.classList.add('show');btn.disabled=false;btn.textContent='Se connecter';return;
+      }
+    }
     const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({password:pwd,email:email})});
     const d=await r.json();
     if(d.ok){
