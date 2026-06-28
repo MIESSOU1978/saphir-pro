@@ -559,48 +559,6 @@ class _Handler(BaseHTTPRequestHandler):
                 m["closed"] = m["id"] in closed
             return self._json(msgs)
 
-        if path.startswith("/api/messages/") and path.endswith("/read"):
-            try:
-                nid = int(path.split("/")[-2])
-            except (ValueError, IndexError):
-                return self._json({"error": "id invalide"}, 400)
-            db.mark_message_read(nid)
-            email = self._get_email()
-            if email:
-                db.mark_message_status(nid, email, "read")
-            return self._json({"ok": True})
-
-        if path.startswith("/api/messages/") and path.endswith("/close"):
-            try:
-                nid = int(path.split("/")[-2])
-            except (ValueError, IndexError):
-                return self._json({"error": "id invalide"}, 400)
-            email = ""
-            try:
-                body = self._read_body()
-                email = body.get("email", "").strip()
-            except Exception:
-                pass
-            if not email:
-                email = self._get_email()
-            if not email:
-                return self._json({"error": "Non authentifié"}, 401)
-            db.mark_message_status(nid, email, "closed")
-            return self._json({"ok": True})
-
-        if path == "/api/messages/read-all":
-            email = self._get_email()
-            if not email:
-                return self._json({"error": "Non authentifié"}, 401)
-            db.mark_all_read(email)
-            return self._json({"ok": True})
-
-        if path == "/api/messages/admin-status":
-            if self._get_role() != "admin":
-                return self._json({"error": "Accès refusé"}, 403)
-            statuses = db.get_all_message_statuses()
-            return self._json(statuses)
-
         if path == "/api/test-email":
             if self._get_role() != "admin":
                 return self._json({"error": "Accès refusé"}, 403)
@@ -937,6 +895,49 @@ class _Handler(BaseHTTPRequestHandler):
                 print(f"[MSG ERROR] {exc}")
                 import traceback; traceback.print_exc()
                 return self._json({"error": "Erreur interne du serveur"}, 500)
+
+        # ── Message read/close/read-all/admin-status (POST) ──
+        if path.startswith("/api/messages/") and path.endswith("/read"):
+            try:
+                nid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            db.mark_message_read(nid)
+            email = self._get_email()
+            if email:
+                db.mark_message_status(nid, email, "read")
+            return self._json({"ok": True})
+
+        if path.startswith("/api/messages/") and path.endswith("/close"):
+            try:
+                nid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            email = ""
+            try:
+                body = self._read_body()
+                email = body.get("email", "").strip()
+            except Exception:
+                pass
+            if not email:
+                email = self._get_email()
+            if not email:
+                return self._json({"error": "Non authentifié"}, 401)
+            db.mark_message_status(nid, email, "closed")
+            return self._json({"ok": True})
+
+        if path == "/api/messages/read-all":
+            email = self._get_email()
+            if not email:
+                return self._json({"error": "Non authentifié"}, 401)
+            db.mark_all_read(email)
+            return self._json({"ok": True})
+
+        if path == "/api/messages/admin-status":
+            if self._get_role() != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            statuses = db.get_all_message_statuses()
+            return self._json(statuses)
 
         # ── CHECK BANNED (must be before auth) ──
         if path == "/api/check-banned":

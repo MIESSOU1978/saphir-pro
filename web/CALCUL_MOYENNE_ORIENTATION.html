@@ -4250,6 +4250,22 @@ let _msgPoll=null;
 let _currentMsgId=null;
 let _lastShownMsgId=null;
 
+document.addEventListener('DOMContentLoaded',function(){
+  const dlg=document.getElementById('msg-dialog');
+  if(dlg){
+    dlg.addEventListener('close',function(){
+      if(_currentMsgId){
+        const email=localStorage.getItem('saphir_email')||'';
+        fetch(API+'/api/messages/'+_currentMsgId+'/close',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({email:email})}).catch(()=>{});
+        _currentMsgId=null;
+      }
+    });
+    dlg.addEventListener('click',function(e){
+      if(e.target===dlg) closeMsgDialog();
+    });
+  }
+});
+
 function startMsgPoll(){
   if(_msgPoll) return;
   _msgPoll=setInterval(async()=>{
@@ -4287,8 +4303,10 @@ function showMsgDialog(m){
   document.getElementById('msg-dlg-time').textContent=time?`Envoyé le ${time}`:'';
   dlg.showModal();
   dlg.querySelector('.msg-dlg-close').focus();
+  const email=localStorage.getItem('saphir_email')||'';
   if(m.id){
     fetch(API+'/api/messages/'+m.id+'/read',{method:'POST',credentials:'same-origin'}).catch(()=>{});
+    fetch(API+'/api/messages/'+m.id+'/close',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({email:email})}).catch(()=>{});
   }
 }
 
