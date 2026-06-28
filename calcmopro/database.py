@@ -505,8 +505,8 @@ def list_eleves() -> list[dict[str, Any]]:
 def get_eleve(eleve_id: int) -> dict[str, Any] | None:
     if _turso_enabled():
         rows = _turso_exec("""
-            SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.created_at,
-                   r.total, r.mo, r.mention, r.matieres, r.date_calc
+            SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.created_by, e.created_at,
+                   r.total, r.mo, r.mention, r.matieres, r.printed, r.date_calc
             FROM eleves e
             LEFT JOIN resultats r ON r.eleve_id = e.id
             WHERE e.id = ?
@@ -524,8 +524,8 @@ def get_eleve(eleve_id: int) -> dict[str, Any] | None:
 
     conn = _connect()
     row = conn.execute("""
-        SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.created_at,
-               r.total, r.mo, r.mention, r.matieres, r.date_calc
+        SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.created_by, e.created_at,
+               r.total, r.mo, r.mention, r.matieres, r.printed, r.date_calc
         FROM eleves e
         LEFT JOIN resultats r ON r.eleve_id = e.id
         WHERE e.id = ?
