@@ -3261,6 +3261,8 @@ function doLogout(){
   logActivity('Déconnexion','Authentification','Déconnexion utilisateur');
   fetch(API+'/api/logout',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({session_id:sid?parseInt(sid):0})}).catch(()=>{});
   localStorage.removeItem('saphir_session_id');
+  localStorage.removeItem('saphir_email');
+  document.cookie='saphir_session_id=; path=/; max-age=0';
   window.location.href='/login';
 }
 function applyRole(){
