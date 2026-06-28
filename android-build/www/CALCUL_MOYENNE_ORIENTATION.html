@@ -596,6 +596,37 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .btn-icon-danger svg{width:18px;height:18px;stroke:#B42318;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .btn-icon-danger:hover{background:#FDECEA;border-color:#D92D20;box-shadow:0 2px 6px rgba(180,35,24,.10);}
 .btn-icon-danger:active{transform:scale(.95);}
+
+/* ── Actions dropdown menu ── */
+.users-actions-cell{display:flex;gap:5px;align-items:center;flex-wrap:nowrap;}
+.users-actions-wrap{position:relative;display:inline-flex;}
+.users-actions-more{
+  width:30px;height:28px;border-radius:6px;border:1px solid #D5E5DE;background:#fff;
+  color:#60736D;cursor:pointer;font-size:.85rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;
+  transition:all .18s ease;padding:0;
+}
+.users-actions-more:hover{background:#F3F8F5;border-color:#064E3B;color:#064E3B;}
+.users-actions-dropdown{
+  display:none;position:absolute;top:calc(100% + 4px);right:0;min-width:180px;
+  background:#fff;border:1px solid #d9e5de;border-radius:10px;
+  box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:100;padding:4px;
+}
+.users-actions-dropdown.show{display:block;}
+.users-actions-dropdown button{
+  display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;
+  border:none;background:transparent;border-radius:6px;cursor:pointer;
+  font-size:.74rem;font-weight:600;text-align:left;transition:background .15s;
+  font-family:inherit;
+}
+.users-actions-dropdown button:hover{background:#f4f8f6;}
+.users-actions-dropdown .dropdown-danger{color:#B42318;}
+.users-actions-dropdown .dropdown-danger:hover{background:#FEF2F2;}
+.users-actions-dropdown .dropdown-danger svg{stroke:#B42318;}
+.users-actions-dropdown svg{width:14px;height:14px;stroke:#60736D;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+/* ── Current device badge ── */
+.users-device-current{background:#EFF6FF;color:#1D4ED8;border:1px solid #93C5FD;}
+.users-device-other{background:#F3F4F6;color:#6B7280;border:1px solid #D1D5DB;}
 .users-filters{display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;}
 .users-search{
   flex:1 1 220px;padding:8px 12px;border:1.5px solid #AFC6BA;border-radius:10px;
@@ -611,17 +642,23 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 }
 .users-filter-select:hover{background:#F3F8F5;border-color:#8FB7A4;}
 .users-filter-select:focus{background:#EEF7F2;border-color:#0B6B50;outline:none;}
-.users-table-wrap{overflow-x:auto;overflow-y:visible;border:1px solid #d9e5de;border-radius:10px;}
-.users-table{width:100%;min-width:960px;border-collapse:collapse;font-size:.78rem;table-layout:auto;}
+.users-table-wrap{overflow-x:auto;overflow-y:visible;border:1px solid #d9e5de;border-radius:10px;background:#fff;}
+.users-table{width:100%;min-width:1400px;border-collapse:separate;border-spacing:0;font-size:.78rem;table-layout:auto;}
 .users-table th{
   padding:10px 10px;background:#f4f8f6;color:#064E3B;font-weight:700;font-size:.7rem;
   text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #d5e5de;text-align:left;white-space:nowrap;
+  position:sticky;top:0;z-index:1;
 }
 .users-table td{
   padding:9px 10px;border-bottom:1px solid #eef3f0;color:#1a3a2e;vertical-align:middle;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
-.users-table tbody tr:hover{background:#f8fbf9;}
+.users-table th:last-child,.users-table td:last-child{
+  position:sticky;right:0;z-index:2;
+}
+.users-table th:last-child{background:#f4f8f6;border-left:2px solid #d5e5de;}
+.users-table td:last-child{background:#fff;border-left:1px solid #eef3f0;}
+.users-table tbody tr:hover td:last-child{background:#f8fbf9;}
 .users-table tbody tr:last-child td{border-bottom:none;}
 .users-role-badge{
   display:inline-block;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700;
@@ -3285,6 +3322,14 @@ function renderUsers(sessions){
   ct.textContent=n+' session'+(n>1?'s':'')+' enregistrée'+(n>1?'s':'');
   const knownMap={};
   _knownDevices.forEach(d=>{knownMap[d.fingerprint]=d;});
+  /* Compute current device fingerprint */
+  const curUA=navigator.userAgent||'';
+  let curFP='';
+  try{
+    let h=0x811c9dc5;
+    for(let i=0;i<curUA.length;i++){h^=curUA.charCodeAt(i);h=(h*0x01000193)>>>0;}
+    curFP=h.toString(16).padStart(8,'0').substring(0,16);
+  }catch(e){curFP='';}
   tb.innerHTML=sessions.map(s=>{
     const logoutAt=s.logout_at||'';
     const isOnline=!logoutAt;
@@ -3308,17 +3353,32 @@ function renderUsers(sessions){
       fp=h.toString(16).padStart(8,'0').substring(0,16);
     }catch(e){fp='';}
     const kd=knownMap[fp];
+    const isCurrentDevice=(fp===curFP&&fp!=='');
     let badge='';
-    if(kd){
+    if(isCurrentDevice){
+      badge='<span class="users-device-badge users-device-current" title="Appareil actuel">&#9679; Cet appareil</span>';
+    }else if(kd){
       badge=kd.trusted
         ?'<span class="users-device-badge users-device-trusted" title="Appareil fiable">&#10003; Fiable</span>'
-        :'<span class="users-device-badge users-device-untrusted" title="Appareil inconnu">&#9888; Appareil inconnu</span>';
+        :'<span class="users-device-badge users-device-untrusted" title="Autre appareil">&#9679; Autre appareil</span>';
     }else{
       badge='<span class="users-device-badge users-device-untrusted" title="Nouvel appareil détecté">&#9888; Nouvel appareil</span>';
     }
     const emailLabel=email||'—';
-    const disconnectBtn=isOnline?`<button class="btn btn-reset users-btn-disconnect" onclick="disconnectUser(${s.id},'${esc(email).replace(/'/g,"\\'")}')" title="Déconnecter cet utilisateur" style="min-height:28px;padding:3px 8px;font-size:.7rem;white-space:nowrap;">⏻ Déconnecter</button>`:'';
-    const banBtn=!isSelf?`<button class="btn btn-reset users-btn-danger" onclick="banUser(${s.id},'${esc(email).replace(/'/g,"\\'")}')" title="Bannir définitivement" style="min-height:28px;padding:3px 8px;font-size:.7rem;white-space:nowrap;">&#128683; Bannir</button>`:'';
+    const disconnectBtn=isOnline?`<button class="btn btn-reset users-btn-disconnect" onclick="disconnectUser(${s.id},'${esc(email).replace(/'/g,"\\'")}')" title="Déconnecter" style="min-height:28px;padding:3px 8px;font-size:.7rem;white-space:nowrap;">⏻</button>`:'';
+    const showBan=!isSelf;
+    const showDelete=!isSelf||isOnline;
+    const hasDropdown=showBan||showDelete;
+    let dropdownHTML='';
+    if(hasDropdown){
+      let items='';
+      if(showBan) items+=`<button class="dropdown-danger" onclick="banUser(${s.id},'${esc(email).replace(/'/g,"\\'")}')" title="Bannir"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Bannir</button>`;
+      if(showDelete) items+=`<button class="dropdown-danger" onclick="deleteSession(${s.id})" title="Supprimer"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>Supprimer la session</button>`;
+      dropdownHTML=`<div class="users-actions-wrap">
+        <button class="users-actions-more" onclick="event.stopPropagation();this.nextElementSibling.classList.toggle('show')" title="Plus d'actions">&#8943;</button>
+        <div class="users-actions-dropdown">${items}</div>
+      </div>`;
+    }
     return `<tr title="${email} | ${s.os||''} | ${s.navigateur||''} | ${s.ip||''}">
       <td style="text-align:center;"><input type="checkbox" class="users-cb" value="${s.id}" onchange="updateDeleteBtn()"></td>
       <td title="${email}">${esc(emailLabel)}</td>
@@ -3329,11 +3389,12 @@ function renderUsers(sessions){
       <td style="font-family:monospace;font-size:.72rem;" title="${s.ip||''}">${s.ip||'—'}</td>
       <td style="font-size:.72rem;">${loginDisplay}</td>
       <td style="font-size:.72rem;">${logoutDisplay}</td>
-      <td style="display:flex;gap:6px;align-items:center;flex-wrap:nowrap;">
-        ${disconnectBtn}
-        <button class="btn btn-reset" onclick="showUserActivities(${s.id},'${email.replace(/'/g,"\\'")}')" title="Voir les activités" style="min-height:28px;padding:3px 10px;font-size:.7rem;white-space:nowrap;">Activités</button>
-        ${banBtn}
-        <button class="btn-icon-danger" onclick="deleteSession(${s.id})" title="Supprimer cette session"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
+      <td>
+        <div class="users-actions-cell">
+          ${disconnectBtn}
+          <button class="btn btn-reset users-activity-btn" onclick="showUserActivities(${s.id},'${email.replace(/'/g,"\\'")}')" title="Voir les activités" style="min-height:28px;padding:3px 8px;font-size:.7rem;white-space:nowrap;">Activités</button>
+          ${dropdownHTML}
+        </div>
       </td>
     </tr>`;
   }).join('');
@@ -3608,7 +3669,7 @@ function exportUsersPDF(){
     const logoutAt=s.logout_at||'—';
     const status=s.logout_at?'Déconnecté':'En ligne';
     return `<tr>
-      <td style="padding:8px;border-bottom:1px solid #eee;">${s.email||'Utilisateur inconnu'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${s.email||'—'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.role==='admin'?'Admin':'Élève'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.appareil||'—'}</td>
       <td style="padding:8px;border-bottom:1px solid #eee;">${s.ville||'—'}</td>
@@ -3627,7 +3688,7 @@ function exportUsersPDF(){
     </style></head><body>
     <h1>Liste des utilisateurs — SAPHIR Pro</h1>
     <p>${_allSessions.length} session(s) • Exporté le ${new Date().toLocaleDateString('fr-FR')}</p>
-    <table><thead><tr><th>Email</th><th>Rôle</th><th>Appareil</th><th>Ville</th><th>IP</th><th>Connexion</th><th>Déconnexion</th><th>État</th></tr></thead><tbody>${rows}</tbody></table>
+    <table><thead><tr><th>Utilisateur</th><th>Rôle</th><th>Appareil</th><th>Ville</th><th>IP</th><th>Connexion</th><th>Déconnexion</th><th>État</th></tr></thead><tbody>${rows}</tbody></table>
     </body></html>`;
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
@@ -3685,6 +3746,11 @@ function closeNotifPanel(e){
   if(!p.contains(e.target)&&!b.contains(e.target)){_notifOpen=false;p.classList.remove('open');}
 }
 document.addEventListener('click',closeNotifPanel);
+document.addEventListener('click',function(e){
+  document.querySelectorAll('.users-actions-dropdown.show').forEach(dd=>{
+    if(!dd.parentElement.contains(e.target)) dd.classList.remove('show');
+  });
+});
 
 async function loadNotifications(){
   let list=[];
