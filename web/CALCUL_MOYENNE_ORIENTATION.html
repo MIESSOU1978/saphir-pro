@@ -1424,8 +1424,20 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 #page-mo #mo-etablissement{width:100%;}
 
 /* ── Établissement toggle ── */
-.etab-wrap{position:relative;display:flex;align-items:center;}
-.etab-wrap input{flex:1;padding-right:32px;}
+.etab-wrap{display:flex;flex-direction:column;gap:6px;}
+.etab-header{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.etab-header label{margin:0;}
+.etab-abg{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:3px 9px;border-radius:5px;border:1px solid #B8CEC3;
+  background:#F4FAF7;color:#064E3B;font-size:.68rem;font-weight:700;
+  letter-spacing:.3px;cursor:pointer;transition:all .15s;line-height:1;
+  white-space:nowrap;flex-shrink:0;
+}
+.etab-abg:hover{background:#EAF5F0;border-color:#064E3B;color:#064E3B;}
+.etab-abg.active{background:#064E3B;color:#fff;border-color:#064E3B;}
+.etab-row{position:relative;display:flex;align-items:center;}
+.etab-row input{flex:1;padding-right:32px;}
 .etab-toggle{
   position:absolute;right:4px;top:50%;transform:translateY(-50%);
   width:26px;height:26px;border-radius:6px;border:1px solid #D5E5DE;background:#F4F8F6;
@@ -1434,13 +1446,6 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 }
 .etab-toggle:hover{background:#EAF5F0;border-color:#064E3B;color:#064E3B;}
 .etab-toggle.active{background:#064E3B;color:#fff;border-color:#064E3B;}
-.etab-tag{
-  display:none;position:absolute;right:34px;top:-14px;
-  font-size:.58rem;font-weight:700;color:#064E3B;letter-spacing:.3px;
-  background:#EAF5F0;padding:2px 6px;border-radius:4px;
-  border:1px solid #D5E5DE;white-space:nowrap;
-}
-.etab-tag.visible{display:inline;}
 #page-mga .field-group input:hover,
 #page-mga .field-group select:hover,
 #page-mo .field-group input:hover,
@@ -1771,11 +1776,15 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         </select>
       </div>
       <div class="field-group">
-        <label>ÉTABLISSEMENT</label>
         <div class="etab-wrap">
-          <span class="etab-tag" id="etab-tag">ABG</span>
-          <input type="text" id="etablissement" placeholder="Saisir ou sélectionner...">
-          <button type="button" class="etab-toggle" onclick="toggleEtabList('etablissement',this)" title="Pour afficher les étab. de Drenaet Abengourou">&#9660;</button>
+          <div class="etab-header">
+            <label>ÉTABLISSEMENT</label>
+            <button type="button" class="etab-abg" id="etab-abg" onclick="toggleEtabList('etablissement','etab-abg','etab-toggle')" title="Afficher les établissements par défaut">ABG &#9660;</button>
+          </div>
+          <div class="etab-row">
+            <input type="text" id="etablissement" placeholder="Saisir ou sélectionner...">
+            <button type="button" class="etab-toggle" id="etab-toggle" onclick="toggleEtabList('etablissement','etab-abg','etab-toggle')" title="Afficher les établissements par défaut">&#9660;</button>
+          </div>
         </div>
         <datalist id="etablissement-list">
           <option>COLLÈGE DÉPARTEMENTAL AGNIBILÉKROU</option>
@@ -1945,11 +1954,15 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         </select>
       </div>
       <div class="field-group">
-        <label>ÉTABLISSEMENT</label>
         <div class="etab-wrap">
-          <span class="etab-tag" id="mo-etab-tag">ABG</span>
-          <input type="text" id="mo-etablissement" placeholder="Saisir ou sélectionner...">
-          <button type="button" class="etab-toggle" onclick="toggleEtabList('mo-etablissement',this)" title="Pour afficher les étab. de Drenaet Abengourou">&#9660;</button>
+          <div class="etab-header">
+            <label>ÉTABLISSEMENT</label>
+            <button type="button" class="etab-abg" id="mo-etab-abg" onclick="toggleEtabList('mo-etablissement','mo-etab-abg','mo-etab-toggle')" title="Afficher les établissements par défaut">ABG &#9660;</button>
+          </div>
+          <div class="etab-row">
+            <input type="text" id="mo-etablissement" placeholder="Saisir ou sélectionner...">
+            <button type="button" class="etab-toggle" id="mo-etab-toggle" onclick="toggleEtabList('mo-etablissement','mo-etab-abg','mo-etab-toggle')" title="Afficher les établissements par défaut">&#9660;</button>
+          </div>
         </div>
       </div>
     </div>
@@ -3462,18 +3475,20 @@ let _knownDevices=[];
 let _bannedUsers=[];
 let _actBulletinData=[];
 
-function toggleEtabList(inputId, btn){
+function toggleEtabList(inputId, abgId, toggleId){
   const input=document.getElementById(inputId);
+  const abg=document.getElementById(abgId);
+  const toggle=document.getElementById(toggleId);
   if(!input) return;
-  const tag=document.getElementById(inputId==='etablissement'?'etab-tag':'mo-etab-tag');
-  if(input.getAttribute('list')){
+  const isActive=input.getAttribute('list');
+  if(isActive){
     input.removeAttribute('list');
-    btn.classList.remove('active');
-    if(tag) tag.classList.remove('visible');
+    if(abg) abg.classList.remove('active');
+    if(toggle) toggle.classList.remove('active');
   }else{
     input.setAttribute('list','etablissement-list');
-    btn.classList.add('active');
-    if(tag) tag.classList.add('visible');
+    if(abg) abg.classList.add('active');
+    if(toggle) toggle.classList.add('active');
     input.focus();
   }
 }
