@@ -4112,7 +4112,7 @@ async function loadIncomingMessages(){
     const msgs=await r.json();
     const unread=msgs.filter(m=>!m.lu);
     unread.forEach(m=>{
-      showMsgPopup(m);
+      showMsgPopup({message:m.msg_content||m.message||'',created_at:m.created_at||''});
       fetch(API+'/api/messages/'+m.id+'/read',{method:'POST',credentials:'same-origin'}).catch(()=>{});
     });
   }catch(e){}
