@@ -667,6 +667,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 }
 .users-table th:last-child{background:#f4f8f6;border-left:2px solid #d5e5de;}
 .users-table td:last-child{background:#fff;border-left:1px solid #eef3f0;}
+.users-cb-self{opacity:.3;cursor:not-allowed;}
 .users-table tbody tr:hover td:last-child{background:#f8fbf9;}
 .users-table tbody tr:last-child td{border-bottom:none;}
 .users-role-badge{
@@ -3412,7 +3413,7 @@ function _sseOnEvent(data){
       loadUsers().then(()=>{
         if(wrap){wrap.scrollLeft=scrollLeft;wrap.scrollTop=scrollTop;}
         selected.forEach(id=>{
-          const cb=document.querySelector('.users-cb[value="'+id+'"]');
+          const cb=document.querySelector('.users-cb[value="'+id+'"]:not(:disabled)');
           if(cb){cb.checked=true;}
         });
         updateDeleteBtn();
@@ -3612,7 +3613,7 @@ function renderUsers(sessions){
       </div>`;
     }
     return `<tr title="${email} | ${s.os||''} | ${s.navigateur||''} | ${s.ip||''}">
-      <td style="text-align:center;"><input type="checkbox" class="users-cb" value="${s.id}" onchange="updateDeleteBtn()"></td>
+      <td style="text-align:center;"><input type="checkbox" class="users-cb${isSelf?' users-cb-self':''}" value="${s.id}" ${isSelf?'disabled title="Votre session active"':''} onchange="updateDeleteBtn()"></td>
       <td title="${email}">${esc(emailLabel)}</td>
       <td><span class="users-role-badge ${roleCls}">${roleLabel}</span></td>
       <td title="${s.appareil||''}">${s.appareil||'—'} ${badge}</td>
@@ -3704,7 +3705,7 @@ function filterUsers(){
 }
 
 function toggleSelectAll(cb){
-  document.querySelectorAll('.users-cb').forEach(c=>{c.checked=cb.checked;});
+  document.querySelectorAll('.users-cb:not(:disabled)').forEach(c=>{c.checked=cb.checked;});
   updateDeleteBtn();
 }
 
