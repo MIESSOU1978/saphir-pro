@@ -877,15 +877,21 @@ class _Handler(BaseHTTPRequestHandler):
         if path == "/api/messages/send":
             if self._get_role() != "admin":
                 return self._json({"error": "Accès refusé"}, 403)
-            body = self._read_body()
-            recipient = body.get("recipient", "").strip()
-            message = body.get("message", "").strip()
-            if not recipient or not message:
-                return self._json({"error": "Destinataire et message requis"}, 400)
-            sender = "admin"
-            mid = db.send_message(sender, recipient, message)
-            _sse_emit("new_message", {"id": mid, "sender": sender, "recipient": recipient, "message": message})
-            return self._json({"ok": True, "id": mid}, 201)
+            try:
+                body = self._read_body()
+                recipient = body.get("recipient", "").strip()
+                message = body.get("message", "").strip()
+                if not recipient or not message:
+                    return self._json({"error": "Destinataire et message requis"}, 400)
+                sender = "admin"
+                mid = db.send_message(sender, recipient, message)
+                print(f"[MSG] sent id={mid} from={sender} to={recipient}")
+                _sse_emit("new_message", {"id": mid, "sender": sender, "recipient": recipient, "message": message})
+                return self._json({"ok": True, "id": mid}, 201)
+            except Exception as exc:
+                print(f"[MSG ERROR] {exc}")
+                import traceback; traceback.print_exc()
+                return self._json({"error": "Erreur interne du serveur"}, 500)
 
         # ── CHECK BANNED (must be before auth) ──
         if path == "/api/check-banned":
