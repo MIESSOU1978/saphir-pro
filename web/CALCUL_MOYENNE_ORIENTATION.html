@@ -1434,6 +1434,12 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 }
 .etab-toggle:hover{background:#EAF5F0;border-color:#064E3B;color:#064E3B;}
 .etab-toggle.active{background:#064E3B;color:#fff;border-color:#064E3B;}
+.etab-tag{
+  display:none;position:absolute;right:36px;top:-2px;
+  font-size:.58rem;font-weight:700;color:#064E3B;letter-spacing:.3px;
+  background:#EAF5F0;padding:1px 5px;border-radius:4px;
+}
+.etab-tag.visible{display:inline;}
 #page-mga .field-group input:hover,
 #page-mga .field-group select:hover,
 #page-mo .field-group input:hover,
@@ -1766,6 +1772,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       <div class="field-group">
         <label>ÉTABLISSEMENT</label>
         <div class="etab-wrap">
+          <span class="etab-tag" id="etab-tag">ABG</span>
           <input type="text" id="etablissement" placeholder="Saisir ou sélectionner...">
           <button type="button" class="etab-toggle" onclick="toggleEtabList('etablissement',this)" title="Pour afficher les étab. de Drenaet Abengourou">&#9660;</button>
         </div>
@@ -1939,6 +1946,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       <div class="field-group">
         <label>ÉTABLISSEMENT</label>
         <div class="etab-wrap">
+          <span class="etab-tag" id="mo-etab-tag">ABG</span>
           <input type="text" id="mo-etablissement" placeholder="Saisir ou sélectionner...">
           <button type="button" class="etab-toggle" onclick="toggleEtabList('mo-etablissement',this)" title="Pour afficher les étab. de Drenaet Abengourou">&#9660;</button>
         </div>
@@ -3456,12 +3464,15 @@ let _actBulletinData=[];
 function toggleEtabList(inputId, btn){
   const input=document.getElementById(inputId);
   if(!input) return;
+  const tag=document.getElementById(inputId==='etablissement'?'etab-tag':'mo-etab-tag');
   if(input.getAttribute('list')){
     input.removeAttribute('list');
     btn.classList.remove('active');
+    if(tag) tag.classList.remove('visible');
   }else{
     input.setAttribute('list','etablissement-list');
     btn.classList.add('active');
+    if(tag) tag.classList.add('visible');
     input.focus();
   }
 }
