@@ -1008,7 +1008,7 @@ msg-dialog .msg-dlg-btn-read:hover{background:#0B6B50;}
 .bp-summary-label{color:#6b7a70;font-size:8pt;font-weight:900;text-transform:uppercase;letter-spacing:.4px;}
 .bp-summary-mo .bp-summary-label{color:#4f675a;}
 .bp-summary-total .bp-summary-label{color:#4f675a;font-size:9pt;letter-spacing:.8px;}
-.bp-total-value{margin-top:2mm;color:#0b3d2e;font-size:22pt;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.5px;}
+.bp-total-value{margin-top:2mm;color:#0b3d2e;font-size:28pt;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.5px;}
 .bp-mo-value{margin-top:1.5mm;font-size:34pt;font-weight:900;line-height:1;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:1.5mm;}
 .bp-mo-value span{font-size:34pt;}
 .bp-summary-mo.is-passing .bp-mo-value{color:#087443;}
@@ -1020,7 +1020,7 @@ msg-dialog .msg-dlg-btn-read:hover{background:#0B6B50;}
 .bp-mention.mention-pass{background:rgba(8,116,67,.12);color:#087443;}
 .bp-mention.mention-warn{background:rgba(217,154,19,.15);color:#92710a;}
 .bp-mention.mention-fail{background:#FDECEA;color:#B42318;}
-.bp-footer{padding-top:2mm;border-top:.4mm solid #0b3d2e;text-align:center;color:#87958d;font-size:8pt;}
+.bp-footer{padding-top:2mm;border-top:.4mm solid #0b3d2e;display:flex;justify-content:space-between;align-items:flex-end;color:#87958d;font-size:8pt;}
 #bp-filename{color:#0b3d2e;font-size:8pt;font-weight:700;text-align:center;align-self:center;display:none;}
 .bp-footer strong{color:#0b3d2e;}
 .bp-footer-right{text-align:left;}
@@ -1990,8 +1990,8 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
           <th>MA <span class="mga-injected" id="mga-badge" style="display:none;">✔ injecté</span></th>
           <th>Note BEPC</th>
           <th>MA + BEPC</th>
-          <th>Coeff.</th>
-          <th style="background:#0a6b4e;">TOTAL PONDÉRÉ <span style="font-weight:400;font-size:.62rem;display:block;letter-spacing:.3px;text-transform:none;opacity:.65;margin-top:2px;">(MA + BEPC) × Coeff.</span></th>
+          <th>Cœff.</th>
+          <th style="background:#0a6b4e;">TOTAL PONDÉRÉ <span style="font-weight:400;font-size:.62rem;display:block;letter-spacing:.3px;text-transform:none;opacity:.65;margin-top:2px;">(MA + BEPC) × Cœff.</span></th>
         </tr>
       </thead>
       <tbody id="mo-tbody"></tbody>
@@ -2257,7 +2257,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 <!-- BULLETIN A4 DYNAMIQUE -->
 <section id="bulletin-print" aria-hidden="true">
   <article class="bulletin-sheet">
-    <div class="bp-tricolor"><span></span><span>SAPHIR <strong>&nbsp;Pro</strong> | Orientation en seconde</span><span></span></div>
+    <div class="bp-tricolor"><span></span><span>SAPHIR <strong>&nbsp;Pro</strong>-Orientation en seconde</span><span></span></div>
     <header class="bp-header">
       <div class="bp-header-top">
         <div class="bp-ministry">
@@ -2294,7 +2294,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
           <div class="bp-student-name" id="bp-name">NON RENSEIGNÉ</div>
           <div class="bp-student-meta">
             <span>Classe : <strong id="bp-class">-</strong></span><span class="bp-student-sep">•</span>
-            <span><strong id="bp-school">NON RENSEIGNÉ</strong></span>
+            <span><strong id="bp-school">NON RENSEIGNÉ</strong></span><span class="bp-student-sep">•</span>
             <span>Année scolaire : <strong id="bp-year">-</strong></span>
           </div>
         </div>
@@ -2305,7 +2305,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       <div class="bp-table-wrap">
         <table class="bp-grades">
           <colgroup><col><col><col><col><col><col></colgroup>
-<thead><tr><th>Matière</th><th>MA</th><th>Note BEPC</th><th>MA + BEPC</th><th>Coeff.</th><th>Total pondéré</th></tr></thead>
+<thead><tr><th>Matière</th><th>MA</th><th>Note BEPC</th><th>MA + BEPC</th><th>Cœff.</th><th>Total pondéré</th></tr></thead>
           <tbody id="bp-grades-body"></tbody>
         </table>
       </div>
@@ -2326,8 +2326,17 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       </div>
     </div>
 
+    <div class="bp-bottom-brand">
+      <div class="bp-bottom-brand-line"></div>
+      <div class="bp-bottom-brand-name">SAPHIR <span>Pro</span></div>
+      <div class="bp-bottom-brand-sub">Système d'Aide à l'Orientation Scolaire</div>
+      <div class="bp-bottom-brand-contact">07 08 10 98 40 / 01 52 03 06 22</div>
+    </div>
+
     <footer class="bp-footer">
-      <div>Édité via <strong>SAPHIR Pro</strong> — Document généré le <span id="bp-date">-</span></div>
+      <div>Édité via <strong>SAPHIR Pro</strong></div>
+      <div id="bp-filename"></div>
+      <div class="bp-footer-right"><div class="bp-footer-date">Document généré le <span id="bp-date">-</span></div></div>
     </footer>
     <div class="bp-nonprofit">Projet à but non lucratif, développé pour accompagner les utilisateurs et leur offrir un service utile, sans recherche de profit financier.</div>
   </article>
@@ -3161,21 +3170,22 @@ function buildBulletinHTML(h){
   else if(mo>=8){mention='Insuffisant';mCls='mention-fail';}
   else if(mo>0){mention='Très insuffisant';mCls='mention-fail';}
   return `<article class="bulletin-sheet">
-<div class="bp-tricolor"><span></span><span>SAPHIR <strong>&nbsp;Pro</strong> | Orientation en seconde</span><span></span></div>
+<div class="bp-tricolor"><span></span><span>SAPHIR <strong>&nbsp;Pro</strong>-Orientation en seconde</span><span></span></div>
 <header class="bp-header"><div class="bp-header-top"><div class="bp-ministry"><span>Ministère de l'Éducation Nationale,</span><span>de l'Alphabétisation</span><span>et de l'Enseignement Technique</span></div><div class="bp-state"><div class="bp-republique">République de Côte d'Ivoire</div><div class="bp-devise">Union - Discipline - Travail</div></div></div>
 <div class="bp-header-rule"></div>
 <div class="bp-title-row"><div class="bp-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10 12 5l10 5-10 5L2 10Z"/><path d="M6 12.5V17c2.8 2.4 9.2 2.4 12 0v-4.5"/><path d="M22 10v6"/></svg></div><div><div class="bp-title">Calcul de la Moyenne d'Orientation</div><div class="bp-subtitle">Fiche individuelle de calcul de la moyenne d'orientation</div></div></div>
 </header>
 <div class="bp-content">
 <div class="bp-section-title"><span class="bp-section-num">1</span><span>Informations de l'élève</span><span class="bp-section-line"></span></div>
-<div class="bp-student"><div class="bp-avatar">${initials}</div><div class="bp-student-info"><div class="bp-student-name">${name}</div><div class="bp-student-meta"><span>Classe : <strong>${classe}</strong></span><span class="bp-student-sep">•</span><span><strong>${school}</strong></span><span>Année scolaire : <strong>${year}</strong></span></div></div><div class="bp-matricule"><small>Matricule</small><span>${matricule}</span></div></div>
+<div class="bp-student"><div class="bp-avatar">${initials}</div><div class="bp-student-info"><div class="bp-student-name">${name}</div><div class="bp-student-meta"><span>Classe : <strong>${classe}</strong></span><span class="bp-student-sep">•</span><span><strong>${school}</strong></span><span class="bp-student-sep">•</span><span>Année scolaire : <strong>${year}</strong></span></div></div><div class="bp-matricule"><small>Matricule</small><span>${matricule}</span></div></div>
 <div class="bp-section-title"><span class="bp-section-num">2</span><span>Relevé des notes par matière</span><span class="bp-section-line"></span></div>
-<div class="bp-table-wrap"><table class="bp-grades"><colgroup><col><col><col><col><col><col></colgroup><thead><tr><th>Matière</th><th>MA</th><th>Note BEPC</th><th>MA + BEPC</th><th>Coeff.</th><th>Total pondéré</th></tr></thead><tbody>${rows}</tbody></table></div>
+<div class="bp-table-wrap"><table class="bp-grades"><colgroup><col><col><col><col><col><col></colgroup><thead><tr><th>Matière</th><th>MA</th><th>Note BEPC</th><th>MA + BEPC</th><th>Cœff.</th><th>Total pondéré</th></tr></thead><tbody>${rows}</tbody></table></div>
 <div class="bp-table-note">Total pondéré = (MA + Note BEPC) × Coefficient</div>
 <div class="bp-section-title"><span class="bp-section-num">3</span><span>Synthèse</span><span class="bp-section-line"></span></div>
 <div class="bp-summary"><div class="bp-summary-box bp-summary-total"><div class="bp-summary-label">Total général pondéré</div><div class="bp-total-value">${totalDisplay}</div><div class="bp-summary-sub"></div></div><div class="bp-summary-box bp-summary-mo ${moClass}"><div class="bp-summary-label">Moyenne d'orientation</div><div class="bp-mo-value"><span>${moDisplay}</span><small>/ 20</small></div><div class="bp-mention ${mCls}">${mention}</div></div></div>
 </div>
-<footer class="bp-footer"><div>Édité via <strong>SAPHIR Pro</strong> — Document généré le <span>${today}</span></div></footer>
+<div class="bp-bottom-brand"><div class="bp-bottom-brand-line"></div><div class="bp-bottom-brand-name">SAPHIR <span>Pro</span></div><div class="bp-bottom-brand-sub">Système d'Aide à l'Orientation Scolaire</div><div class="bp-bottom-brand-contact">07 08 10 98 40 / 01 52 03 06 22</div></div>
+<footer class="bp-footer"><div>Édité via <strong>SAPHIR Pro</strong></div><div></div><div class="bp-footer-right"><div class="bp-footer-date">Document généré le <span>${today}</span></div></div></footer>
 <div class="bp-nonprofit">Projet à but non lucratif, développé pour accompagner les utilisateurs et leur offrir un service utile, sans recherche de profit financier.</div>
 </article>`;
 }
