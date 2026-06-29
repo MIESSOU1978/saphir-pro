@@ -1024,9 +1024,9 @@ msg-dialog .msg-dlg-btn-read:hover{background:#0B6B50;}
 .bp-footer strong{color:#0b3d2e;}
 .bp-footer-right{text-align:left;}
 .bp-footer-date{color:#0b3d2e;font-weight:700;}
-.bp-nonprofit{margin-top:3mm;text-align:center;color:#87958d;font-size:7pt;font-style:italic;line-height:1.4;}
+.bp-nonprofit{margin-top:2mm;text-align:center;color:#87958d;font-size:7pt;font-style:italic;line-height:1.4;}
 
-.bp-bottom-brand{margin-top:5mm;padding-top:4mm;text-align:center;}
+.bp-bottom-brand{margin-top:3mm;padding-top:3mm;text-align:center;}
 .bp-bottom-brand-line{height:1px;margin:0 auto 3.5mm;max-width:60%;background:linear-gradient(90deg,transparent,#dfe7e2 30%,#0b4a35 50%,#dfe7e2 70%,transparent);}
 .bp-bottom-brand-name{font-size:14pt;font-weight:900;color:#0b4a35;line-height:1;}
 .bp-bottom-brand-name span{color:#f2b632;}
@@ -1649,7 +1649,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 .hist-year-filter select:focus{outline:none;border-color:#064e3b;box-shadow:0 0 0 3px rgba(11,107,80,.1);}
 
 @media print{
-  @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;@top-left{content:none;}@top-center{content:none;}@top-right{content:none;}@bottom-left{content:none;}@bottom-center{content:none;}@bottom-right{content:none;}}
+  @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;@top-left{content:none;}@top-center{content:none;}@top-right{content:none;}@bottom-left{content:none;}@bottom-center{content:none;}@bottom-right{content:none;}}
   html,body{width:auto!important;min-height:0!important;background:#fff!important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
   body{display:block!important;}
   body>header,body>nav,body>main,body>#toast{display:none!important;}
@@ -2920,7 +2920,7 @@ function printSelection(){
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}</style></head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</style></head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
 }
@@ -2931,7 +2931,7 @@ function exportSelection(){
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}</style></head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</style></head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
 }
@@ -3052,7 +3052,7 @@ ${styles}
 <style>
   body{margin:0;padding:0;background:#fff;}
   .bulletin-sheet{page-break-after:auto;margin:0;padding:0;}
-  @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
+  @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
 </style></head><body>${page}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
@@ -3082,7 +3082,7 @@ ${styles}
   .preview-toolbar-btn{background:#fff;color:#064E3B;border:none;padding:8px 16px;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
   .preview-toolbar-btn:hover{background:#F4FAF7;}
   .preview-page-wrap{display:flex;justify-content:center;padding:60px 16px 24px;min-height:100vh;}
-  .preview-a4{width:210mm;min-height:297mm;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.18);padding:8mm 10mm 8mm 12mm;overflow:hidden;}
+  .preview-a4{width:210mm;min-height:297mm;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.18);padding:8mm 10mm 5mm 12mm;overflow:hidden;}
   .bulletin-sheet{width:100%;margin:0;padding:0;box-shadow:none;border:none;background:transparent;}
   .bulletin-sheet .bp-header{box-shadow:none;border:1px solid #dfe7e2;border-top:0;}
   .bulletin-sheet .bp-table-wrap{border:1px solid #bdcdc4;}
@@ -3092,7 +3092,7 @@ ${styles}
     .preview-page-wrap{padding:0;margin:0;display:block;}
     .preview-a4{width:100%;min-height:auto;padding:0;box-shadow:none;background:transparent;}
     .bulletin-sheet{width:100%;margin:0;box-shadow:none;}
-    @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
+    @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
   }
 </style></head><body>
 <div class="preview-toolbar">
@@ -3201,7 +3201,7 @@ ${styles}
   body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
   .bulletin-sheet{page-break-after:always;margin:0;padding:0;}
   .bulletin-sheet:last-child{page-break-after:auto;}
-  @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
+  @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
 </style></head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>{win.print();},600);
@@ -3422,7 +3422,7 @@ ${styles}
   .preview-toolbar-btn{background:#fff;color:#064E3B;border:none;padding:8px 16px;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
   .preview-toolbar-btn:hover{background:#F4FAF7;}
   .preview-page-wrap{display:flex;justify-content:center;padding:60px 16px 24px;min-height:100vh;}
-  .preview-a4{width:210mm;min-height:297mm;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.18);padding:8mm 10mm 8mm 12mm;overflow:hidden;}
+  .preview-a4{width:210mm;min-height:297mm;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.18);padding:8mm 10mm 5mm 12mm;overflow:hidden;}
   .bulletin-sheet{width:100%;margin:0;padding:0;box-shadow:none;border:none;background:transparent;}
   .bulletin-sheet .bp-header{box-shadow:none;border:1px solid #dfe7e2;border-top:0;}
   .bulletin-sheet .bp-table-wrap{border:1px solid #bdcdc4;}
@@ -3432,7 +3432,7 @@ ${styles}
     .preview-page-wrap{padding:0;margin:0;display:block;}
     .preview-a4{width:100%;min-height:auto;padding:0;box-shadow:none;background:transparent;}
     .bulletin-sheet{width:100%;margin:0;box-shadow:none;}
-    @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
+    @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
   }
 </style></head><body>
 <div class="preview-toolbar">
@@ -4114,7 +4114,7 @@ ${styles}
   *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
   body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
   .bulletin-sheet{margin:0;padding:0;}
-  @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
+  @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
 </style></head><body>${html}</body></html>`);
   win.document.close();
   toast('Aperçu bulletin pour '+d.nom);
