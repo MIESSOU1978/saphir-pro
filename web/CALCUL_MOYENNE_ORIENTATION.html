@@ -967,7 +967,8 @@ msg-dialog .msg-dlg-btn-read:hover{background:#0B6B50;}
 .bp-mark svg{width:7mm;height:7mm;display:block;}
 .bp-title{font-size:15pt;font-weight:900;line-height:1.2;}
 .bp-to-badge{display:inline-flex;align-items:center;justify-content:center;width:5mm;height:5mm;border-radius:50%;background:#064E3B;color:#fff;font-size:7pt;font-weight:900;letter-spacing:0;line-height:1;}
-.bp-to-col-badge{position:absolute;top:-3mm;right:0;}
+.bp-th-to{position:relative;}
+.bp-to-col-badge{position:absolute;top:-3mm;right:2mm;z-index:2;}
 .bp-subtitle{margin-top:1mm;color:#6b7a70;font-size:9pt;line-height:1.3;}
 
 .bp-content{padding-top:3mm;}
@@ -2318,11 +2319,10 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       </div>
 
       <div class="bp-section-title"><span class="bp-section-num">2</span><span>Relevé des notes par matière</span><span class="bp-section-line"></span></div>
-      <div class="bp-table-wrap" style="position:relative;">
-        <div class="bp-to-badge bp-to-col-badge" id="bp-to-col" style="display:none;">TO</div>
+      <div class="bp-table-wrap">
         <table class="bp-grades">
           <colgroup><col><col><col><col><col><col></colgroup>
-<thead><tr><th>Matière</th><th>MA</th><th>Note BEPC</th><th>MA + BEPC</th><th>Cœff.</th><th>Total pondéré</th></tr></thead>
+<thead><tr><th>Matière</th><th>MA</th><th>Note BEPC</th><th>MA + BEPC</th><th>Cœff.</th><th id="bp-th-total">Total pondéré<span class="bp-to-badge bp-to-col-badge" id="bp-to-col" style="display:none;">TO</span></th></tr></thead>
           <tbody id="bp-grades-body"></tbody>
         </table>
       </div>
@@ -3240,7 +3240,7 @@ function buildBulletinHTML(h){
 <div class="bp-section-title"><span class="bp-section-num">1</span><span>Informations de l'élève</span><span class="bp-section-line"></span></div>
 <div class="bp-student"><div class="bp-avatar">${initials}</div><div class="bp-student-info"><div class="bp-student-name">${name}</div><div class="bp-student-meta"><span>Classe : <strong>${classe}</strong></span><span class="bp-student-sep">•</span><span><strong>${school}</strong></span><span class="bp-student-sep">•</span><span>Année scolaire : <strong>${year}</strong></span></div></div><div class="bp-matricule"><small>Matricule</small><span>${matricule}</span></div></div>
 <div class="bp-section-title"><span class="bp-section-num">2</span><span>Relevé des notes par matière</span><span class="bp-section-line"></span></div>
-<div class="bp-table-wrap" style="position:relative;">${isTO?'<div class="bp-to-badge bp-to-col-badge">TO</div>':''}<table class="bp-grades"><colgroup><col><col><col><col><col><col></colgroup><thead><tr><th>Matière</th><th>MA</th><th>Note BEPC</th><th>MA + BEPC</th><th>Cœff.</th><th>Total pondéré</th></tr></thead><tbody>${rows}</tbody></table></div>
+<div class="bp-table-wrap"><table class="bp-grades"><colgroup><col><col><col><col><col><col></colgroup><thead><tr><th>Matière</th><th>MA</th><th>Note BEPC</th><th>MA + BEPC</th><th>Cœff.</th><th class="${isTO?'bp-th-to':''}">Total pondéré${isTO?'<span class="bp-to-badge bp-to-col-badge">TO</span>':''}</th></tr></thead><tbody>${rows}</tbody></table></div>
 <div class="bp-table-note">Total pondéré = (MA + Note BEPC) × Coefficient</div>
 <div class="bp-section-title"><span class="bp-section-num">3</span><span>Synthèse</span><span class="bp-section-line"></span></div>
 <div class="bp-summary"><div class="bp-summary-box bp-summary-total"><div class="bp-summary-label">Total général pondéré</div><div class="bp-total-value">${totalDisplay}</div><div class="bp-summary-sub"></div></div><div class="bp-summary-box bp-summary-mo ${moClass}"><div class="bp-summary-label">Moyenne d'orientation</div><div class="bp-mo-value"><span>${moDisplay}</span><small>/ 20</small></div><div class="bp-mention ${mCls}">${mention}</div></div></div>
@@ -3310,6 +3310,8 @@ function buildBulletin(){
   if(titleEl) titleEl.innerHTML='Calcul de la Moyenne d\'Orientation'+(_toMode?' <span class="bp-to-badge">TO</span>':'');
   const toColEl=document.getElementById('bp-to-col');
   if(toColEl) toColEl.style.display=_toMode?'inline-flex':'none';
+  const thTotalEl=document.getElementById('bp-th-total');
+  if(thTotalEl) thTotalEl.className=_toMode?'bp-th-to':'';
 
   document.getElementById('bp-grades-body').innerHTML=MATIERES.map(m=>{
     let bepc;
