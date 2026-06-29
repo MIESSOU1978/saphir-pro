@@ -2645,7 +2645,7 @@ function logMOCompletion(){
     else{d.bepc=parseNoteValue(document.getElementById(m.id+'_bepc')?.value);}
     matieres[m.id]=d;
   });
-  const payload={nom,matricule,classe,etablissement:etab,annee_scolaire:anneeScolaire,mo,mention,total,matieres};
+  const payload={nom,matricule,classe,etablissement:etab,annee_scolaire:anneeScolaire,mo,mention,total,matieres,to_mode:_toMode};
   const detail=JSON.stringify(payload);
   logActivity('Saisie complète des matières dans Calcul MO','Calcul MO',detail,'succes');
   sendNotification('Calcul MO terminé','Saisie complète des matières pour '+nom+' — '+classe,'success');
@@ -2842,7 +2842,7 @@ async function saveToHistory(){
     else{d.bepc=parseNoteValue(document.getElementById(m.id+'_bepc')?.value);}
     matieres[m.id]=d;
   });
-  const payload={nom,matricule,classe,etablissement:etab,annee:anneeScolaire,annee_scolaire:anneeScolaire,total:parseFloat(String(total).replace(',','.'))||0,mo:parseFloat(String(mo).replace(',','.'))||0,mention,matieres,created_by:localStorage.getItem('saphir_email')||''};
+  const payload={nom,matricule,classe,etablissement:etab,annee:anneeScolaire,annee_scolaire:anneeScolaire,total:parseFloat(String(total).replace(',','.'))||0,mo:parseFloat(String(mo).replace(',','.'))||0,mention,matieres,created_by:localStorage.getItem('saphir_email')||'',to_mode:_toMode};
   try{
     let r;let savedId=editingId||null;
     if(editingId){
@@ -3164,7 +3164,7 @@ function buildBulletinHTML(h){
   })();
   const classe=esc(h.classe||'-');
   const school=esc(h.etablissement||'NON RENSEIGNÉ');
-  const year=esc(h.annee_scolaire||h.annee||'-')+(_toMode?' — TEST D\'ORIENTATION':'');
+  const year=esc(h.annee_scolaire||h.annee||'-')+(h.to_mode?' — TEST D\'ORIENTATION':'');
   const matricule=esc(h.matricule||'-');
   const today=new Date().toLocaleDateString('fr-FR');
   let totalWeighted=0;
@@ -3179,7 +3179,8 @@ function buildBulletinHTML(h){
       const rawOral=d.bepc_oral!=null?Number(d.bepc_oral):null;
       const ecrit=Number.isFinite(rawEcrit)?rawEcrit:null;
       const oral=Number.isFinite(rawOral)?rawOral:null;
-      bepc=ecrit!=null&&oral!=null?(ecrit+oral)/2:0;
+      bepc=ecrit!=null&&oral!=null?(ecrit+oral)/2:(ecrit!=null?ecrit:0);
+      if(h.to_mode) bepc=ecrit!=null?ecrit:0;
       hasData=mgaVal!=null||ecrit!=null||oral!=null;
       const ecritS=ecrit!=null?fmtNum(ecrit,2):'—';
       const oralS=oral!=null?fmtNum(oral,2):'—';
@@ -3213,7 +3214,7 @@ function buildBulletinHTML(h){
 <div class="bp-tricolor"><span></span><span>SAPHIR <strong>&nbsp;Pro</strong>-Orientation en seconde</span><span></span></div>
 <header class="bp-header"><div class="bp-header-top"><div class="bp-ministry"><span>Ministère de l'Éducation Nationale,</span><span>de l'Alphabétisation</span><span>et de l'Enseignement Technique</span></div><div class="bp-state"><div class="bp-republique">République de Côte d'Ivoire</div><div class="bp-devise">Union - Discipline - Travail</div></div></div>
 <div class="bp-header-rule"></div>
-<div class="bp-title-row"><div class="bp-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10 12 5l10 5-10 5L2 10Z"/><path d="M6 12.5V17c2.8 2.4 9.2 2.4 12 0v-4.5"/><path d="M22 10v6"/></svg></div><div><div class="bp-title">Calcul de la Moyenne d'Orientation${_toMode?' <span class="bp-to-badge">TO</span>':''}</div><div class="bp-subtitle">Fiche individuelle de calcul de la moyenne d'orientation</div></div></div>
+<div class="bp-title-row"><div class="bp-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10 12 5l10 5-10 5L2 10Z"/><path d="M6 12.5V17c2.8 2.4 9.2 2.4 12 0v-4.5"/><path d="M22 10v6"/></svg></div><div><div class="bp-title">Calcul de la Moyenne d'Orientation${h.to_mode?' <span class="bp-to-badge">TO</span>':''}</div><div class="bp-subtitle">Fiche individuelle de calcul de la moyenne d'orientation</div></div></div>
 </header>
 <div class="bp-content">
 <div class="bp-section-title"><span class="bp-section-num">1</span><span>Informations de l'élève</span><span class="bp-section-line"></span></div>
@@ -3289,7 +3290,7 @@ function buildBulletin(){
   document.getElementById('bp-grades-body').innerHTML=MATIERES.map(m=>{
     let bepc;
     if(m.anglais){
-      if(_toMode){
+      if(h.to_mode){
         bepc=`<span class="bp-pill bp-pill-bepc">${bulletinEntry(m.id+'_bepc_e')}</span>`;
       } else {
         bepc=`<div class="bp-dual">
