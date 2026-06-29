@@ -2846,7 +2846,7 @@ async function saveToHistory(){
   const mo=document.getElementById('r-mo').textContent;
   const mention=document.getElementById('r-mention').textContent;
   const etab=(document.getElementById('mo-etablissement').value||document.getElementById('etablissement')?.value||'').trim();
-  const matieres={};
+  const matieres={_to_mode:_toMode};
   MATIERES.forEach(m=>{
     const d={mga:parseNoteValue(document.getElementById(m.id+'_mga')?.value)};
     if(m.anglais){d.bepc_ecrit=parseNoteValue(document.getElementById(m.id+'_bepc_e')?.value);d.bepc_oral=parseNoteValue(document.getElementById(m.id+'_bepc_o')?.value);}
@@ -3033,6 +3033,8 @@ function loadCalcToMO(h){
     }
     calcRowMO(m.id);
   });
+  const shouldTO=!!(h.to_mode||(h.matieres&&h.matieres._to_mode));
+  if(shouldTO!==_toMode) toggleTO();
   updateMOInfo();
 }
 function cancelEdit(){
@@ -3167,6 +3169,7 @@ ${styles}
 
 /* ════ IMPRESSION MULTIPLE ════ */
 function buildBulletinHTML(h){
+  const isTO=!!(h.to_mode||(h.matieres&&h.matieres._to_mode));
   const name=esc((h.nom||'NON RENSEIGNÉ').toUpperCase());
   const initials=(()=>{
     const parts=(h.nom||'').trim().split(/\s+/).filter(Boolean);
@@ -3175,7 +3178,7 @@ function buildBulletinHTML(h){
   })();
   const classe=esc(h.classe||'-');
   const school=esc(h.etablissement||'NON RENSEIGNÉ');
-  const year=esc(h.annee_scolaire||h.annee||'-')+(h.to_mode?' — TEST D\'ORIENTATION':'');
+  const year=esc(h.annee_scolaire||h.annee||'-')+(isTO?' — TEST D\'ORIENTATION':'');
   const matricule=esc(h.matricule||'-');
   const today=new Date().toLocaleDateString('fr-FR');
   let totalWeighted=0;
@@ -3191,11 +3194,15 @@ function buildBulletinHTML(h){
       const ecrit=Number.isFinite(rawEcrit)?rawEcrit:null;
       const oral=Number.isFinite(rawOral)?rawOral:null;
       bepc=ecrit!=null&&oral!=null?(ecrit+oral)/2:(ecrit!=null?ecrit:0);
-      if(h.to_mode) bepc=ecrit!=null?ecrit:0;
+      if(isTO) bepc=ecrit!=null?ecrit:0;
       hasData=mgaVal!=null||ecrit!=null||oral!=null;
       const ecritS=ecrit!=null?fmtNum(ecrit,2):'—';
       const oralS=oral!=null?fmtNum(oral,2):'—';
-      bepcDisplay=`<div class="bp-dual"><span class="bp-dual-item">${ecritS}<small>Écrit</small></span><span class="bp-dual-link"></span><span class="bp-dual-item">${oralS}<small>Oral</small></span></div>`;
+      if(isTO){
+        bepcDisplay=`<span class="bp-pill bp-pill-bepc">${ecritS}</span>`;
+      }else{
+        bepcDisplay=`<div class="bp-dual"><span class="bp-dual-item">${ecritS}<small>Écrit</small></span><span class="bp-dual-link"></span><span class="bp-dual-item">${oralS}<small>Oral</small></span></div>`;
+      }
     }else{
       const rawB=d.bepc!=null?Number(d.bepc):null;
       const b=Number.isFinite(rawB)?rawB:null;
@@ -3225,7 +3232,7 @@ function buildBulletinHTML(h){
 <div class="bp-tricolor"><span></span><span>SAPHIR <strong>&nbsp;Pro</strong>-Orientation en seconde</span><span></span></div>
 <header class="bp-header"><div class="bp-header-top"><div class="bp-ministry"><span>Ministère de l'Éducation Nationale,</span><span>de l'Alphabétisation</span><span>et de l'Enseignement Technique</span></div><div class="bp-state"><div class="bp-republique">République de Côte d'Ivoire</div><div class="bp-devise">Union - Discipline - Travail</div></div></div>
 <div class="bp-header-rule"></div>
-<div class="bp-title-row"><div class="bp-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10 12 5l10 5-10 5L2 10Z"/><path d="M6 12.5V17c2.8 2.4 9.2 2.4 12 0v-4.5"/><path d="M22 10v6"/></svg></div><div><div class="bp-title">Calcul de la Moyenne d'Orientation${h.to_mode?' <span class="bp-to-badge">TO</span>':''}</div><div class="bp-subtitle">Fiche individuelle de calcul de la moyenne d'orientation</div></div></div>
+<div class="bp-title-row"><div class="bp-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10 12 5l10 5-10 5L2 10Z"/><path d="M6 12.5V17c2.8 2.4 9.2 2.4 12 0v-4.5"/><path d="M22 10v6"/></svg></div><div><div class="bp-title">Calcul de la Moyenne d'Orientation${isTO?' <span class="bp-to-badge">TO</span>':''}</div><div class="bp-subtitle">Fiche individuelle de calcul de la moyenne d'orientation</div></div></div>
 </header>
 <div class="bp-content">
 <div class="bp-section-title"><span class="bp-section-num">1</span><span>Informations de l'élève</span><span class="bp-section-line"></span></div>
@@ -3295,13 +3302,15 @@ function buildBulletin(){
   document.getElementById('bp-initials').textContent=bulletinInitials(name);
   document.getElementById('bp-class').textContent=bulletinField('mo-classe');
   document.getElementById('bp-school').textContent=bulletinField('mo-etablissement','NON RENSEIGNÉ');
-  document.getElementById('bp-year').textContent=bulletinField('mo-annee_scolaire');
+  document.getElementById('bp-year').textContent=bulletinField('mo-annee_scolaire')+(_toMode?' — TEST D\'ORIENTATION':'');
   document.getElementById('bp-matricule').textContent=bulletinField('mo-matricule');
+  const titleEl=document.querySelector('#bulletin-print .bp-title');
+  if(titleEl) titleEl.innerHTML='Calcul de la Moyenne d\'Orientation'+(_toMode?' <span class="bp-to-badge">TO</span>':'');
 
   document.getElementById('bp-grades-body').innerHTML=MATIERES.map(m=>{
     let bepc;
     if(m.anglais){
-      if(h.to_mode){
+      if(_toMode){
         bepc=`<span class="bp-pill bp-pill-bepc">${bulletinEntry(m.id+'_bepc_e')}</span>`;
       } else {
         bepc=`<div class="bp-dual">
@@ -3442,11 +3451,15 @@ function exportPDF(){
   }
   buildBulletin();
   saveToHistory().then(id=>{
-    if(id) markPrinted(id);
-    window.print();
-    toast('PDF exporté et enregistré ✔');
-    logActivity('Export PDF','Calcul MO','Export depuis formulaire');
-    sendNotification('PDF exporté','Bulletin téléchargé depuis le formulaire','info');
+    if(id){
+      markPrinted(id);
+      window.print();
+      toast('PDF exporté et enregistré ✔');
+      logActivity('Export PDF','Calcul MO','Export depuis formulaire');
+      sendNotification('PDF exporté','Bulletin téléchargé depuis le formulaire','info');
+    } else {
+      toast('Enregistrement échoué. PDF non imprimé.',true);
+    }
   });
 }
 
@@ -3471,13 +3484,14 @@ function previewMO(){
   if(missing.length>0){toast('Note manquante : '+missing[0],true);return;}
   buildBulletin();
   saveToHistory().then(id=>{
-    if(id) markPrinted(id);
-    const page=document.getElementById('bulletin-print').innerHTML;
-    const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
-    const nom=esc((document.getElementById('mo-nom')?.value||'Élève').trim());
-    const win=window.open('','_blank','width=900,height=700');
-    if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+    if(id){
+      markPrinted(id);
+      const page=document.getElementById('bulletin-print').innerHTML;
+      const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+      const nom=esc((document.getElementById('mo-nom')?.value||'Élève').trim());
+      const win=window.open('','_blank','width=900,height=700');
+      if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+      win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
 <title>Apercu — ${nom} — SAPHIR Pro</title>
 ${styles}
 <style>
@@ -3509,8 +3523,11 @@ ${styles}
   <div class="preview-a4">${page}</div>
 </div>
 </body></html>`);
-    win.document.close();
-    logActivity('Aperçu PDF','Calcul MO',nom);
+      win.document.close();
+      logActivity('Aperçu PDF','Calcul MO',nom);
+    } else {
+      toast('Enregistrement échoué. Aperçu non généré.',true);
+    }
   });
 }
 
