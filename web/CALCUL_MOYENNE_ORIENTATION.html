@@ -1424,10 +1424,10 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 #page-mo .section-title{margin-bottom:18px;padding-bottom:10px;font-size:.987rem;line-height:1.35;letter-spacing:1.35px;}
 .section-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .section-title-row .section-title{margin-bottom:0;padding-bottom:0;}
-.to-toggle{width:36px;height:36px;border-radius:50%;border:2px solid #B8CEC3;background:#fff;color:#60736D;font-size:.72rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s ease;flex-shrink:0;}
-.to-toggle:hover{border-color:#064E3B;color:#064E3B;background:#F3F8F5;}
-.to-toggle.active{background:#064E3B;color:#fff;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.25);}
-.to-toggle.active:hover{background:#0B6B50;}
+.to-toggle{width:32px;height:22px;border-radius:5px;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:rgba(255,255,255,.7);font-size:.65rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s ease;flex-shrink:0;}
+.to-toggle:hover{border-color:#fff;color:#fff;background:rgba(255,255,255,.2);}
+.to-toggle.active{background:#fff;color:#0a6b4e;border-color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.to-toggle.active:hover{background:#eaf3eb;color:#064E3B;}
 .to-toggle .to-label{pointer-events:none;line-height:1;}
 .two-notes.to-single{display:flex;justify-content:center;}
 .two-notes.to-single .note-input{width:100%;max-width:none;}
@@ -1986,9 +1986,6 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
   <div class="card">
     <div class="section-title-row">
       <div class="section-title">Saisie MA et notes au BEPC — Calcul de la Moyenne d'Orientation</div>
-      <button class="to-toggle" id="to-toggle" onclick="toggleTO()" title="Traitement Oral — Masque l'Anglais oral du calcul">
-        <span class="to-label">TO</span>
-      </button>
     </div>
     <table class="mat-table" style="table-layout:fixed;">
       <colgroup>
@@ -2006,7 +2003,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
           <th>Note BEPC</th>
           <th>MA + BEPC</th>
           <th>Cœff.</th>
-          <th style="background:#0a6b4e;">TOTAL PONDÉRÉ <span style="font-weight:400;font-size:.62rem;display:block;letter-spacing:.3px;text-transform:none;opacity:.65;margin-top:2px;">(MA + BEPC) × Cœff.</span></th>
+          <th style="background:#0a6b4e;position:relative;">TOTAL PONDÉRÉ <span style="font-weight:400;font-size:.62rem;display:block;letter-spacing:.3px;text-transform:none;opacity:.65;margin-top:2px;">(MA + BEPC) × Cœff.</span><button class="to-toggle" id="to-toggle" onclick="toggleTO()" title="Traitement Oral — Masque l'Anglais oral du calcul" style="position:absolute;top:4px;right:4px;"><span class="to-label">TO</span></button></th>
         </tr>
       </thead>
       <tbody id="mo-tbody"></tbody>
