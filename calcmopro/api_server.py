@@ -581,8 +581,6 @@ class _Handler(BaseHTTPRequestHandler):
                 return self._json([], 500)
 
         if path == "/api/eleves":
-            if self._get_role() != "admin":
-                return self._json({"error": "Accès refusé"}, 403)
             try:
                 return self._json(db.list_eleves())
             except Exception as exc:
@@ -1071,8 +1069,6 @@ class _Handler(BaseHTTPRequestHandler):
             return self._json({"ok": True})
 
         if path.startswith("/api/eleves/") and path.endswith("/printed"):
-            if self._get_role() != "admin":
-                return self._json({"error": "Accès refusé"}, 403)
             try:
                 eid = int(path.split("/")[-2])
             except (ValueError, IndexError):

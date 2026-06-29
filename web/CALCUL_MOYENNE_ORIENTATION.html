@@ -2340,7 +2340,6 @@ const TOTAL_COEF = MATIERES.reduce((s,m)=>s+m.coef,0);
 /* ── NAVIGATION ── */
 let _role='guest';
 function showPage(id){
-  if(id==='hist'&&_role!=='admin') return;
   if(id==='users'&&_role!=='admin') return;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
