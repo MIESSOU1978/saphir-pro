@@ -949,7 +949,8 @@ msg-dialog .msg-dlg-btn-read:hover{background:#0B6B50;}
 .bp-tricolor span:nth-child(2){display:flex;align-items:center;justify-content:center;padding:0 5mm;background:#fff;color:#0b3d2e;font-size:10.5pt;font-weight:900;line-height:1;white-space:nowrap;text-align:center;}
 .bp-tricolor span:nth-child(2) strong{color:#d99a13;}
 .bp-tricolor span:nth-child(3){background:#009e60;height:3.5mm;align-self:start;}
-.bp-header{display:block;position:relative;top:auto;width:auto;padding:6mm 10mm 5mm;border:1px solid #dfe7e2;border-top:0;border-radius:0 0 2.5mm 2.5mm;background:#fff;color:#0b3d2e;box-shadow:none;}
+.bp-ministry{text-align:center;color:#0b3d2e;font-size:7.5pt;font-weight:600;line-height:1.35;padding:2mm 8mm 0;text-transform:uppercase;letter-spacing:.2px;}
+.bp-header{display:block;position:relative;top:auto;width:auto;padding:5mm 10mm 4mm;border:1px solid #dfe7e2;border-top:0;border-radius:0 0 2.5mm 2.5mm;background:#fff;color:#0b3d2e;box-shadow:none;}
 .bp-header-top{display:flex;align-items:flex-start;justify-content:center;gap:10mm;}
 .bp-state{width:max-content;text-align:center;margin-left:auto;}
 .bp-republique{font-size:10pt;font-weight:900;line-height:1.15;text-transform:uppercase;white-space:nowrap;}
@@ -2257,6 +2258,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 <section id="bulletin-print" aria-hidden="true">
   <article class="bulletin-sheet">
     <div class="bp-tricolor"><span></span><span>SAPHIR <strong>&nbsp;Pro</strong>-Orientation en seconde</span><span></span></div>
+    <div class="bp-ministry">Ministère de l'Éducation Nationale et de l'Alphabétisation<br>et de l'Enseignement Technique</div>
     <header class="bp-header">
       <div class="bp-header-top">
         <div class="bp-state">
@@ -3165,6 +3167,7 @@ function buildBulletinHTML(h){
   else if(mo>0){mention='Très insuffisant';mCls='mention-fail';}
   return `<article class="bulletin-sheet">
 <div class="bp-tricolor"><span></span><span>SAPHIR <strong>&nbsp;Pro</strong>-Orientation en seconde</span><span></span></div>
+<div class="bp-ministry">Ministère de l'Éducation Nationale et de l'Alphabétisation<br>et de l'Enseignement Technique</div>
 <header class="bp-header"><div class="bp-header-top"><div class="bp-state"><div class="bp-republique">République de Côte d'Ivoire</div><div class="bp-devise">Union - Discipline - Travail</div></div></div>
 <div class="bp-header-rule"></div>
 <div class="bp-title-row"><div class="bp-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10 12 5l10 5-10 5L2 10Z"/><path d="M6 12.5V17c2.8 2.4 9.2 2.4 12 0v-4.5"/><path d="M22 10v6"/></svg></div><div><div class="bp-title">Calcul de la Moyenne d'Orientation</div><div class="bp-subtitle">Fiche individuelle de calcul de la moyenne d'orientation</div></div></div>
