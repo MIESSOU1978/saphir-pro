@@ -1421,6 +1421,15 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 /* ── CONFORT TYPOGRAPHIQUE : MODULES MGA ET MO (+2 pt) ── */
 #page-mga .section-title,
 #page-mo .section-title{margin-bottom:18px;padding-bottom:10px;font-size:.987rem;line-height:1.35;letter-spacing:1.35px;}
+.section-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.section-title-row .section-title{margin-bottom:0;padding-bottom:0;}
+.to-toggle{width:36px;height:36px;border-radius:50%;border:2px solid #B8CEC3;background:#fff;color:#60736D;font-size:.72rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s ease;flex-shrink:0;}
+.to-toggle:hover{border-color:#064E3B;color:#064E3B;background:#F3F8F5;}
+.to-toggle.active{background:#064E3B;color:#fff;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.25);}
+.to-toggle.active:hover{background:#0B6B50;}
+.to-toggle .to-label{pointer-events:none;line-height:1;}
+.two-notes.to-single{display:flex;justify-content:center;}
+.two-notes.to-single .note-input{width:100%;max-width:none;}
 #page-mga .eleve-grid,
 #page-mo .eleve-grid{gap:14px 16px;grid-template-columns:1.9fr 0.6fr 0.6fr 1fr 2.4fr;}
 #page-mga .field-group,
@@ -1974,7 +1983,12 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
   </div>
 
   <div class="card">
-    <div class="section-title">Saisie MA et notes au BEPC — Calcul de la Moyenne d'Orientation</div>
+    <div class="section-title-row">
+      <div class="section-title">Saisie MA et notes au BEPC — Calcul de la Moyenne d'Orientation</div>
+      <button class="to-toggle" id="to-toggle" onclick="toggleTO()" title="Traitement Oral — Masque l'Anglais oral du calcul">
+        <span class="to-label">TO</span>
+      </button>
+    </div>
     <table class="mat-table" style="table-layout:fixed;">
       <colgroup>
         <col style="width:18%;">
@@ -2351,6 +2365,7 @@ const MATIERES = [
   { id:'anglais',   label:'Anglais',        coef:1, anglais:true  },
 ];
 const TOTAL_COEF = MATIERES.reduce((s,m)=>s+m.coef,0);
+let _toMode = false;
 
 /* ── NAVIGATION ── */
 let _role='guest';
@@ -2508,12 +2523,30 @@ function buildMOTable(){
   });
 }
 
+function toggleTO(){
+  _toMode=!_toMode;
+  const btn=document.getElementById('to-toggle');
+  if(btn) btn.classList.toggle('active',_toMode);
+  const oralEl=document.getElementById('anglais_bepc_o');
+  if(oralEl){
+    oralEl.closest('.two-notes').classList.toggle('to-single',_toMode);
+    oralEl.disabled=_toMode;
+    if(_toMode){oralEl.value='';oralEl.style.display='none';}
+    else{oralEl.style.display='';oralEl.disabled=false;}
+  }
+  MATIERES.forEach(m=>calcRowMO(m.id));
+}
+
 function calcRowMO(mid){
   const m=MATIERES.find(x=>x.id===mid);
   const mga=getVal(mid+'_mga');
   let bepc=0;
   if(m.anglais){
-    bepc=(getVal(mid+'_bepc_e')+getVal(mid+'_bepc_o'))/2;
+    if(_toMode){
+      bepc=getVal(mid+'_bepc_e');
+    } else {
+      bepc=(getVal(mid+'_bepc_e')+getVal(mid+'_bepc_o'))/2;
+    }
   } else {
     bepc=getVal(mid+'_bepc');
   }
@@ -2521,7 +2554,7 @@ function calcRowMO(mid){
   const mgaEl=document.getElementById(mid+'_mga');
   const bepcEl=m.anglais?null:document.getElementById(mid+'_bepc');
   const bepcE=m.anglais?document.getElementById(mid+'_bepc_e'):null;
-  const bepcO=m.anglais?document.getElementById(mid+'_bepc_o'):null;
+  const bepcO=m.anglais&&!_toMode?document.getElementById(mid+'_bepc_o'):null;
   const hasInput=(mgaEl&&mgaEl.value!=='')||(bepcEl&&bepcEl.value!=='')||(bepcE&&bepcE.value!=='')||(bepcO&&bepcO.value!=='');
   document.getElementById(mid+'_sum').textContent  = hasInput ? fmtNum(sum,2)  : '—';
   document.getElementById(mid+'_prod').textContent = hasInput ? fmtNum(prod,2) : '—';
@@ -2534,7 +2567,11 @@ function calcTotalMO(){
     const mga=getVal(m.id+'_mga');
     let bepc=0;
     if(m.anglais){
-      bepc=(getVal(m.id+'_bepc_e')+getVal(m.id+'_bepc_o'))/2;
+      if(_toMode){
+        bepc=getVal(m.id+'_bepc_e');
+      } else {
+        bepc=(getVal(m.id+'_bepc_e')+getVal(m.id+'_bepc_o'))/2;
+      }
     } else {
       bepc=getVal(m.id+'_bepc');
     }
@@ -2542,7 +2579,7 @@ function calcTotalMO(){
     const mgaEl=document.getElementById(m.id+'_mga');
     const bepcEl=m.anglais?null:document.getElementById(m.id+'_bepc');
     const bepcE=m.anglais?document.getElementById(m.id+'_bepc_e'):null;
-    const bepcO=m.anglais?document.getElementById(m.id+'_bepc_o'):null;
+    const bepcO=m.anglais&&!_toMode?document.getElementById(m.id+'_bepc_o'):null;
     if((mgaEl&&mgaEl.value!=='')||(bepcEl&&bepcEl.value!=='')||(bepcE&&bepcE.value!=='')||(bepcO&&bepcO.value!=='')) count++;
   });
   const mo=total/(2*TOTAL_COEF);
@@ -2691,6 +2728,7 @@ function saveDraft(){
       annee_scolaire:document.getElementById('mo-annee_scolaire')?.value||'',
       etablissement:document.getElementById('mo-etablissement')?.value||'',
       tab:document.querySelector('.page.active')?.id||'',
+      toMode:_toMode,
       matieres:{}
     };
     MATIERES.forEach(m=>{
@@ -2738,6 +2776,7 @@ function restoreDraft(){
     });
     MATIERES.forEach(m=>calcRowMO(m.id));
   }
+  if(d.toMode && d.toMode!==_toMode) toggleTO();
   if(d.tab){
     showPage(d.tab==='page-mga'?'mga':d.tab==='page-mo'?'mo':'home');
   }
@@ -3249,11 +3288,15 @@ function buildBulletin(){
   document.getElementById('bp-grades-body').innerHTML=MATIERES.map(m=>{
     let bepc;
     if(m.anglais){
-      bepc=`<div class="bp-dual">
-        <span class="bp-dual-item">${bulletinEntry(m.id+'_bepc_e')}<small>Écrit</small></span>
-        <span class="bp-dual-link" aria-hidden="true"></span>
-        <span class="bp-dual-item">${bulletinEntry(m.id+'_bepc_o')}<small>Oral</small></span>
-      </div>`;
+      if(_toMode){
+        bepc=`<span class="bp-pill bp-pill-bepc">${bulletinEntry(m.id+'_bepc_e')}</span>`;
+      } else {
+        bepc=`<div class="bp-dual">
+          <span class="bp-dual-item">${bulletinEntry(m.id+'_bepc_e')}<small>Écrit</small></span>
+          <span class="bp-dual-link" aria-hidden="true"></span>
+          <span class="bp-dual-item">${bulletinEntry(m.id+'_bepc_o')}<small>Oral</small></span>
+        </div>`;
+      }
     }else{
       bepc=`<span class="bp-pill bp-pill-bepc">${bulletinEntry(m.id+'_bepc')}</span>`;
     }
@@ -3371,9 +3414,11 @@ function exportPDF(){
     if(!mgaEl||mgaEl.value==='') missing.push(m.label+' → MA');
     if(m.anglais){
       const be=document.getElementById(m.id+'_bepc_e');
-      const bo=document.getElementById(m.id+'_bepc_o');
       if(!be||be.value==='') missing.push(m.label+' → BEPC Écrit');
-      if(!bo||bo.value==='') missing.push(m.label+' → BEPC Oral');
+      if(!_toMode){
+        const bo=document.getElementById(m.id+'_bepc_o');
+        if(!bo||bo.value==='') missing.push(m.label+' → BEPC Oral');
+      }
     } else {
       const bepcEl=document.getElementById(m.id+'_bepc');
       if(!bepcEl||bepcEl.value==='') missing.push(m.label+' → BEPC');
@@ -3400,9 +3445,11 @@ function previewMO(){
     if(!mgaEl||mgaEl.value==='') missing.push(m.label+' → MA');
     if(m.anglais){
       const be=document.getElementById(m.id+'_bepc_e');
-      const bo=document.getElementById(m.id+'_bepc_o');
       if(!be||be.value==='') missing.push(m.label+' → BEPC Écrit');
-      if(!bo||bo.value==='') missing.push(m.label+' → BEPC Oral');
+      if(!_toMode){
+        const bo=document.getElementById(m.id+'_bepc_o');
+        if(!bo||bo.value==='') missing.push(m.label+' → BEPC Oral');
+      }
     } else {
       const bepcEl=document.getElementById(m.id+'_bepc');
       if(!bepcEl||bepcEl.value==='') missing.push(m.label+' → BEPC');
