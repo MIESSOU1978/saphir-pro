@@ -2528,13 +2528,24 @@ function toggleTO(){
   _toMode=!_toMode;
   const btn=document.getElementById('to-toggle');
   if(btn) btn.classList.toggle('active',_toMode);
-  const oralEl=document.getElementById('anglais_bepc_o');
-  if(oralEl){
-    oralEl.closest('.two-notes').classList.toggle('to-single',_toMode);
-    oralEl.disabled=_toMode;
-    if(_toMode){oralEl.value='';oralEl.style.display='none';}
-    else{oralEl.style.display='';oralEl.disabled=false;}
-  }
+  MATIERES.forEach(m=>{
+    if(!m.anglais) return;
+    const oralEl=document.getElementById(m.id+'_bepc_o');
+    const ecritEl=document.getElementById(m.id+'_bepc_e');
+    if(!oralEl) return;
+    const wrap=oralEl.closest('.two-notes');
+    if(_toMode){
+      oralEl.value='';
+      oralEl.style.display='none';
+      oralEl.disabled=true;
+      if(wrap) wrap.classList.add('to-single');
+      if(ecritEl) ecritEl.focus();
+    } else {
+      oralEl.style.display='';
+      oralEl.disabled=false;
+      if(wrap) wrap.classList.remove('to-single');
+    }
+  });
   MATIERES.forEach(m=>calcRowMO(m.id));
 }
 
