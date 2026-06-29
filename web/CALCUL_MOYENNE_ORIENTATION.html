@@ -950,7 +950,7 @@ msg-dialog .msg-dlg-btn-read:hover{background:#0B6B50;}
 .bp-tricolor span:nth-child(2) strong{color:#d99a13;}
 .bp-tricolor span:nth-child(3){background:#009e60;height:3.5mm;align-self:start;}
 .bp-header{display:block;position:relative;top:auto;width:auto;padding:6mm 10mm 5mm;border:1px solid #dfe7e2;border-top:0;border-radius:0 0 2.5mm 2.5mm;background:#fff;color:#0b3d2e;box-shadow:none;}
-.bp-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10mm;}
+.bp-header-top{display:flex;align-items:flex-start;justify-content:center;gap:10mm;}
 .bp-state{width:max-content;text-align:center;margin-left:auto;}
 .bp-republique{font-size:10pt;font-weight:900;line-height:1.15;text-transform:uppercase;white-space:nowrap;}
 .bp-devise{width:84%;margin:1mm auto 0;color:#d99a13;font-size:8.5pt;font-style:italic;line-height:1.15;letter-spacing:0;word-spacing:0;white-space:nowrap;text-align:center;}
@@ -1025,6 +1025,13 @@ msg-dialog .msg-dlg-btn-read:hover{background:#0B6B50;}
 .bp-footer-right{text-align:left;}
 .bp-footer-date{color:#0b3d2e;font-weight:700;}
 .bp-nonprofit{margin-top:3mm;text-align:center;color:#87958d;font-size:7pt;font-style:italic;line-height:1.4;}
+
+.bp-bottom-brand{margin-top:5mm;padding-top:4mm;text-align:center;}
+.bp-bottom-brand-line{height:1px;margin:0 auto 3.5mm;max-width:60%;background:linear-gradient(90deg,transparent,#dfe7e2 30%,#0b4a35 50%,#dfe7e2 70%,transparent);}
+.bp-bottom-brand-name{font-size:14pt;font-weight:900;color:#0b4a35;line-height:1;}
+.bp-bottom-brand-name span{color:#f2b632;}
+.bp-bottom-brand-sub{margin-top:1mm;color:#6b7a70;font-size:8pt;font-style:italic;}
+.bp-bottom-brand-contact{margin-top:1.2mm;color:#0b4a35;font-size:8pt;font-weight:800;letter-spacing:.3mm;}
 
 /* ── IDENTITÉ VISUELLE SAPHIR / BULLETIN ── */
 :root{
@@ -2252,11 +2259,6 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
     <div class="bp-tricolor"><span></span><span>SAPHIR <strong>&nbsp;Pro</strong>-Orientation en seconde</span><span></span></div>
     <header class="bp-header">
       <div class="bp-header-top">
-        <div class="bp-brand">
-          <div class="bp-brand-name">SAPHIR <span>Pro</span></div>
-          <div class="bp-brand-sub">Système d'Aide à l'Orientation Scolaire</div>
-          <div class="bp-brand-contact">0708109840 / 0152030622</div>
-        </div>
         <div class="bp-state">
           <div class="bp-republique">République de Côte d'Ivoire</div>
           <div class="bp-devise">Union - Discipline - Travail</div>
@@ -2316,6 +2318,13 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
           <div class="bp-mention" id="bp-mention"></div>
         </div>
       </div>
+    </div>
+
+    <div class="bp-bottom-brand">
+      <div class="bp-bottom-brand-line"></div>
+      <div class="bp-bottom-brand-name">SAPHIR <span>Pro</span></div>
+      <div class="bp-bottom-brand-sub">Système d'Aide à l'Orientation Scolaire</div>
+      <div class="bp-bottom-brand-contact">07 08 10 98 40 / 01 52 03 06 22</div>
     </div>
 
     <footer class="bp-footer">
@@ -3156,7 +3165,7 @@ function buildBulletinHTML(h){
   else if(mo>0){mention='Très insuffisant';mCls='mention-fail';}
   return `<article class="bulletin-sheet">
 <div class="bp-tricolor"><span></span><span>SAPHIR <strong>&nbsp;Pro</strong>-Orientation en seconde</span><span></span></div>
-<header class="bp-header"><div class="bp-header-top"><div class="bp-brand"><div class="bp-brand-name">SAPHIR <span>Pro</span></div><div class="bp-brand-sub">Système d'Aide à l'Orientation Scolaire</div><div class="bp-brand-contact">0708109840 / 0152030622</div></div><div class="bp-state"><div class="bp-republique">République de Côte d'Ivoire</div><div class="bp-devise">Union - Discipline - Travail</div></div></div>
+<header class="bp-header"><div class="bp-header-top"><div class="bp-state"><div class="bp-republique">République de Côte d'Ivoire</div><div class="bp-devise">Union - Discipline - Travail</div></div></div>
 <div class="bp-header-rule"></div>
 <div class="bp-title-row"><div class="bp-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10 12 5l10 5-10 5L2 10Z"/><path d="M6 12.5V17c2.8 2.4 9.2 2.4 12 0v-4.5"/><path d="M22 10v6"/></svg></div><div><div class="bp-title">Calcul de la Moyenne d'Orientation</div><div class="bp-subtitle">Fiche individuelle de calcul de la moyenne d'orientation</div></div></div>
 </header>
@@ -3169,6 +3178,7 @@ function buildBulletinHTML(h){
 <div class="bp-section-title"><span class="bp-section-num">3</span><span>Synthèse</span><span class="bp-section-line"></span></div>
 <div class="bp-summary"><div class="bp-summary-box bp-summary-total"><div class="bp-summary-label">Total général pondéré</div><div class="bp-total-value">${totalDisplay}</div><div class="bp-summary-sub"></div></div><div class="bp-summary-box bp-summary-mo ${moClass}"><div class="bp-summary-label">Moyenne d'orientation</div><div class="bp-mo-value"><span>${moDisplay}</span><small>/ 20</small></div><div class="bp-mention ${mCls}">${mention}</div></div></div>
 </div>
+<div class="bp-bottom-brand"><div class="bp-bottom-brand-line"></div><div class="bp-bottom-brand-name">SAPHIR <span>Pro</span></div><div class="bp-bottom-brand-sub">Système d'Aide à l'Orientation Scolaire</div><div class="bp-bottom-brand-contact">07 08 10 98 40 / 01 52 03 06 22</div></div>
 <footer class="bp-footer"><div>Édité via <strong>SAPHIR Pro</strong></div><div></div><div class="bp-footer-right"><div class="bp-footer-date">Document généré le <span>${today}</span></div></div></footer>
 <div class="bp-nonprofit">Projet à but non lucratif, développé pour accompagner les utilisateurs et leur offrir un service utile, sans recherche de profit financier.</div>
 </article>`;
@@ -3805,7 +3815,7 @@ function renderUsers(sessions){
     }else if(kd){
       badge=Number(kd.trusted)
         ?'<span class="users-device-badge users-device-trusted" title="Appareil fiable">&#10003; Fiable</span>'
-        :'<span class="users-device-badge users-device-untrusted" title="Autre appareil">&#9679; Autre appareil</span>';
+        :'<span class="users-device-badge users-device-untrusted" title="Appareil non fiable">&#9888; Inconnu</span>';
     }else{
       badge='<span class="users-device-badge users-device-untrusted" title="Nouvel appareil détecté">&#9888; Nouvel appareil</span>';
     }
