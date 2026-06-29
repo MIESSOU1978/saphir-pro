@@ -2765,7 +2765,7 @@ async function loadHistory(){
 
 async function saveToHistory(){
   const nom=(document.getElementById('mo-nom').value||document.getElementById('nomEleve').value).trim();
-  if(!nom){toast('Veuillez remplir les informations de l\'élève avant d\'enregistrer.',true);return;}
+  if(!nom){toast('Veuillez remplir les informations de l\'élève avant d\'enregistrer.',true);return null;}
   const matricule=(document.getElementById('mo-matricule').value||document.getElementById('matricule')?.value||'').trim();
   const classe=(document.getElementById('mo-classe').value||document.getElementById('classe')?.value||'').trim();
   const anneeScolaire=(document.getElementById('mo-annee_scolaire')?.value||document.getElementById('annee_scolaire')?.value||'').trim();
@@ -2774,7 +2774,7 @@ async function saveToHistory(){
     if(!matricule) manquants.push('Matricule');
     if(!classe) manquants.push('Classe');
     if(!anneeScolaire) manquants.push('Année scolaire');
-    toast('Champs manquants : '+manquants.join(', '),true);return;
+    toast('Champs manquants : '+manquants.join(', '),true);return null;
   }
   const total=document.getElementById('r-total').textContent;
   const mo=document.getElementById('r-mo').textContent;
@@ -2789,7 +2789,7 @@ async function saveToHistory(){
   });
   const payload={nom,matricule,classe,etablissement:etab,annee:anneeScolaire,annee_scolaire:anneeScolaire,total:parseFloat(String(total).replace(',','.'))||0,mo:parseFloat(String(mo).replace(',','.'))||0,mention,matieres,created_by:localStorage.getItem('saphir_email')||''};
   try{
-    let r;
+    let r;let savedId=editingId||null;
     if(editingId){
       r=await fetch(API+'/api/eleves/'+editingId,{method:'PUT',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify(payload)});
     } else {
@@ -2797,14 +2797,17 @@ async function saveToHistory(){
     }
     if(!r.ok){
       const err=await r.json().catch(()=>({}));
-      if(r.status===401||r.status===302){toast('Session expirée. Reconnectez-vous.',true);return;}
-      toast(err.error||'Erreur serveur ('+r.status+')',true);return;
+      if(r.status===401||r.status===302){toast('Session expirée. Reconnectez-vous.',true);return null;}
+      toast(err.error||'Erreur serveur ('+r.status+')',true);return null;
     }
+    const res=await r.json().catch(()=>({}));
+    if(!editingId&&res&&res.eleve&&res.eleve.id) savedId=res.eleve.id;
     if(editingId){toast('Calcul mis à jour avec succès ✔');cancelEdit();logActivity('Modification élève','Calcul MO','id='+editingId);sendNotification('Modification','Calcul de '+nom+' modifié (#'+editingId+')','info');}
     else{toast('Enregistré : '+nom);logActivity('Création élève','Calcul MO',nom);sendNotification('Nouveau calcul','Calcul de '+nom+' enregistré avec succès','success');}
     localStorage.removeItem('saphir_draft');
     await loadHistory();
-  }catch(e){toast('Erreur lors de l\'enregistrement.',true);}
+    return savedId;
+  }catch(e){toast('Erreur lors de l\'enregistrement.',true);return null;}
 }
 
 async function supprimerCalculHistorique(id,btn){
@@ -3346,7 +3349,6 @@ function fmtMO(n,dec){
   return `${integer},${decimal}`;
 }
 function exportPDF(){
-  // Vérifie que toutes les matières ont MGA + BEPC renseignés dans MO
   const missing=[];
   MATIERES.forEach(m=>{
     const mgaEl=document.getElementById(m.id+'_mga');
@@ -3364,9 +3366,14 @@ function exportPDF(){
   if(missing.length>0){
     toast('Note manquante : '+missing[0],true);return;
   }
-  buildBulletin();saveToHistory();window.print();toast('PDF exporté et enregistré ✔');
-  logActivity('Export PDF','Calcul MO','Export depuis formulaire');
-  sendNotification('PDF exporté','Bulletin téléchargé depuis le formulaire','info');
+  buildBulletin();
+  saveToHistory().then(id=>{
+    if(id) markPrinted(id);
+    window.print();
+    toast('PDF exporté et enregistré ✔');
+    logActivity('Export PDF','Calcul MO','Export depuis formulaire');
+    sendNotification('PDF exporté','Bulletin téléchargé depuis le formulaire','info');
+  });
 }
 
 /* ════ APERÇU BULLETIN DEPUIS FORMULAIRE MO ════ */
@@ -3387,12 +3394,14 @@ function previewMO(){
   });
   if(missing.length>0){toast('Note manquante : '+missing[0],true);return;}
   buildBulletin();
-  const page=document.getElementById('bulletin-print').innerHTML;
-  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
-  const nom=esc((document.getElementById('mo-nom')?.value||'Élève').trim());
-  const win=window.open('','_blank','width=900,height=700');
-  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+  saveToHistory().then(id=>{
+    if(id) markPrinted(id);
+    const page=document.getElementById('bulletin-print').innerHTML;
+    const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+    const nom=esc((document.getElementById('mo-nom')?.value||'Élève').trim());
+    const win=window.open('','_blank','width=900,height=700');
+    if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
 <title>Apercu — ${nom} — SAPHIR Pro</title>
 ${styles}
 <style>
@@ -3424,8 +3433,9 @@ ${styles}
   <div class="preview-a4">${page}</div>
 </div>
 </body></html>`);
-  win.document.close();
-  logActivity('Aperçu PDF','Calcul MO',nom);
+    win.document.close();
+    logActivity('Aperçu PDF','Calcul MO',nom);
+  });
 }
 
 function toast(msg,isErr=false){
