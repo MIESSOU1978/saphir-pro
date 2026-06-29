@@ -3163,7 +3163,7 @@ function buildBulletinHTML(h){
   })();
   const classe=esc(h.classe||'-');
   const school=esc(h.etablissement||'NON RENSEIGNÉ');
-  const year=esc(h.annee_scolaire||h.annee||'-');
+  const year=esc(h.annee_scolaire||h.annee||'-')+(_toMode?' — TEST D\'ORIENTATION':'');
   const matricule=esc(h.matricule||'-');
   const today=new Date().toLocaleDateString('fr-FR');
   let totalWeighted=0;
