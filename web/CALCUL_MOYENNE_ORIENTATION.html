@@ -932,6 +932,8 @@ msg-dialog .msg-dlg-btn-read:hover{background:#0B6B50;}
 .bulletin-sheet{
   width:190mm;
   margin:0 auto;
+  max-height:297mm;
+  overflow:hidden;
   padding-top:12mm;
   background:#fff;
   color:#1a2420;
@@ -2978,7 +2980,7 @@ function printSelection(){
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</style></head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</style></head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
 }
@@ -2989,7 +2991,7 @@ function exportSelection(){
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</style></head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</style></head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
 }
@@ -3111,7 +3113,7 @@ async function downloadBulletinPDF(id){
 ${styles}
 <style>
   body{margin:0;padding:0;background:#fff;}
-  .bulletin-sheet{page-break-after:auto;margin:0;padding:0;}
+   .bulletin-sheet{page-break-after:auto;margin:0;padding:0;max-height:297mm;overflow:hidden;}
   @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
 </style></head><body>${page}</body></html>`);
   win.document.close();
@@ -3143,7 +3145,7 @@ ${styles}
   .preview-toolbar-btn:hover{background:#F4FAF7;}
   .preview-page-wrap{display:flex;justify-content:center;padding:60px 16px 24px;min-height:100vh;}
   .preview-a4{width:210mm;min-height:297mm;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.18);padding:4mm 10mm 1mm 12mm;overflow:hidden;}
-  .bulletin-sheet{width:100%;margin:0;padding:0;box-shadow:none;border:none;background:transparent;}
+  .bulletin-sheet{width:100%;margin:0;padding:0;max-height:297mm;overflow:hidden;box-shadow:none;border:none;background:transparent;}
   .bulletin-sheet .bp-header{box-shadow:none;border:1px solid #dfe7e2;border-top:0;}
   .bulletin-sheet .bp-table-wrap{border:1px solid #bdcdc4;}
   @media print{
@@ -3265,7 +3267,7 @@ ${styles}
 <style>
   *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
   body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
-  .bulletin-sheet{page-break-after:always;margin:0;padding:0;}
+  .bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}
   .bulletin-sheet:last-child{page-break-after:auto;}
   @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
 </style></head><body>${pages}</body></html>`);
@@ -3511,7 +3513,7 @@ ${styles}
   .preview-toolbar-btn:hover{background:#F4FAF7;}
   .preview-page-wrap{display:flex;justify-content:center;padding:60px 16px 24px;min-height:100vh;}
   .preview-a4{width:210mm;min-height:297mm;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.18);padding:4mm 10mm 1mm 12mm;overflow:hidden;}
-  .bulletin-sheet{width:100%;margin:0;padding:0;box-shadow:none;border:none;background:transparent;}
+  .bulletin-sheet{width:100%;margin:0;padding:0;max-height:297mm;overflow:hidden;box-shadow:none;border:none;background:transparent;}
   .bulletin-sheet .bp-header{box-shadow:none;border:1px solid #dfe7e2;border-top:0;}
   .bulletin-sheet .bp-table-wrap{border:1px solid #bdcdc4;}
   @media print{
@@ -4204,7 +4206,7 @@ ${styles}
 <style>
   *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
   body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
-  .bulletin-sheet{margin:0;padding:0;}
+  .bulletin-sheet{margin:0;padding:0;max-height:297mm;overflow:hidden;}
   @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
 </style></head><body>${html}</body></html>`);
   win.document.close();
