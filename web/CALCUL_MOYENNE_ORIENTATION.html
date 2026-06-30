@@ -3852,7 +3852,7 @@ function renderKnownDevices(){
     const isCurrent=d.sessions.some(s=>s.id===_sessionId);
     let badge='';
     if(isCurrent){
-      badge='<span class="users-device-badge users-device-current" title="Cet appareil est en cours d'utilisation">&#9679; Cet appareil</span>';
+      badge=`<span class="users-device-badge users-device-current" title="Cet appareil est en cours d'utilisation">&#9679; Cet appareil</span>`;
     }else if(kd){
       badge=trusted
         ?'<span class="users-device-badge users-device-trusted">&#10003; Fiable</span>'
