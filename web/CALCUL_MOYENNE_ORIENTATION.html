@@ -3849,11 +3849,17 @@ function renderKnownDevices(){
   container.innerHTML=devices.map((d,idx)=>{
     const kd=d.kd;
     const trusted=kd?Number(kd.trusted):0;
-    const badge=kd
-      ?(trusted
+    const isCurrent=d.sessions.some(s=>s.id===_sessionId);
+    let badge='';
+    if(isCurrent){
+      badge='<span class="users-device-badge users-device-current" title="Cet appareil est en cours d'utilisation">&#9679; Cet appareil</span>';
+    }else if(kd){
+      badge=trusted
         ?'<span class="users-device-badge users-device-trusted">&#10003; Fiable</span>'
-        :'<span class="users-device-badge users-device-untrusted">&#9888; Inconnu</span>')
-      :'<span class="users-device-badge users-device-untrusted">&#9888; Nouvel appareil</span>';
+        :'<span class="users-device-badge users-device-untrusted">&#9888; Inconnu</span>';
+    }else{
+      badge='<span class="users-device-badge users-device-untrusted">&#9888; Nouvel appareil</span>';
+    }
     let actions='';
     if(kd){
       const trustLabel=trusted?'Retirer des appareils fiables':'Marquer comme fiable';
