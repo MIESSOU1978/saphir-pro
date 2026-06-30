@@ -847,6 +847,7 @@ msg-dialog .msg-dlg-btn-read:hover{background:#0B6B50;}
 .users-trust-add:hover{background:#F0F7F3;border-color:#064E3B;}
 .users-trust-remove{color:#A85B00;}
 .users-trust-remove:hover{background:#FFF7E8;border-color:#F5A623;}
+.users-trust-remove svg{width:14px;height:14px;}
 
 .users-devices-alert{
   display:flex;align-items:center;gap:8px;padding:10px 16px;
@@ -873,7 +874,9 @@ msg-dialog .msg-dlg-btn-read:hover{background:#0B6B50;}
 .users-device-card:hover{background:#f8faf9;}
 .users-device-info{display:flex;flex-direction:column;gap:4px;min-width:0;}
 .users-device-label{font-size:.82rem;font-weight:600;color:#003b32;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.users-device-fp{font-size:.68rem;color:#9aa79f;font-family:monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.users-device-detail{font-size:.68rem;color:#60736d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.users-device-detail-link{font-size:.68rem;color:#064E3B;font-weight:600;cursor:pointer;text-decoration:underline;white-space:nowrap;}
+.users-device-detail-link:hover{color:#043d2b;}
 .users-device-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .users-device-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .users-devices-empty{text-align:center;padding:30px 16px;color:#60736d;font-size:.8rem;}
@@ -3843,13 +3846,13 @@ function renderKnownDevices(){
   const alertText=document.getElementById('users-devices-alert-text');
   if(unknownCount>0){alertEl.style.display='flex';alertText.textContent=unknownCount+' appareil'+(unknownCount>1?'s':'')+' inconnu'+(unknownCount>1?'s':'')+' détecté'+(unknownCount>1?'s':'');}
   else{alertEl.style.display='none';}
-  container.innerHTML=devices.map(d=>{
+  container.innerHTML=devices.map((d,idx)=>{
     const kd=d.kd;
     const trusted=kd?Number(kd.trusted):0;
     const badge=kd
       ?(trusted
         ?'<span class="users-device-badge users-device-trusted">&#10003; Fiable</span>'
-        :'<span class="users-device-badge users-device-untrusted">&#9888; Appareil inconnu</span>')
+        :'<span class="users-device-badge users-device-untrusted">&#9888; Inconnu</span>')
       :'<span class="users-device-badge users-device-untrusted">&#9888; Nouvel appareil</span>';
     let actions='';
     if(kd){
@@ -3865,15 +3868,39 @@ function renderKnownDevices(){
     }else{
       actions=`<button class="users-trust-btn users-trust-add" onclick="trustNewDevice('${d.fingerprint}','${(d.label||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer comme fiable"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>`;
     }
-    const sessionsInfo=d.sessions.map(s=>s.email||'').filter(Boolean).join(', ')||'Session active';
+    const uniqueEmails=[...new Set(d.sessions.map(s=>s.email||'').filter(Boolean))];
+    let detailLine='';
+    if(uniqueEmails.length===1){
+      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${esc(uniqueEmails[0])}</div>`;
+    }else if(uniqueEmails.length>1){
+      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${uniqueEmails.length} utilisateurs associés <span class="users-device-detail-link" onclick="showDeviceUsers(${idx})">Voir</span></div>`;
+    }else{
+      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · Session active</div>`;
+    }
     return `<div class="users-device-card">
       <div class="users-device-info">
         <div class="users-device-label">${esc(d.label||'Appareil inconnu')} ${badge}</div>
-        <div class="users-device-fp">${esc(d.os||'')} · ${esc(d.navigateur||'')} · ${sessionsInfo}</div>
+        ${detailLine}
       </div>
       <div class="users-device-actions">${actions}</div>
     </div>`;
   }).join('');
+  window._deviceUsersMap=devices.map(d=>[...new Set(d.sessions.map(s=>s.email||'').filter(Boolean))]);
+}
+
+function showDeviceUsers(idx){
+  const emails=window._deviceUsersMap?window._deviceUsersMap[idx]:[];
+  if(!emails||!emails.length)return;
+  const list=emails.map(e=>'<div style="padding:6px 0;border-bottom:1px solid #eef3f0;font-size:.8rem;color:#003b32;">'+esc(e)+'</div>').join('');
+  const modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:9999;';
+  modal.innerHTML=`<div style="background:#fff;border-radius:12px;padding:20px 24px;min-width:280px;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.18);">
+    <div style="font-size:.88rem;font-weight:700;color:#003b32;margin-bottom:12px;">Utilisateurs associés</div>
+    <div style="max-height:240px;overflow-y:auto;">${list}</div>
+    <div style="text-align:right;margin-top:14px;"><button onclick="this.closest('div[style*=fixed]').remove()" style="padding:6px 16px;border-radius:8px;border:1px solid #B8CEC3;background:#fff;color:#064E3B;font-size:.8rem;font-weight:600;cursor:pointer;">Fermer</button></div>
+  </div>`;
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+  document.body.appendChild(modal);
 }
 
 function renderUsers(sessions){
