@@ -597,9 +597,11 @@ class _Handler(BaseHTTPRequestHandler):
                 msg["Subject"] = "[SAPHIR Pro] Test email"
                 msg["From"] = _EMAIL_USER
                 msg["To"] = _EMAIL_USER
+                clean_pass = _EMAIL_PASS.replace(" ", "")
                 with smtplib.SMTP(_EMAIL_HOST, _EMAIL_PORT, timeout=10) as server:
-            server.starttls()
-            server.login(_EMAIL_USER, clean_pass)
+                    server.starttls()
+                    server.login(_EMAIL_USER, clean_pass)
+                    server.send_message(msg)
                 return self._json({"ok": True, "message": "Email envoye avec succes"})
             except Exception as e:
                 return self._json({"ok": False, "error": str(e)})
