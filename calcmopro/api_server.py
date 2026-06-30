@@ -205,30 +205,29 @@ def _send_login_sms(role: str, ip: str, email: str) -> None:
 
 
 def _send_login_email(role: str, ip: str, email: str) -> None:
-    """Send email via SendGrid API on successful login (non-blocking)."""
-    if not all([_EMAIL_API_KEY, _EMAIL_TO]):
+    """Send email via Gmail SMTP on successful login (non-blocking)."""
+    if not _EMAIL_PASS:
         return
+    import smtplib
+    from email.mime.text import MIMEText
     now = time.strftime("%d/%m/%Y %H:%M:%S")
     role_label = "Administrateur" if role == "admin" else "Élève"
     subject = f"[SAPHIR Pro] Connexion {role_label}"
     body = f"Nouvelle connexion détectée sur SAPHIR Pro\n\nRôle : {role_label}\nIP : {ip}\nDate : {now}"
     if email:
         body += f"\nEmail : {email}"
-    payload = json.dumps({
-        "personalizations": [{"to": [{"email": _EMAIL_TO}]}],
-        "from": {"email": _EMAIL_FROM, "name": "SAPHIR Pro"},
-        "subject": subject,
-        "content": [{"type": "text/plain", "value": body}]
-    }).encode()
-    req = urllib.request.Request("https://api.sendgrid.com/v3/mail/send", data=payload, method="POST")
-    req.add_header("Authorization", f"Bearer {_EMAIL_API_KEY}")
-    req.add_header("Content-Type", "application/json")
-    req.add_header("User-Agent", "Mozilla/5.0")
+    msg = MIMEText(body, _charset="utf-8")
+    msg["Subject"] = subject
+    msg["From"] = _EMAIL_USER
+    msg["To"] = _EMAIL_USER
     try:
-        urllib.request.urlopen(req, timeout=10)
-        print(f"[EMAIL] Sent to {_EMAIL_TO} for {role} login from {ip}")
+        with smtplib.SMTP(_EMAIL_HOST, _EMAIL_PORT, timeout=10) as server:
+            server.starttls()
+            server.login(_EMAIL_USER, _EMAIL_PASS)
+            server.send_message(msg)
+        print(f"[EMAIL] Login alert sent for {role} from {ip}")
     except Exception as e:
-        print(f"[EMAIL ERROR] {e}")
+        print(f"[EMAIL ERROR] _send_login_email: {e}")
 
 def _send_failed_login_email(ip: str, email: str, ville: str, niveau: str, raison: str, count: int) -> None:
     """Send email via Gmail SMTP to user on failed login attempt (non-blocking)."""
@@ -586,23 +585,22 @@ class _Handler(BaseHTTPRequestHandler):
         if path == "/api/test-email":
             if self._get_role() != "admin":
                 return self._json({"error": "Accès refusé"}, 403)
-            if not all([_EMAIL_API_KEY, _EMAIL_TO]):
-                return self._json({"ok": False, "error": "Variables email non configurées"})
+            if not _EMAIL_PASS:
+                return self._json({"ok": False, "error": "EMAIL_PASSWORD non configuré"})
             try:
-                payload = json.dumps({
-                    "personalizations": [{"to": [{"email": _EMAIL_TO}]}],
-                    "from": {"email": _EMAIL_FROM, "name": "SAPHIR Pro"},
-                    "subject": "[SAPHIR Pro] Test email",
-                    "content": [{"type": "text/plain", "value": "Test SAPHIR Pro - SendGrid fonctionne !"}]
-                }).encode()
-                req = urllib.request.Request("https://api.sendgrid.com/v3/mail/send", data=payload, method="POST")
-                req.add_header("Authorization", f"Bearer {_EMAIL_API_KEY}")
-                req.add_header("Content-Type", "application/json")
-                req.add_header("User-Agent", "Mozilla/5.0")
-                resp = urllib.request.urlopen(req, timeout=10)
+                import smtplib
+                from email.mime.text import MIMEText
+                msg = MIMEText("Test SAPHIR Pro - Gmail SMTP fonctionne !", _charset="utf-8")
+                msg["Subject"] = "[SAPHIR Pro] Test email"
+                msg["From"] = _EMAIL_USER
+                msg["To"] = _EMAIL_USER
+                with smtplib.SMTP(_EMAIL_HOST, _EMAIL_PORT, timeout=10) as server:
+                    server.starttls()
+                    server.login(_EMAIL_USER, _EMAIL_PASS)
+                    server.send_message(msg)
                 return self._json({"ok": True, "message": "Email envoye avec succes"})
             except Exception as e:
-                return self._json({"ok": False, "error": "Erreur interne du serveur"})
+                return self._json({"ok": False, "error": str(e)})
 
         if not self._require_auth():
             return
