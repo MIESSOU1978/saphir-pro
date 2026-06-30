@@ -79,13 +79,11 @@ _TWILIO_TOKEN: str = os.environ.get("TWILIO_AUTH_TOKEN", "")
 _TWILIO_FROM: str = os.environ.get("TWILIO_FROM", "")
 _TWILIO_TO: str = os.environ.get("TWILIO_TO", "")
 
-# Email config (Infobip)
-_INFOBIP_API_KEY: str = os.environ.get("INFOBIP_API_KEY", "")
-_INFOBIP_BASE_URL: str = os.environ.get("INFOBIP_BASE_URL", "")
-# Legacy SendGrid config (kept for backward compatibility)
-_EMAIL_API_KEY: str = os.environ.get("SENDGRID_API_KEY", "")
-_EMAIL_FROM: str = os.environ.get("EMAIL_FROM", "miessou8@gmail.com")
-_EMAIL_TO: str = os.environ.get("EMAIL_TO", "")
+# Email config (Gmail SMTP)
+_EMAIL_HOST: str = "smtp.gmail.com"
+_EMAIL_PORT: int = 587
+_EMAIL_USER: str = os.environ.get("EMAIL_FROM", "miessou8@gmail.com")
+_EMAIL_PASS: str = os.environ.get("EMAIL_PASSWORD", "")
 
 # Security: PBKDF2-HMAC-SHA256 salt — new derived + legacy fallback
 def _derive_salt() -> bytes:
@@ -233,13 +231,19 @@ def _send_login_email(role: str, ip: str, email: str) -> None:
         print(f"[EMAIL ERROR] {e}")
 
 def _send_failed_login_email(ip: str, email: str, ville: str, niveau: str, raison: str, count: int) -> None:
-    """Send email via Infobip to user on failed login attempt (non-blocking)."""
-    if not all([_INFOBIP_API_KEY, _INFOBIP_BASE_URL, email]):
+    """Send email via Gmail SMTP to user on failed login attempt (non-blocking)."""
+    if not _EMAIL_PASS:
+        print("[EMAIL] Skip — EMAIL_PASSWORD not set")
         return
+    if not email:
+        print("[EMAIL] Skip — no recipient address")
+        return
+    import smtplib
+    from email.mime.text import MIMEText
     now = time.strftime("%d/%m/%Y %H:%M:%S")
     niveau_label = {"normal": "Normale", "suspect": "Suspecte", "critique": "Critique"}.get(niveau, niveau)
     subject = f"[SAPHIR Pro] Échec de connexion — {niveau_label}"
-    text = (
+    body = (
         f"Bonjour,\n\n"
         f"Une tentative de connexion échouée a été détectée sur votre compte SAPHIR Pro.\n\n"
         f"Tentative n°{count}\n"
@@ -253,24 +257,18 @@ def _send_failed_login_email(ip: str, email: str, ville: str, niveau: str, raiso
         f"---\n"
         f"SAPHIR Pro — Système d'aide à l'orientation scolaire"
     )
-    payload = json.dumps({
-        "from": {"address": _EMAIL_FROM},
-        "to": [{"address": email}],
-        "subject": subject,
-        "text": text,
-    }).encode()
-    req = urllib.request.Request(
-        f"https://{_INFOBIP_BASE_URL}/email/4/send-messages",
-        data=payload, method="POST"
-    )
-    req.add_header("Authorization", f"App {_INFOBIP_API_KEY}")
-    req.add_header("Content-Type", "application/json")
-    req.add_header("User-Agent", "Mozilla/5.0")
+    msg = MIMEText(body, _charset="utf-8")
+    msg["Subject"] = subject
+    msg["From"] = _EMAIL_USER
+    msg["To"] = email
     try:
-        urllib.request.urlopen(req, timeout=10)
-        print(f"[INFOBIP] Failed-login alert sent to {email} from {ip}")
+        with smtplib.SMTP(_EMAIL_HOST, _EMAIL_PORT, timeout=10) as server:
+            server.starttls()
+            server.login(_EMAIL_USER, _EMAIL_PASS)
+            server.send_message(msg)
+        print(f"[EMAIL] Failed-login alert sent to {email} from {ip}")
     except Exception as e:
-        print(f"[INFOBIP ERROR] _send_failed_login_email: {e}")
+        print(f"[EMAIL ERROR] _send_failed_login_email: {e}")
 
 
 def _device_fingerprint(ua: str) -> str:
