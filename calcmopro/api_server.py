@@ -80,10 +80,35 @@ _TWILIO_FROM: str = os.environ.get("TWILIO_FROM", "")
 _TWILIO_TO: str = os.environ.get("TWILIO_TO", "")
 
 # Email config (Gmail SMTP)
-_EMAIL_HOST: str = os.environ.get("EMAIL_HOST", "smtp.mailgun.org")
+_EMAIL_HOST: str = os.environ.get("EMAIL_HOST", "")
 _EMAIL_PORT: int = int(os.environ.get("EMAIL_PORT", "587"))
 _EMAIL_USER: str = os.environ.get("EMAIL_USER", "")
 _EMAIL_PASS: str = os.environ.get("EMAIL_PASSWORD", "")
+_MAILGUN_DOMAIN: str = os.environ.get("MAILGUN_DOMAIN", "")
+
+
+def _mailgun_send(to: str, subject: str, body: str) -> None:
+    """Send email via Mailgun REST API (HTTPS, port 443 — works on Render free tier)."""
+    if not _EMAIL_PASS or not _MAILGUN_DOMAIN:
+        print("[EMAIL] Skip — EMAIL_PASSWORD or MAILGUN_DOMAIN not set")
+        return
+    import base64
+    url = f"https://api.mailgun.net/v3/{_MAILGUN_DOMAIN}/messages"
+    payload = urllib.parse.urlencode({
+        "from": f"SAPHIR Pro <{_EMAIL_USER}>",
+        "to": to,
+        "subject": subject,
+        "text": body,
+    }).encode()
+    auth = base64.b64encode(f"api:{_EMAIL_PASS}".encode()).decode()
+    req = urllib.request.Request(url, data=payload, method="POST")
+    req.add_header("Authorization", f"Basic {auth}")
+    req.add_header("Content-Type", "application/x-www-form-urlencoded")
+    try:
+        resp = urllib.request.urlopen(req, timeout=15)
+        print(f"[EMAIL] Sent to {to} — {resp.status}")
+    except Exception as e:
+        print(f"[EMAIL ERROR] {e}")
 
 # Security: PBKDF2-HMAC-SHA256 salt — new derived + legacy fallback
 def _derive_salt() -> bytes:
@@ -205,41 +230,23 @@ def _send_login_sms(role: str, ip: str, email: str) -> None:
 
 
 def _send_login_email(role: str, ip: str, email: str) -> None:
-    """Send email via Gmail SMTP on successful login (non-blocking)."""
-    if not _EMAIL_PASS:
-        return
-    import smtplib
-    from email.mime.text import MIMEText
+    """Send email via Mailgun API on successful login (non-blocking)."""
     now = time.strftime("%d/%m/%Y %H:%M:%S")
     role_label = "Administrateur" if role == "admin" else "Élève"
     subject = f"[SAPHIR Pro] Connexion {role_label}"
     body = f"Nouvelle connexion détectée sur SAPHIR Pro\n\nRôle : {role_label}\nIP : {ip}\nDate : {now}"
     if email:
         body += f"\nEmail : {email}"
-    msg = MIMEText(body, _charset="utf-8")
-    msg["Subject"] = subject
-    msg["From"] = _EMAIL_USER
-    msg["To"] = _EMAIL_USER
     try:
-        clean_pass = _EMAIL_PASS.replace(" ", "")
-        with smtplib.SMTP(_EMAIL_HOST, _EMAIL_PORT, timeout=10) as server:
-            server.starttls()
-            server.login(_EMAIL_USER, clean_pass)
-            server.send_message(msg)
-        print(f"[EMAIL] Login alert sent for {role} from {ip}")
+        _mailgun_send(_EMAIL_USER, subject, body)
     except Exception as e:
         print(f"[EMAIL ERROR] _send_login_email: {e}")
 
 def _send_failed_login_email(ip: str, email: str, ville: str, niveau: str, raison: str, count: int) -> None:
-    """Send email via Gmail SMTP to user on failed login attempt (non-blocking)."""
-    if not _EMAIL_PASS:
-        print("[EMAIL] Skip — EMAIL_PASSWORD not set")
-        return
+    """Send email via Mailgun API to user on failed login attempt (non-blocking)."""
     if not email:
         print("[EMAIL] Skip — no recipient address")
         return
-    import smtplib
-    from email.mime.text import MIMEText
     now = time.strftime("%d/%m/%Y %H:%M:%S")
     niveau_label = {"normal": "Normale", "suspect": "Suspecte", "critique": "Critique"}.get(niveau, niveau)
     subject = f"[SAPHIR Pro] Échec de connexion — {niveau_label}"
@@ -257,18 +264,8 @@ def _send_failed_login_email(ip: str, email: str, ville: str, niveau: str, raiso
         f"---\n"
         f"SAPHIR Pro — Système d'aide à l'orientation scolaire"
     )
-    msg = MIMEText(body, _charset="utf-8")
-    msg["Subject"] = subject
-    msg["From"] = _EMAIL_USER
-    msg["To"] = email
     try:
-        clean_pass = _EMAIL_PASS.replace(" ", "")
-        with smtplib.SMTP(_EMAIL_HOST, _EMAIL_PORT, timeout=10) as server:
-            server.starttls()
-            server.login(_EMAIL_USER, clean_pass)
-            server.send_message(msg)
-            server.send_message(msg)
-        print(f"[EMAIL] Failed-login alert sent to {email} from {ip}")
+        _mailgun_send(email, subject, body)
     except Exception as e:
         print(f"[EMAIL ERROR] _send_failed_login_email: {e}")
 
@@ -588,21 +585,11 @@ class _Handler(BaseHTTPRequestHandler):
         if path == "/api/test-email":
             if self._get_role() != "admin":
                 return self._json({"error": "Accès refusé"}, 403)
-            if not _EMAIL_PASS:
-                return self._json({"ok": False, "error": "EMAIL_PASSWORD non configuré"})
+            if not _EMAIL_PASS or not _MAILGUN_DOMAIN:
+                return self._json({"ok": False, "error": "EMAIL_PASSWORD ou MAILGUN_DOMAIN non configuré"})
             try:
-                import smtplib
-                from email.mime.text import MIMEText
-                msg = MIMEText("Test SAPHIR Pro - Gmail SMTP fonctionne !", _charset="utf-8")
-                msg["Subject"] = "[SAPHIR Pro] Test email"
-                msg["From"] = _EMAIL_USER
-                msg["To"] = _EMAIL_USER
-                clean_pass = _EMAIL_PASS.replace(" ", "")
-                with smtplib.SMTP(_EMAIL_HOST, _EMAIL_PORT, timeout=10) as server:
-                    server.starttls()
-                    server.login(_EMAIL_USER, clean_pass)
-                    server.send_message(msg)
-                return self._json({"ok": True, "message": "Email envoye avec succes"})
+                _mailgun_send(_EMAIL_USER, "[SAPHIR Pro] Test email", "Test SAPHIR Pro — Mailgun API fonctionne !")
+                return self._json({"ok": True, "message": "Email envoyé avec succès"})
             except Exception as e:
                 return self._json({"ok": False, "error": str(e)})
 
