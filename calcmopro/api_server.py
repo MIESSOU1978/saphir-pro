@@ -79,7 +79,10 @@ _TWILIO_TOKEN: str = os.environ.get("TWILIO_AUTH_TOKEN", "")
 _TWILIO_FROM: str = os.environ.get("TWILIO_FROM", "")
 _TWILIO_TO: str = os.environ.get("TWILIO_TO", "")
 
-# Email config (SendGrid API)
+# Email config (Infobip)
+_INFOBIP_API_KEY: str = os.environ.get("INFOBIP_API_KEY", "")
+_INFOBIP_BASE_URL: str = os.environ.get("INFOBIP_BASE_URL", "")
+# Legacy SendGrid config (kept for backward compatibility)
 _EMAIL_API_KEY: str = os.environ.get("SENDGRID_API_KEY", "")
 _EMAIL_FROM: str = os.environ.get("EMAIL_FROM", "miessou8@gmail.com")
 _EMAIL_TO: str = os.environ.get("EMAIL_TO", "")
@@ -230,13 +233,13 @@ def _send_login_email(role: str, ip: str, email: str) -> None:
         print(f"[EMAIL ERROR] {e}")
 
 def _send_failed_login_email(ip: str, email: str, ville: str, niveau: str, raison: str, count: int) -> None:
-    """Send email to user on failed login attempt (non-blocking)."""
-    if not all([_EMAIL_API_KEY, email]) or count < 3:
+    """Send email via Infobip to user on failed login attempt (non-blocking)."""
+    if not all([_INFOBIP_API_KEY, _INFOBIP_BASE_URL, email]):
         return
     now = time.strftime("%d/%m/%Y %H:%M:%S")
     niveau_label = {"normal": "Normale", "suspect": "Suspecte", "critique": "Critique"}.get(niveau, niveau)
     subject = f"[SAPHIR Pro] Échec de connexion — {niveau_label}"
-    body = (
+    text = (
         f"Bonjour,\n\n"
         f"Une tentative de connexion échouée a été détectée sur votre compte SAPHIR Pro.\n\n"
         f"Tentative n°{count}\n"
@@ -251,20 +254,23 @@ def _send_failed_login_email(ip: str, email: str, ville: str, niveau: str, raiso
         f"SAPHIR Pro — Système d'aide à l'orientation scolaire"
     )
     payload = json.dumps({
-        "personalizations": [{"to": [{"email": email}]}],
-        "from": {"email": _EMAIL_FROM, "name": "SAPHIR Pro"},
+        "from": {"address": _EMAIL_FROM},
+        "to": [{"address": email}],
         "subject": subject,
-        "content": [{"type": "text/plain", "value": body}]
+        "text": text,
     }).encode()
-    req = urllib.request.Request("https://api.sendgrid.com/v3/mail/send", data=payload, method="POST")
-    req.add_header("Authorization", f"Bearer {_EMAIL_API_KEY}")
+    req = urllib.request.Request(
+        f"https://{_INFOBIP_BASE_URL}/email/4/send-messages",
+        data=payload, method="POST"
+    )
+    req.add_header("Authorization", f"App {_INFOBIP_API_KEY}")
     req.add_header("Content-Type", "application/json")
     req.add_header("User-Agent", "Mozilla/5.0")
     try:
         urllib.request.urlopen(req, timeout=10)
-        print(f"[EMAIL] Failed-login alert sent to {email} from {ip}")
+        print(f"[INFOBIP] Failed-login alert sent to {email} from {ip}")
     except Exception as e:
-        print(f"[EMAIL ERROR] _send_failed_login_email: {e}")
+        print(f"[INFOBIP ERROR] _send_failed_login_email: {e}")
 
 
 def _device_fingerprint(ua: str) -> str:
