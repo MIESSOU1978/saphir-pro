@@ -229,6 +229,43 @@ def _send_login_email(role: str, ip: str, email: str) -> None:
     except Exception as e:
         print(f"[EMAIL ERROR] {e}")
 
+def _send_failed_login_email(ip: str, email: str, ville: str, niveau: str, raison: str, count: int) -> None:
+    """Send email to user on failed login attempt (non-blocking)."""
+    if not all([_EMAIL_API_KEY, email]) or count < 3:
+        return
+    now = time.strftime("%d/%m/%Y %H:%M:%S")
+    niveau_label = {"normal": "Normale", "suspect": "Suspecte", "critique": "Critique"}.get(niveau, niveau)
+    subject = f"[SAPHIR Pro] Échec de connexion — {niveau_label}"
+    body = (
+        f"Bonjour,\n\n"
+        f"Une tentative de connexion échouée a été détectée sur votre compte SAPHIR Pro.\n\n"
+        f"Tentative n°{count}\n"
+        f"Date : {now}\n"
+        f"IP : {ip}\n"
+        f"Ville : {ville or 'Inconnue'}\n"
+        f"Niveau d'alerte : {niveau_label}\n"
+        f"Raison : {raison}\n\n"
+        f"Si ce n'était pas vous, veuillez contacter votre administrateur.\n"
+        f"Si c'était vous, ignorez ce message.\n\n"
+        f"---\n"
+        f"SAPHIR Pro — Système d'aide à l'orientation scolaire"
+    )
+    payload = json.dumps({
+        "personalizations": [{"to": [{"email": email}]}],
+        "from": {"email": _EMAIL_FROM, "name": "SAPHIR Pro"},
+        "subject": subject,
+        "content": [{"type": "text/plain", "value": body}]
+    }).encode()
+    req = urllib.request.Request("https://api.sendgrid.com/v3/mail/send", data=payload, method="POST")
+    req.add_header("Authorization", f"Bearer {_EMAIL_API_KEY}")
+    req.add_header("Content-Type", "application/json")
+    req.add_header("User-Agent", "Mozilla/5.0")
+    try:
+        urllib.request.urlopen(req, timeout=10)
+        print(f"[EMAIL] Failed-login alert sent to {email} from {ip}")
+    except Exception as e:
+        print(f"[EMAIL ERROR] _send_failed_login_email: {e}")
+
 
 def _device_fingerprint(ua: str) -> str:
     """Generate a stable device fingerprint from User-Agent (matches frontend FNV-1a).
@@ -827,6 +864,7 @@ class _Handler(BaseHTTPRequestHandler):
                 "navigateur": info.get("browser", ""), "raison": raison,
                 "niveau": niveau, "email_count": email_count + 1, "ip_count": ip_count + 1,
             })
+            threading.Thread(target=_send_failed_login_email, args=(client_ip, email, ville, niveau, raison, count), daemon=True).start()
             return self._json({"error": msg, "attempts": count}, 401)
 
         if path == "/api/logout":
