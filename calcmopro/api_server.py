@@ -825,7 +825,7 @@ class _Handler(BaseHTTPRequestHandler):
                 niveau = "normal"
             # Get device info from User-Agent
             ua = self.headers.get("User-Agent", "")
-            info = _parse_user_agent(ua)
+            info = db._parse_user_agent(ua)
             # Get city from IP
             ville = ""
             if client_ip and client_ip not in ("127.0.0.1", "::1", ""):
