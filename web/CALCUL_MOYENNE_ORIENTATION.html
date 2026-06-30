@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=overlays-content">
 <meta name="google-site-verification" content="YZf2o0U5chCswRvGy9i2XFqozxTBtVfAy2wnlYH-Yj0" />
-<title></title>
+<title>SAPHIR Pro — Calcul MO</title>
 <style>
 :root {
   --navy:    #050b14;
@@ -3368,8 +3368,11 @@ function buildBulletin(){
 }
 
 function printBulletin(){
+  const nom=document.getElementById('mo-nom')?.value?.trim()||'Élève';
+  const origTitle=document.title;
+  document.title='Bulletin — '+nom+' — SAPHIR Pro';
   buildBulletin();
-  setTimeout(()=>window.print(),60);
+  setTimeout(()=>{window.print();setTimeout(()=>{document.title=origTitle;},100);},60);
 }
 
 function loadBulletinPreview(){
@@ -3460,6 +3463,9 @@ function exportPDF(){
     toast('Note manquante : '+missing[0],true);return;
   }
   buildBulletin();
+  const nom=document.getElementById('mo-nom')?.value?.trim()||'Élève';
+  const origTitle=document.title;
+  document.title='Bulletin — '+nom+' — SAPHIR Pro';
   saveToHistory().then(id=>{
     if(id){
       markPrinted(id);
@@ -3467,6 +3473,7 @@ function exportPDF(){
       toast('PDF exporté et enregistré ✔');
       logActivity('Export PDF','Calcul MO','Export depuis formulaire');
       sendNotification('PDF exporté','Bulletin téléchargé depuis le formulaire','info');
+      setTimeout(()=>{document.title=origTitle;},100);
     } else {
       toast('Enregistrement échoué. PDF non imprimé.',true);
     }
