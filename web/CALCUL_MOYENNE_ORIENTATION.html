@@ -3183,7 +3183,8 @@ function buildBulletinHTML(h){
   const school=esc(h.etablissement||'NON RENSEIGNÉ');
   const year=esc(h.annee_scolaire||h.annee||'-')+(isTO?' — TEST D\'ORIENTATION':'');
   const matricule=esc(h.matricule||'-');
-  const today=new Date().toLocaleDateString('fr-FR');
+  const d=new Date();
+  const today=String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()+' à '+d.getHours()+' h '+String(d.getMinutes()).padStart(2,'0');
   let totalWeighted=0;
   const rows=MATIERES.map(m=>{
     const d=(h.matieres||{})[m.id]||{};
@@ -3364,7 +3365,8 @@ function buildBulletin(){
   mentionEl.textContent=lbl;
   mentionEl.className='bp-mention '+cls;
 
-  document.getElementById('bp-date').textContent=new Date().toLocaleDateString('fr-FR');
+  const d2=new Date();
+  document.getElementById('bp-date').textContent=String(d2.getDate()).padStart(2,'0')+'/'+String(d2.getMonth()+1).padStart(2,'0')+'/'+d2.getFullYear()+' à '+d2.getHours()+' h '+String(d2.getMinutes()).padStart(2,'0');
 }
 
 function printBulletin(){
