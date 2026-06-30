@@ -2980,7 +2980,7 @@ function printSelection(){
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</style></head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins — SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</style></head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
 }
@@ -2991,7 +2991,7 @@ function exportSelection(){
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</style></head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins — SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</style></head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
 }
@@ -3262,7 +3262,7 @@ async function printAllBulletins(){
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Bulletins - SAPHIR Pro</title>
+<title>Bulletins — SAPHIR Pro</title>
 ${styles}
 <style>
   *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
@@ -3502,7 +3502,7 @@ function previewMO(){
       const win=window.open('','_blank','width=900,height=700');
       if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
       win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Apercu — ${nom} — SAPHIR Pro</title>
+<title>Aperçu — ${nom} — SAPHIR Pro</title>
 ${styles}
 <style>
   *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;box-sizing:border-box;}
@@ -4201,7 +4201,7 @@ function previewBulletinFromAct(idx){
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Aperçu bulletin — ${esc(d.nom||'')} — SAPHIR Pro</title>
+<title>Aperçu — ${esc(d.nom||'')} — SAPHIR Pro</title>
 ${styles}
 <style>
   *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
