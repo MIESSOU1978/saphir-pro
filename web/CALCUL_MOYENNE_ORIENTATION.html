@@ -840,14 +840,14 @@ msg-dialog .msg-dlg-btn-read:hover{background:#0B6B50;}
 .users-actions-dropdown svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
 
 .users-trust-btn{
-  width:28px;height:28px;border-radius:6px;border:1px solid #D5E5DE;background:#fff;
-  cursor:pointer;font-size:.78rem;font-weight:700;transition:all .18s ease;display:inline-flex;align-items:center;justify-content:center;
+  width:36px;height:36px;border-radius:8px;border:1.5px solid #D5E5DE;background:#fff;
+  cursor:pointer;transition:all .18s ease;display:inline-flex;align-items:center;justify-content:center;
 }
-.users-trust-add{color:#064E3B;}
+.users-trust-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.users-trust-add{color:#064E3B;border-color:#B8CEC3;}
 .users-trust-add:hover{background:#F0F7F3;border-color:#064E3B;}
-.users-trust-remove{color:#A85B00;}
+.users-trust-remove{color:#A85B00;border-color:#F5C56B;}
 .users-trust-remove:hover{background:#FFF7E8;border-color:#F5A623;}
-.users-trust-remove svg{width:14px;height:14px;}
 
 .users-devices-alert{
   display:flex;align-items:center;gap:8px;padding:10px 16px;
@@ -3859,14 +3859,14 @@ function renderKnownDevices(){
       const trustLabel=trusted?'Retirer des appareils fiables':'Marquer comme fiable';
       if(trusted){
         actions=`
-          <button class="users-trust-btn users-trust-remove" onclick="toggleDeviceTrust(${kd.id},0)" title="${trustLabel}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+          <button class="users-trust-btn users-trust-remove" onclick="toggleDeviceTrust(${kd.id},0)" title="Retirer des appareils fiables"><svg viewBox="0 0 24 24"><path d="M19.69 14a6.9 6.9 0 0 0 .31-2V5l-8-3-3.16 1.18"/><path d="M4.73 4.73L4 5v7c0 6 8 10 8 10a20.29 20.29 0 0 0 5.62-4.38"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>`;
       }else{
         actions=`
-          <button class="users-trust-btn users-trust-add" onclick="toggleDeviceTrust(${kd.id},1)" title="${trustLabel}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>`;
+          <button class="users-trust-btn users-trust-add" onclick="toggleDeviceTrust(${kd.id},1)" title="Marquer comme fiable"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></button>`;
       }
-      actions+=`<button class="btn-icon-danger" onclick="deleteKnownDevice(${kd.id})" title="Supprimer cet appareil"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
+      actions+=`<button class="btn-icon-danger" onclick="deleteKnownDevice(${kd.id})" title="Supprimer cet appareil connu" style="width:36px;height:36px;"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
     }else{
-      actions=`<button class="users-trust-btn users-trust-add" onclick="trustNewDevice('${d.fingerprint}','${(d.label||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer comme fiable"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>`;
+      actions=`<button class="users-trust-btn users-trust-add" onclick="trustNewDevice('${d.fingerprint}','${(d.label||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer comme fiable"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></button>`;
     }
     const uniqueEmails=[...new Set(d.sessions.map(s=>s.email||'').filter(Boolean))];
     let detailLine='';
@@ -3990,7 +3990,7 @@ function renderUsers(sessions){
 
 function toggleDeviceTrust(deviceId, trusted) {
   if(trusted && !confirm('Voulez-vous vraiment marquer cet appareil comme fiable ?')) return;
-  if(!trusted && !confirm('Voulez-vous vraiment retirer la confiance de cet appareil ?')) return;
+  if(!trusted && !confirm('Voulez-vous vraiment retirer cet appareil des appareils fiables ?')) return;
   const action = trusted ? 'trust' : 'untrust';
   const label = trusted ? 'fiable' : 'non reconnu';
   toast('Mise à jour en cours…');
@@ -4026,7 +4026,7 @@ function trustNewDevice(fingerprint, label) {
 }
 
 function deleteKnownDevice(deviceId) {
-  if(!confirm('Supprimer cet appareil de la liste ?')) return;
+  if(!confirm('Voulez-vous vraiment supprimer cet appareil connu ? Cette action est irréversible.')) return;
   toast('Suppression…');
   fetch(API + '/api/known-devices/' + deviceId, {
     method: 'DELETE', credentials: 'same-origin'
