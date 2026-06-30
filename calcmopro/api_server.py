@@ -221,9 +221,10 @@ def _send_login_email(role: str, ip: str, email: str) -> None:
     msg["From"] = _EMAIL_USER
     msg["To"] = _EMAIL_USER
     try:
+        clean_pass = _EMAIL_PASS.replace(" ", "")
         with smtplib.SMTP(_EMAIL_HOST, _EMAIL_PORT, timeout=10) as server:
             server.starttls()
-            server.login(_EMAIL_USER, _EMAIL_PASS)
+            server.login(_EMAIL_USER, clean_pass)
             server.send_message(msg)
         print(f"[EMAIL] Login alert sent for {role} from {ip}")
     except Exception as e:
@@ -261,9 +262,11 @@ def _send_failed_login_email(ip: str, email: str, ville: str, niveau: str, raiso
     msg["From"] = _EMAIL_USER
     msg["To"] = email
     try:
+        clean_pass = _EMAIL_PASS.replace(" ", "")
         with smtplib.SMTP(_EMAIL_HOST, _EMAIL_PORT, timeout=10) as server:
             server.starttls()
-            server.login(_EMAIL_USER, _EMAIL_PASS)
+            server.login(_EMAIL_USER, clean_pass)
+            server.send_message(msg)
             server.send_message(msg)
         print(f"[EMAIL] Failed-login alert sent to {email} from {ip}")
     except Exception as e:
@@ -595,9 +598,8 @@ class _Handler(BaseHTTPRequestHandler):
                 msg["From"] = _EMAIL_USER
                 msg["To"] = _EMAIL_USER
                 with smtplib.SMTP(_EMAIL_HOST, _EMAIL_PORT, timeout=10) as server:
-                    server.starttls()
-                    server.login(_EMAIL_USER, _EMAIL_PASS)
-                    server.send_message(msg)
+            server.starttls()
+            server.login(_EMAIL_USER, clean_pass)
                 return self._json({"ok": True, "message": "Email envoye avec succes"})
             except Exception as e:
                 return self._json({"ok": False, "error": str(e)})
