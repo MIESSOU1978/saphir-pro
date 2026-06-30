@@ -80,9 +80,9 @@ _TWILIO_FROM: str = os.environ.get("TWILIO_FROM", "")
 _TWILIO_TO: str = os.environ.get("TWILIO_TO", "")
 
 # Email config (Gmail SMTP)
-_EMAIL_HOST: str = "smtp.gmail.com"
-_EMAIL_PORT: int = 587
-_EMAIL_USER: str = os.environ.get("EMAIL_FROM", "miessou8@gmail.com")
+_EMAIL_HOST: str = os.environ.get("EMAIL_HOST", "smtp.mailgun.org")
+_EMAIL_PORT: int = int(os.environ.get("EMAIL_PORT", "587"))
+_EMAIL_USER: str = os.environ.get("EMAIL_USER", "")
 _EMAIL_PASS: str = os.environ.get("EMAIL_PASSWORD", "")
 
 # Security: PBKDF2-HMAC-SHA256 salt — new derived + legacy fallback
