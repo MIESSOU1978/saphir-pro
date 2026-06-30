@@ -20,8 +20,7 @@ from typing import Any
 _DB_NAME = "calcmo.db"
 _TURSO_URL: str = os.environ.get("TURSO_URL", "")
 _TURSO_URL = _TURSO_URL.replace("libsql://", "")
-_TURSO_TOKEN: str = os.environ.get("APP_PASSWORD", "")
-_TURSO_TOKEN = os.environ.get("TURSO_TOKEN", _TURSO_TOKEN)
+_TURSO_TOKEN: str = os.environ.get("TURSO_TOKEN", "")
 
 def _turso_enabled() -> bool:
     return bool(_TURSO_URL and _TURSO_TOKEN)
