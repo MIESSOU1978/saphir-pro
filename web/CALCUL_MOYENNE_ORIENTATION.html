@@ -3156,7 +3156,7 @@ async function downloadBulletinPDF(id){
   }
   if(!h||!h.matieres){toast('Données indisponibles.',true);return;}
   const page=buildBulletinHTML(h);
-  openBulletinModal(page,'Bulletin — '+(h.nom||'Élève'));
+  openBulletinModal(page,'Télécharger — '+(h.nom||'Élève'));
   setTimeout(()=>window.print(),300);
   markPrinted(id);
   logActivity('Téléchargement PDF','Bulletin',h.nom||'');
@@ -3363,10 +3363,10 @@ function buildBulletin(){
 
 function printBulletin(){
   const nom=document.getElementById('mo-nom')?.value?.trim()||'Élève';
-  const origTitle=document.title;
-  document.title='Bulletin — '+nom+' — SAPHIR Pro';
   buildBulletin();
-  setTimeout(()=>{window.print();setTimeout(()=>{document.title=origTitle;},100);},60);
+  document.title='Imprimer — '+nom+' — SAPHIR Pro';
+  window.print();
+  document.title='SAPHIR Pro — Calcul MO';
 }
 
 function loadBulletinPreview(){
@@ -3458,15 +3458,14 @@ function exportPDF(){
   }
   buildBulletin();
   const nom=document.getElementById('mo-nom')?.value?.trim()||'Élève';
-  const origTitle=document.title;
-  document.title='Bulletin — '+nom+' — SAPHIR Pro';
   saveToHistory().then(id=>{
     if(id) markPrinted(id);
+    document.title='Télécharger — '+nom+' — SAPHIR Pro';
     window.print();
+    document.title='SAPHIR Pro — Calcul MO';
     toast(id?'PDF exporté et enregistré ✔':'PDF imprimé (enregistrement échoué)',!id);
     logActivity('Export PDF','Calcul MO','Export depuis formulaire');
     sendNotification('PDF exporté','Bulletin téléchargé depuis le formulaire','info');
-    setTimeout(()=>{document.title=origTitle;},100);
   });
 }
 
@@ -4674,9 +4673,11 @@ window.addEventListener('pagehide',()=>{
 function openBulletinModal(html,title){
   const c=document.getElementById('bpm-content');
   c.innerHTML=html;
-  document.getElementById('bpm-title').textContent=title||'Aperçu du bulletin';
+  const label=title||'Aperçu du bulletin';
+  document.getElementById('bpm-title').textContent=label;
   document.body.style.overflow='hidden';
   document.body.classList.add('bpm-active');
+  document.title=label+' — SAPHIR Pro';
   const ov=document.getElementById('bpm-overlay');
   ov.classList.add('open');
   document.addEventListener('keydown',_bpmEscHandler);
@@ -4687,6 +4688,7 @@ function closeBulletinModal(e){
   document.getElementById('bpm-content').innerHTML='';
   document.body.style.overflow='';
   document.body.classList.remove('bpm-active');
+  document.title='SAPHIR Pro — Calcul MO';
   document.removeEventListener('keydown',_bpmEscHandler);
 }
 function _bpmEscHandler(e){if(e.key==='Escape')closeBulletinModal();}
