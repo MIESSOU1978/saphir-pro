@@ -711,6 +711,9 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 }
 .users-act-btn svg{width:16px;height:16px;stroke:#2563EB;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .users-act-btn:hover{background:#EFF6FF;border-color:#2563EB;box-shadow:0 2px 8px rgba(37,99,235,.12);}
+.users-act-btn-active{border-color:#064E3B;background:#E6F4ED;}
+.users-act-btn-active svg{stroke:#064E3B;}
+.users-act-btn-active:hover{background:#CCE8D8;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.15);}
 
 .btn-icon-danger{border-radius:8px;background:#fff;border:1.5px solid #F3B8B2;color:#D92D20;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s ease;padding:0 10px;font-size:.72rem;font-weight:600;gap:5px;white-space:nowrap;}
 .btn-icon-danger svg{width:15px;height:15px;stroke:#D92D20;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
@@ -2235,6 +2238,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
             <th>IP</th>
             <th>Connexion</th>
             <th>Déconnexion</th>
+            <th>Activités</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -2400,9 +2404,9 @@ function buildMGATable(){
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td><span class="mat-label">${m.label}</span></td>
-      <td><input class="note-input" id="${m.id}_t1" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}')"></td>
-      <td><input class="note-input" id="${m.id}_t2" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}')"></td>
-      <td><input class="note-input" id="${m.id}_t3" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}')"></td>
+      <td><input class="note-input" id="${m.id}_t1" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"></td>
+      <td><input class="note-input" id="${m.id}_t2" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"></td>
+      <td><input class="note-input" id="${m.id}_t3" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"></td>
       <td><span class="mga-val" id="${m.id}_mga_val">0,00</span></td>`;
     tb.appendChild(tr);
   });
@@ -2517,15 +2521,15 @@ function buildMOTable(){
     let bepcCell;
     if(m.anglais){
       bepcCell=`<div class="two-notes">
-        <input class="note-input" id="${m.id}_bepc_e" type="text" inputmode="decimal" maxlength="5" placeholder="Écrit" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}')">
-        <input class="note-input" id="${m.id}_bepc_o" type="text" inputmode="decimal" maxlength="5" placeholder="Oral" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}')">
+        <input class="note-input" id="${m.id}_bepc_e" type="text" inputmode="decimal" maxlength="5" placeholder="Écrit" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}');logNoteChange(this.id,this.value)">
+        <input class="note-input" id="${m.id}_bepc_o" type="text" inputmode="decimal" maxlength="5" placeholder="Oral" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}');logNoteChange(this.id,this.value)">
       </div>`;
     } else {
-      bepcCell=`<input class="note-input" id="${m.id}_bepc" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}')">`;
+      bepcCell=`<input class="note-input" id="${m.id}_bepc" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}');logNoteChange(this.id,this.value)">`;
     }
     tr.innerHTML=`
       <td><span class="mat-label">${m.label}</span></td>
-      <td><input class="note-input" id="${m.id}_mga" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}')"></td>
+      <td><input class="note-input" id="${m.id}_mga" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}');logNoteChange(this.id,this.value)"></td>
       <td>${bepcCell}</td>
       <td><span class="computed-val" id="${m.id}_sum">—</span></td>
       <td><span class="mat-coef">${m.coef}</span></td>
@@ -2538,6 +2542,7 @@ function toggleTO(){
   _toMode=!_toMode;
   const btn=document.getElementById('to-toggle');
   if(btn) btn.classList.toggle('active',_toMode);
+  logActivity(_toMode?'Activation TO':'Désactivation TO','Calcul MO','Mode TO: '+(_toMode?'activé':'désactivé'));
   MATIERES.forEach(m=>{
     if(!m.anglais) return;
     const oralEl=document.getElementById(m.id+'_bepc_o');
@@ -3664,6 +3669,21 @@ function logActivity(action,module,detail,resultat){
   }).catch(()=>{});
 }
 
+let _noteLogTimer=null;
+let _noteLogChanges=[];
+function logNoteChange(inputId,value){
+  if(!value) return;
+  _noteLogChanges.push({id:inputId,val:value});
+  if(_noteLogTimer) clearTimeout(_noteLogTimer);
+  _noteLogTimer=setTimeout(()=>{
+    if(!_noteLogChanges.length) return;
+    const n=_noteLogChanges.length;
+    const sample=_noteLogChanges.slice(-3).map(c=>c.id.replace(/_/g,' ')+': '+c.val).join(', ');
+    logActivity('Saisie de notes','Calcul MO',n+' note(s) modifiée(s): '+sample);
+    _noteLogChanges=[];
+  },2000);
+}
+
 async function loadUsers(){
   try{
     const [r,rd,rb]=await Promise.all([
@@ -3916,7 +3936,7 @@ function renderUsers(sessions){
   const ct=document.getElementById('users-count');
   if(!sessions.length){
     ct.textContent='Aucune session enregistrée';
-    tb.innerHTML='<tr><td colspan="11" class="users-empty-state">Aucune session enregistrée<div class="users-empty-sub">Les connexions des utilisateurs apparaîtront ici.</div></td></tr>';
+    tb.innerHTML='<tr><td colspan="12" class="users-empty-state">Aucune session enregistrée<div class="users-empty-sub">Les connexions des utilisateurs apparaîtront ici.</div></td></tr>';
     return;
   }
   const n=sessions.length;
@@ -3985,10 +4005,11 @@ function renderUsers(sessions){
       <td style="font-family:monospace;font-size:.72rem;" title="${s.ip||''}">${s.ip||'—'}</td>
       <td style="font-size:.72rem;">${loginDisplay}</td>
       <td style="font-size:.72rem;">${logoutDisplay}</td>
+      <td style="font-size:.72rem;text-align:center;" title="${esc(s.last_activity||'Aucune activité')}">${s.activity_count||0}</td>
       <td>
         <div class="users-actions-cell">
           ${disconnectBtn}
-          <button class="users-act-btn" onclick="showUserActivities(${s.id},'${email.replace(/'/g,"\\'")}')" title="Voir les activités"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button>
+          <button class="users-act-btn${(s.activity_count||0)>0?' users-act-btn-active':''}" onclick="showUserActivities(${s.id},'${email.replace(/'/g,"\\'")}')" title="Voir les activités (${s.activity_count||0})"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button>
           ${dropdownHTML}
         </div>
       </td>
@@ -4653,6 +4674,7 @@ function filterByYear(){
     _role=d.role||'guest';
     if(d.email){_userEmail=d.email;localStorage.setItem('saphir_email',d.email);}
     else{_userEmail=localStorage.getItem('saphir_email')||'';}
+    if(d.session_id){_sessionId=d.session_id;localStorage.setItem('saphir_session_id',String(d.session_id));}
   }catch(e){_role='guest';}
   applyRole();
   setTimeout(_sseStart,1000);

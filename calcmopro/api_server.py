@@ -437,6 +437,16 @@ class _Handler(BaseHTTPRequestHandler):
             pass
         return ""
 
+    def _get_session_id(self) -> int:
+        """Get session ID from cookie."""
+        sid = self._get_cookie("saphir_session_id")
+        if not sid:
+            return 0
+        try:
+            return int(sid)
+        except (ValueError, TypeError):
+            return 0
+
     def _extract_session_token(self) -> str | None:
         """Extract session token from cookie."""
         return self._get_cookie("session")
@@ -600,7 +610,7 @@ class _Handler(BaseHTTPRequestHandler):
             return self._html(_html_path)
 
         if path == "/api/role":
-            return self._json({"role": self._get_role(), "email": self._get_email()})
+            return self._json({"role": self._get_role(), "email": self._get_email(), "session_id": self._get_session_id()})
 
         if path == "/api/login-attempts":
             if self._get_role() != "admin":
