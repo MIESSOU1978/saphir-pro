@@ -1331,7 +1331,7 @@ def start_server(html_path: Path, port: int = 0, host: str = "127.0.0.1",
         while True:
             time.sleep(15)
             try:
-                n = db.mark_stale_sessions(timeout_seconds=45)
+                n = db.mark_stale_sessions(timeout_seconds=1200)
                 if n:
                     print(f"[HEARTBEAT] Marked {n} stale session(s) offline")
                     try:

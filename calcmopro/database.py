@@ -750,7 +750,7 @@ def heartbeat(session_id: int) -> None:
     conn.close()
 
 
-def mark_stale_sessions(timeout_seconds: int = 45) -> int:
+def mark_stale_sessions(timeout_seconds: int = 1200) -> int:
     """Mark sessions as offline (set logout_at) if no heartbeat received within timeout.
     Returns number of sessions marked offline."""
     from datetime import timedelta
