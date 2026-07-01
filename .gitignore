@@ -15,3 +15,6 @@ android-build/android/capacitor-community-sqlite/build/
 CALCMO-SAPHIR-Pro.exe
 crash.log
 test_web.py
+.env
+.env.*
+_migrate_turso.py
