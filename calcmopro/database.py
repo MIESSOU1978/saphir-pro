@@ -818,6 +818,31 @@ def clear_sessions() -> None:
     conn.close()
 
 
+def clear_offline_sessions() -> int:
+    """Delete all disconnected sessions (logout_at != '') and their activities. Returns count deleted."""
+    if _turso_enabled():
+        offline = _turso_exec("SELECT id FROM sessions WHERE logout_at != ''")
+        ids = [int(r["id"]) for r in offline]
+        if not ids:
+            return 0
+        placeholders = ",".join("?" * len(ids))
+        _turso_exec_write(f"DELETE FROM activity_log WHERE session_id IN ({placeholders})", ids)
+        _turso_exec_write(f"DELETE FROM sessions WHERE id IN ({placeholders})", ids)
+        return len(ids)
+    conn = _connect()
+    rows = conn.execute("SELECT id FROM sessions WHERE logout_at != ''").fetchall()
+    ids = [r["id"] for r in rows]
+    if not ids:
+        conn.close()
+        return 0
+    placeholders = ",".join("?" * len(ids))
+    conn.execute(f"DELETE FROM activity_log WHERE session_id IN ({placeholders})", ids)
+    conn.execute(f"DELETE FROM sessions WHERE id IN ({placeholders})", ids)
+    conn.commit()
+    conn.close()
+    return len(ids)
+
+
 def log_activity(session_id: int, role: str, action: str, module: str = "", detail: str = "", resultat: str = "succes", email: str = "") -> None:
     """Log an activity event."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

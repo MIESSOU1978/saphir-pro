@@ -1190,6 +1190,16 @@ class _Handler(BaseHTTPRequestHandler):
             _sse_emit("sessions_cleared", {"message": "Historique des sessions vidé"})
             return self._json({"ok": True})
 
+        if path == "/api/sessions/clear-offline":
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                count = db.clear_offline_sessions()
+            except Exception as exc:
+                return self._json({"error": "Erreur interne du serveur"}, 500)
+            _sse_emit("sessions_cleared", {"message": f"{count} session(s) déconnectée(s) supprimée(s)"})
+            return self._json({"ok": True, "deleted": count})
+
         # ── DISCONNECT USER ──
         if path.startswith("/api/sessions/") and path.endswith("/disconnect"):
             if role != "admin":
