@@ -299,8 +299,8 @@ def _check_unknown_device(ua: str, ip: str, email: str, role: str) -> None:
         )
         if email:
             msg += f"\nEmail: {email}"
-        db.add_notification("Nouvel appareil", msg, "warning")
-        _sse_emit("unknown_device", {"message": "Nouvel appareil détecté", "user": email, "device": label, "ip": ip})
+        db.add_notification("Nouvel appareil : " + (email or "inconnu"), msg, "warning")
+        _sse_emit("unknown_device", {"message": "Nouvel appareil : " + (email or "inconnu"), "user": email, "device": label, "ip": ip})
 
 
 class _Handler(BaseHTTPRequestHandler):
@@ -763,7 +763,8 @@ class _Handler(BaseHTTPRequestHandler):
                     threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
                     threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
                     threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student"), daemon=True).start()
-                    _sse_emit("login_success", {"message": "Nouvelle connexion détectée", "user": email, "role": "student", "ip": ip})
+                    db.add_notification("Connexion réussie", json.dumps({"user": email, "ip": ip, "role": "student"}, ensure_ascii=False), "success")
+                    _sse_emit("login_success", {"message": "Nouvelle connexion : " + email, "user": email, "role": "student", "ip": ip})
                     return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token, extra_cookies={"saphir_session_id": str(sid)})
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
@@ -771,7 +772,8 @@ class _Handler(BaseHTTPRequestHandler):
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "admin"), daemon=True).start()
-                _sse_emit("login_success", {"message": "Nouvelle connexion détectée", "user": email, "role": "admin", "ip": ip})
+                db.add_notification("Connexion réussie", json.dumps({"user": email, "ip": ip, "role": "admin"}, ensure_ascii=False), "success")
+                _sse_emit("login_success", {"message": "Nouvelle connexion : " + email, "user": email, "role": "admin", "ip": ip})
                 return self._json({"ok": True, "role": "admin", "session_id": sid})
 
             if _verify_password(pwd, _hash_password(_APP_PASSWORD)):
@@ -782,7 +784,8 @@ class _Handler(BaseHTTPRequestHandler):
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "admin"), daemon=True).start()
-                _sse_emit("login_success", {"message": "Nouvelle connexion détectée", "user": email, "role": "admin", "ip": ip})
+                db.add_notification("Connexion réussie", json.dumps({"user": email, "ip": ip, "role": "admin"}, ensure_ascii=False), "success")
+                _sse_emit("login_success", {"message": "Nouvelle connexion : " + email, "user": email, "role": "admin", "ip": ip})
                 return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid}, "session", token, extra_cookies={"saphir_session_id": str(sid)})
 
             if _STUDENT_PASSWORD and _verify_password(pwd, _hash_password(_STUDENT_PASSWORD)):
@@ -793,7 +796,8 @@ class _Handler(BaseHTTPRequestHandler):
                 threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
                 threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student"), daemon=True).start()
-                _sse_emit("login_success", {"message": "Nouvelle connexion détectée", "user": email, "role": "student", "ip": ip})
+                db.add_notification("Connexion réussie", json.dumps({"user": email, "ip": ip, "role": "student"}, ensure_ascii=False), "success")
+                _sse_emit("login_success", {"message": "Nouvelle connexion : " + email, "user": email, "role": "student", "ip": ip})
                 return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token, extra_cookies={"saphir_session_id": str(sid)})
 
             # ── Failed attempt ──
@@ -847,11 +851,11 @@ class _Handler(BaseHTTPRequestHandler):
                     "navigateur": info.get("browser", ""), "raison": raison,
                     "niveau": niveau, "email_count": email_count + 1, "ip_count": ip_count + 1,
                 }, ensure_ascii=False)
-                db.add_notification("Tentative de connexion échouée", detail_data, "error")
+                db.add_notification("Connexion échouée : " + email, detail_data, "error")
             except Exception as exc:
                 print(f"[ERROR] add_notification login_failed: {exc}")
             _sse_emit("login_failed", {
-                "message": "Tentative de connexion échouée",
+                "message": "Échec de connexion : " + email,
                 "user": email, "ip": client_ip, "ville": ville,
                 "appareil": info.get("device", ""), "os": info.get("os", ""),
                 "navigateur": info.get("browser", ""), "raison": raison,
@@ -864,9 +868,11 @@ class _Handler(BaseHTTPRequestHandler):
             try:
                 body = self._read_body()
                 sess_id = body.get("session_id")
+                logout_email = self._get_email()
                 if sess_id:
                     db.close_session(int(sess_id))
-                    _sse_emit("logout", {"message": "Déconnexion utilisateur", "session_id": int(sess_id)})
+                    db.add_notification("Déconnexion", json.dumps({"user": logout_email or "", "session_id": int(sess_id)}, ensure_ascii=False), "info")
+                    _sse_emit("logout", {"message": "Déconnexion : " + (logout_email or ""), "user": logout_email or "", "session_id": int(sess_id)})
             except Exception:
                 pass
             self.send_response(302)
@@ -1039,8 +1045,9 @@ class _Handler(BaseHTTPRequestHandler):
             resultat = body.get("resultat", "succes")
             session_id = body.get("session_id", 0)
             role = self._get_role()
+            email = self._get_email()
             try:
-                db.log_activity(session_id, role, action, module, detail, resultat)
+                db.log_activity(session_id, role, action, module, detail, resultat, email=email)
             except Exception as exc:
                 print(f"[ERROR] log_activity: {exc}")
             return self._json({"ok": True})
@@ -1182,10 +1189,14 @@ class _Handler(BaseHTTPRequestHandler):
             except (ValueError, IndexError):
                 return self._json({"error": "id invalide"}, 400)
             try:
+                sessions = db.list_sessions()
+                kicked = [s for s in sessions if s.get("id") == sid]
+                kicked_email = kicked[0].get("email", "") if kicked else ""
                 db.close_session(sid)
+                db.add_notification("Session déconnectée", json.dumps({"user": kicked_email, "session_id": sid, "action": "deconnexion par admin"}, ensure_ascii=False), "warning")
             except Exception as exc:
                 return self._json({"error": "Erreur interne du serveur"}, 500)
-            _sse_emit("session_kicked", {"message": "Session déconnectée par l'administrateur", "session_id": sid})
+            _sse_emit("session_kicked", {"message": "Session déconnectée : " + kicked_email, "user": kicked_email, "session_id": sid})
             return self._json({"ok": True})
 
         # ── BAN USER ──
@@ -1211,7 +1222,7 @@ class _Handler(BaseHTTPRequestHandler):
                 db.close_session(sid)
             except Exception as exc:
                 return self._json({"error": "Erreur interne du serveur"}, 500)
-            _sse_emit("user_banned", {"message": "Utilisateur banni", "user": email, "motif": motif})
+            _sse_emit("user_banned", {"message": "Banni : " + email, "user": email, "motif": motif})
             return self._json({"ok": True})
 
         # ── UNBAN USER ──
@@ -1223,7 +1234,7 @@ class _Handler(BaseHTTPRequestHandler):
                 db.unban_user(email)
             except Exception as exc:
                 return self._json({"error": "Erreur interne du serveur"}, 500)
-            _sse_emit("user_unbanned", {"message": "Utilisateur débanni", "user": email})
+            _sse_emit("user_unbanned", {"message": "Débanni : " + email, "user": email})
             return self._json({"ok": True})
 
         # ── LIST BANNED USERS ──
@@ -1244,10 +1255,13 @@ class _Handler(BaseHTTPRequestHandler):
             except ValueError:
                 return self._json({"error": "id invalide"}, 400)
             try:
+                sessions = db.list_sessions()
+                del_sess = [s for s in sessions if s.get("id") == sid]
+                del_email = del_sess[0].get("email", "") if del_sess else ""
                 db.delete_session(sid)
             except Exception as exc:
                 return self._json({"error": "Erreur interne du serveur"}, 500)
-            _sse_emit("session_deleted", {"message": "Session supprimée", "session_id": sid})
+            _sse_emit("session_deleted", {"message": "Session supprimée : " + del_email, "user": del_email, "session_id": sid})
             return self._json({"ok": True})
 
         if path.startswith("/api/known-devices/"):

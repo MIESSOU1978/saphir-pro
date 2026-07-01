@@ -224,6 +224,7 @@ def init_db() -> None:
             CREATE TABLE IF NOT EXISTS activity_log (
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
                 session_id  INTEGER DEFAULT 0,
+                email       TEXT DEFAULT '',
                 role        TEXT DEFAULT '',
                 action      TEXT NOT NULL,
                 module      TEXT DEFAULT '',
@@ -292,6 +293,10 @@ def init_db() -> None:
                 _turso_exec(f"ALTER TABLE eleves ADD COLUMN {col} {typ} DEFAULT {default}")
             except Exception:
                 pass
+        try:
+            _turso_exec("ALTER TABLE activity_log ADD COLUMN email TEXT DEFAULT ''")
+        except Exception:
+            pass
         test = _turso_exec("SELECT COUNT(*) as n FROM eleves")
         count = test[0]["n"] if test else "UNKNOWN"
         print(f"[DB] init_db OK | Turso connected | eleves count={count}")
@@ -339,6 +344,7 @@ def init_db() -> None:
         CREATE TABLE IF NOT EXISTS activity_log (
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
             session_id  INTEGER DEFAULT 0,
+            email       TEXT DEFAULT '',
             role        TEXT DEFAULT '',
             action      TEXT NOT NULL,
             module      TEXT DEFAULT '',
@@ -406,6 +412,10 @@ def init_db() -> None:
         pass
     try:
         conn.execute("ALTER TABLE resultats ADD COLUMN printed INTEGER DEFAULT 0")
+    except Exception:
+        pass
+    try:
+        conn.execute("ALTER TABLE activity_log ADD COLUMN email TEXT DEFAULT ''")
     except Exception:
         pass
     conn.close()
@@ -808,19 +818,19 @@ def clear_sessions() -> None:
     conn.close()
 
 
-def log_activity(session_id: int, role: str, action: str, module: str = "", detail: str = "", resultat: str = "succes") -> None:
+def log_activity(session_id: int, role: str, action: str, module: str = "", detail: str = "", resultat: str = "succes", email: str = "") -> None:
     """Log an activity event."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     if _turso_enabled():
         _turso_exec_insert(
-            "INSERT INTO activity_log (session_id, role, action, module, detail, resultat, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            [session_id, role, action, module, detail, resultat, now],
+            "INSERT INTO activity_log (session_id, email, role, action, module, detail, resultat, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [session_id, email, role, action, module, detail, resultat, now],
         )
         return
     conn = _connect()
     conn.execute(
-        "INSERT INTO activity_log (session_id, role, action, module, detail, resultat, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (session_id, role, action, module, detail, resultat, now),
+        "INSERT INTO activity_log (session_id, email, role, action, module, detail, resultat, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (session_id, email, role, action, module, detail, resultat, now),
     )
     conn.commit()
     conn.close()
