@@ -1106,15 +1106,29 @@ def update_known_device_label(fingerprint: str, label: str) -> None:
 
 
 def list_known_devices() -> list[dict]:
-    """List all known devices."""
+    """List all known devices with associated emails from sessions."""
     if _turso_enabled():
-        rows = _turso_exec("SELECT * FROM known_devices ORDER BY id DESC")
+        rows = _turso_exec("""
+            SELECT kd.*, GROUP_CONCAT(DISTINCT s.email) AS emails
+            FROM known_devices kd
+            LEFT JOIN sessions s ON s.appareil LIKE '%' || kd.label || '%'
+            GROUP BY kd.id
+            ORDER BY kd.id DESC
+        """)
         for r in rows:
             r["trusted"] = int(r.get("trusted", 0))
             r["id"] = int(r.get("id", 0))
+            if not r.get("emails"):
+                r["emails"] = ""
         return rows
     conn = _connect()
-    rows = conn.execute("SELECT * FROM known_devices ORDER BY id DESC").fetchall()
+    rows = conn.execute("""
+        SELECT kd.*, GROUP_CONCAT(DISTINCT s.email) AS emails
+        FROM known_devices kd
+        LEFT JOIN sessions s ON s.appareil LIKE '%' || kd.label || '%'
+        GROUP BY kd.id
+        ORDER BY kd.id DESC
+    """).fetchall()
     conn.close()
     return [dict(r) for r in rows]
 

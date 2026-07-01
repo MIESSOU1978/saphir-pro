@@ -3842,11 +3842,13 @@ function renderKnownDevices(){
       actions=`<button class="users-trust-btn users-trust-add" onclick="trustNewDevice('${d.fingerprint}','${(d.label||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer comme fiable"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></button><button class="users-trust-btn users-trust-remove" onclick="blockNewDevice('${d.fingerprint}','${(d.label||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer comme non fiable"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10a20.29 20.29 0 0 0 5.62-4.38"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>`;
     }
     const uniqueEmails=[...new Set(d.sessions.map(s=>s.email||'').filter(Boolean))];
+    const kdEmails=d.kd&&d.kd.emails?d.kd.emails.split(',').filter(Boolean):[];
+    const allEmails=[...new Set([...uniqueEmails,...kdEmails])];
     let detailLine='';
-    if(uniqueEmails.length===1){
-      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${esc(uniqueEmails[0])}</div>`;
-    }else if(uniqueEmails.length>1){
-      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${uniqueEmails.length} utilisateurs associés <span class="users-device-detail-link" onclick="showDeviceUsers(${idx})">Voir</span></div>`;
+    if(allEmails.length===1){
+      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${esc(allEmails[0])}</div>`;
+    }else if(allEmails.length>1){
+      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${allEmails.length} utilisateurs associés <span class="users-device-detail-link" onclick="showDeviceUsers(${idx})">Voir</span></div>`;
     }else if(d.kd){
       detailLine=`<div class="users-device-detail">${esc(d.kd.label||d.label||'Appareil')} · Aucune session active</div>`;
     }else{
@@ -3861,12 +3863,17 @@ function renderKnownDevices(){
     </div>`;
   }).join('');
   window._deviceUsersMap=devices.map(d=>[...new Set(d.sessions.map(s=>s.email||'').filter(Boolean))]);
+  window._devicesList=devices;
 }
 
 function showDeviceUsers(idx){
-  const emails=window._deviceUsersMap?window._deviceUsersMap[idx]:[];
-  if(!emails||!emails.length)return;
-  const list=emails.map(e=>'<div style="padding:6px 0;border-bottom:1px solid #eef3f0;font-size:.8rem;color:#003b32;">'+esc(e)+'</div>').join('');
+  const d=window._deviceUsersMap?window._deviceUsersMap[idx]:null;
+  const sessionEmails=d&&d.emails?d.emails:[];
+  const kd=window._devicesList?window._devicesList[idx]:null;
+  const kdEmails=kd&&kd.kd&&kd.kd.emails?kd.kd.emails.split(',').filter(Boolean):[];
+  const allEmails=[...new Set([...sessionEmails,...kdEmails])];
+  if(!allEmails.length)return;
+  const list=allEmails.map(e=>'<div style="padding:6px 0;border-bottom:1px solid #eef3f0;font-size:.8rem;color:#003b32;">'+esc(e)+'</div>').join('');
   const modal=document.createElement('div');
   modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:9999;';
   modal.innerHTML=`<div style="background:#fff;border-radius:12px;padding:20px 24px;min-width:280px;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.18);">
