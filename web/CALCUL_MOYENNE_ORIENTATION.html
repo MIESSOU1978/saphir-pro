@@ -3790,15 +3790,8 @@ function renderKnownDevices(){
   const knownMap={};
   _knownDevices.forEach(d=>{knownMap[d.fingerprint]=d;});
   const deviceMap={};
-  function _stableFingerprint(os,nav,device){
-    const s=screen;
-    const parts=[s.width+'x'+s.height,s.colorDepth,new Date().getTimezoneOffset(),navigator.language||navigator.userLanguage||'',navigator.platform||'',navigator.hardwareConcurrency||0,navigator.maxTouchPoints||0].join('|');
-    let h=0x811c9dc5;
-    for(let i=0;i<parts.length;i++){h^=parts.charCodeAt(i);h=(h*0x01000193)>>>0;}
-    return h.toString(16).padStart(8,'0').substring(0,16);
-  }
   _allSessions.forEach(s=>{
-    const fp=_stableFingerprint(s.os,s.navigateur,s.appareil);
+    const fp=s.fingerprint||'';
     if(!fp) return;
     if(!deviceMap[fp]){
       deviceMap[fp]={fingerprint:fp,label:s.appareil||'',os:s.os||'',navigateur:s.navigateur||'',ip:s.ip||'',kd:knownMap[fp]||null,sessions:[]};

@@ -769,6 +769,9 @@ class _Handler(BaseHTTPRequestHandler):
             pwd = body.get("password", "")
             email = (body.get("email") or "").strip().lower()
             machine_fp = (body.get("machine_fp") or "").strip()
+            ip = self._get_real_ip()
+            ua = self.headers.get("User-Agent", "")
+            session_fp = _device_fingerprint(ua, machine_fp)
 
             # ── Email is mandatory ──
             if not email:
@@ -796,7 +799,7 @@ class _Handler(BaseHTTPRequestHandler):
                     token = _create_session("student")
                     ip = self._get_real_ip()
                     ua = self.headers.get("User-Agent", "")
-                    sid = db.create_session("student", ip, ua, email)
+                    sid = db.create_session("student", ip, ua, email, fingerprint=session_fp)
                     _record_success_login(self, email, ip, "student")
                     threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
                     threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
@@ -807,7 +810,7 @@ class _Handler(BaseHTTPRequestHandler):
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
                 token = _create_session("admin")
-                sid = db.create_session("admin", ip, ua, email)
+                sid = db.create_session("admin", ip, ua, email, fingerprint=session_fp)
                 _record_success_login(self, email, ip, "admin")
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
@@ -820,7 +823,7 @@ class _Handler(BaseHTTPRequestHandler):
                 token = _create_session("admin")
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
-                sid = db.create_session("admin", ip, ua, email)
+                sid = db.create_session("admin", ip, ua, email, fingerprint=session_fp)
                 _record_success_login(self, email, ip, "admin")
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
@@ -833,7 +836,7 @@ class _Handler(BaseHTTPRequestHandler):
                 token = _create_session("student")
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
-                sid = db.create_session("student", ip, ua, email)
+                sid = db.create_session("student", ip, ua, email, fingerprint=session_fp)
                 _record_success_login(self, email, ip, "student")
                 threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
@@ -1100,7 +1103,9 @@ class _Handler(BaseHTTPRequestHandler):
             role = body.get("role", self._get_role())
             ip = self._get_real_ip()
             ua = self.headers.get("User-Agent", "")
-            sid = db.create_session(role, ip, ua)
+            machine_fp = (body.get("machine_fp") or "").strip()
+            session_fp = _device_fingerprint(ua, machine_fp)
+            sid = db.create_session(role, ip, ua, fingerprint=session_fp)
             return self._json({"ok": True, "session_id": sid})
 
         if path.startswith("/api/sessions/") and path.endswith("/close"):

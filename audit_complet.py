@@ -128,10 +128,10 @@ def audit_js(content):
                 elif ch == string_char:
                     in_string = False
 
-        # Apostrophes dans les chaînes simple-quoted
-        bad_apostrophes = re.findall(r"'[^']*'[^']*'[^']*'", js)
-        if bad_apostrophes:
-            error(f"Script #{i}: Apostrophes potentiellement cassées ({len(bad_apostrophes)} occurrences)")
+        # Apostrophes cassées (Unicode curly quotes dans le code JS)
+        curly = re.findall(r'[\u2018\u2019\u201C\u201D]', js)
+        if curly:
+            error(f"Script #{i}: Apostrophes/guillemets Unicode cassés ({len(curly)} occurrences)")
 
         # Accolades/parenthèses non fermées
         opens = js.count('{')
