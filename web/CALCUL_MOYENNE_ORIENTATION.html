@@ -4680,7 +4680,7 @@ function openBulletinModal(html,title){
   document.addEventListener('keydown',_bpmEscHandler);
 }
 function closeBulletinModal(e){
-  if(e&&e.target!==e.currentTarget)return;
+  if(e&&e.type==='click'&&e.target!==e.currentTarget)return;
   document.getElementById('bpm-overlay').classList.remove('open');
   document.getElementById('bpm-content').innerHTML='';
   document.body.style.overflow='';
