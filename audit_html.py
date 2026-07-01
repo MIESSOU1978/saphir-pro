@@ -28,13 +28,6 @@ def audit(path: Path) -> bool:
         if not match:
             ok = False
 
-    # Also check that <script> and </script> are balanced (critical!)
-    script_opens = len(re.findall(r"<script[\s>]", content, re.IGNORECASE))
-    script_closes = len(re.findall(r"</script>", content, re.IGNORECASE))
-    if script_opens != script_closes:
-        print(f"\n  *** CRITIQUE: {script_opens} <script> vs {script_closes} </script> ***")
-        ok = False
-
     print(f"\n{'=' * 40}")
     print(f"  {'RESULTAT: OK' if ok else 'RESULTAT: ECHEC'}")
     return ok

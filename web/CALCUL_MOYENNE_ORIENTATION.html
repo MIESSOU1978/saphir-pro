@@ -2985,7 +2985,7 @@ function printSelection(){
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins — SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</style></head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins — SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
 }
@@ -2996,7 +2996,7 @@ function exportSelection(){
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins — SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</style></head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins — SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
 }
@@ -3120,7 +3120,7 @@ ${styles}
   body{margin:0;padding:0;background:#fff;}
    .bulletin-sheet{page-break-after:auto;margin:0;padding:0;max-height:297mm;overflow:hidden;}
   @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
-</style></head><body>${page}</body></html>`);
+</head><body>${page}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
   markPrinted(id);
@@ -3161,7 +3161,7 @@ ${styles}
     .bulletin-sheet{width:100%;margin:0;box-shadow:none;}
     @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
   }
-</style></head><body>
+</head><body>
 <div class="preview-toolbar">
   <span class="preview-toolbar-title">Aperçu du bulletin — ${h.nom||'Élève'}</span>
   <button class="preview-toolbar-btn" onclick="window.print()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Imprimer / PDF</button>
@@ -3276,7 +3276,7 @@ ${styles}
   .bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}
   .bulletin-sheet:last-child{page-break-after:auto;}
   @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
-</style></head><body>${pages}</body></html>`);
+</head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>{win.print();},600);
   items.forEach(h=>{if(h.id)markPrinted(h.id);});
@@ -3538,7 +3538,7 @@ ${styles}
     .bulletin-sheet{width:100%;margin:0;box-shadow:none;}
     @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
   }
-</style></head><body>
+</head><body>
 <div class="preview-toolbar">
   <span class="preview-toolbar-title">Aperçu du bulletin — ${nom}</span>
   <button class="preview-toolbar-btn" onclick="window.print()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Imprimer / PDF</button>
@@ -4252,7 +4252,7 @@ ${styles}
   body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
   .bulletin-sheet{margin:0;padding:0;max-height:297mm;overflow:hidden;}
   @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
-</style></head><body>${html}</body></html>`);
+</head><body>${html}</body></html>`);
   win.document.close();
   toast('Aperçu bulletin pour '+d.nom);
 }
@@ -4279,7 +4279,7 @@ function exportUsersPDF(){
     p{font-size:.75rem;color:#60736d;margin-bottom:16px;}
     table{width:100%;border-collapse:collapse;font-size:.75rem;}
     th{background:#f4f8f6;padding:8px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#064E3B;border-bottom:2px solid #d5e5de;}
-    </style></head><body>
+    </head><body>
     <h1>Liste des utilisateurs — SAPHIR Pro</h1>
     <p>${_allSessions.length} session(s) • Exporté le ${new Date().toLocaleDateString('fr-FR')}</p>
     <table><thead><tr><th>Utilisateur</th><th>Rôle</th><th>Appareil</th><th>Ville</th><th>IP</th><th>Connexion</th><th>Déconnexion</th><th>État</th></tr></thead><tbody>${rows}</tbody></table>
