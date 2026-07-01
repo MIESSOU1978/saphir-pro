@@ -296,9 +296,12 @@ def _send_failed_login_email(ip: str, email: str, ville: str, niveau: str, raiso
         print(f"[EMAIL ERROR] _send_failed_login_email: {e}")
 
 
-def _device_fingerprint(ua: str) -> str:
-    """Generate a stable device fingerprint from User-Agent (matches frontend FNV-1a).
-    Uses parsed OS+browser+device type only — immune to browser auto-updates."""
+def _device_fingerprint(ua: str, machine_fp: str = "") -> str:
+    """Generate a stable device fingerprint.
+    Combines client machine fingerprint (screen, tz, CPU) with UA if available.
+    Falls back to UA-only if client fingerprint not provided."""
+    if machine_fp:
+        return machine_fp[:16]
     info = db._parse_user_agent(ua)
     key = f"{info['os']}|{info['navigateur']}|{info['appareil']}"
     h = 0x811c9dc5
@@ -308,9 +311,9 @@ def _device_fingerprint(ua: str) -> str:
     return format(h, '08x')[:16]
 
 
-def _check_unknown_device(ua: str, ip: str, email: str, role: str) -> None:
+def _check_unknown_device(ua: str, ip: str, email: str, role: str, machine_fp: str = "") -> None:
     """Check if login is from an unknown device. Register it and notify admin."""
-    fp = _device_fingerprint(ua)
+    fp = _device_fingerprint(ua, machine_fp)
     info = db._parse_user_agent(ua)
     label = f"{info['appareil']} — {info['os']} / {info['navigateur']}"
     if db.is_device_known(fp):
@@ -765,6 +768,7 @@ class _Handler(BaseHTTPRequestHandler):
             body = self._read_body()
             pwd = body.get("password", "")
             email = (body.get("email") or "").strip().lower()
+            machine_fp = (body.get("machine_fp") or "").strip()
 
             # ── Email is mandatory ──
             if not email:
@@ -796,7 +800,7 @@ class _Handler(BaseHTTPRequestHandler):
                     _record_success_login(self, email, ip, "student")
                     threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
                     threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
-                    threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student"), daemon=True).start()
+                    threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student", machine_fp), daemon=True).start()
                     db.add_notification("Connexion réussie", json.dumps({"user": email, "ip": ip, "role": "student"}, ensure_ascii=False), "success")
                     _sse_emit("login_success", {"message": "Nouvelle connexion : " + email, "user": email, "role": "student", "ip": ip})
                     return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token, extra_cookies={"saphir_session_id": str(sid)})
@@ -807,7 +811,7 @@ class _Handler(BaseHTTPRequestHandler):
                 _record_success_login(self, email, ip, "admin")
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
-                threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "admin"), daemon=True).start()
+                threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "admin", machine_fp), daemon=True).start()
                 db.add_notification("Connexion réussie", json.dumps({"user": email, "ip": ip, "role": "admin"}, ensure_ascii=False), "success")
                 _sse_emit("login_success", {"message": "Nouvelle connexion : " + email, "user": email, "role": "admin", "ip": ip})
                 return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid}, "session", token, extra_cookies={"saphir_session_id": str(sid)})
@@ -820,7 +824,7 @@ class _Handler(BaseHTTPRequestHandler):
                 _record_success_login(self, email, ip, "admin")
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
-                threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "admin"), daemon=True).start()
+                threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "admin", machine_fp), daemon=True).start()
                 db.add_notification("Connexion réussie", json.dumps({"user": email, "ip": ip, "role": "admin"}, ensure_ascii=False), "success")
                 _sse_emit("login_success", {"message": "Nouvelle connexion : " + email, "user": email, "role": "admin", "ip": ip})
                 return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid}, "session", token, extra_cookies={"saphir_session_id": str(sid)})
@@ -833,7 +837,7 @@ class _Handler(BaseHTTPRequestHandler):
                 _record_success_login(self, email, ip, "student")
                 threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
-                threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student"), daemon=True).start()
+                threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student", machine_fp), daemon=True).start()
                 db.add_notification("Connexion réussie", json.dumps({"user": email, "ip": ip, "role": "student"}, ensure_ascii=False), "success")
                 _sse_emit("login_success", {"message": "Nouvelle connexion : " + email, "user": email, "role": "student", "ip": ip})
                 return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token, extra_cookies={"saphir_session_id": str(sid)})
