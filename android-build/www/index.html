@@ -2217,6 +2217,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
     <option value="">Tous les états</option>
     <option value="online">En ligne</option>
     <option value="offline">Déconnecté</option>
+    <option value="banned">Banni</option>
   </select>
 </div>
 
@@ -4054,8 +4055,11 @@ function filterUsers(){
   let filtered=_allSessions.filter(s=>{
     if(roleF&&s.role!==roleF) return false;
     if(devF&&(s.appareil||'')!==devF) return false;
-    if(stF==='online'&&s.logout_at) return false;
-    if(stF==='offline'&&!s.logout_at) return false;
+    const isBanned=_bannedUsers.some(b=>b.email&&s.email&&b.email.toLowerCase()===s.email.toLowerCase());
+    const isOnline=!s.logout_at;
+    if(stF==='online'&&(s.logout_at||isBanned)) return false;
+    if(stF==='offline'&&(!s.logout_at||isBanned)) return false;
+    if(stF==='banned'&&!isBanned) return false;
     if(q){
       const hay=((s.email||'')+(s.ip||'')+(s.os||'')+(s.navigateur||'')+(s.appareil||'')+(s.role||'')+(s.ville||'')).toLowerCase();
       if(!hay.includes(q)) return false;
