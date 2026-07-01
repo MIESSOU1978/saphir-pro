@@ -1137,6 +1137,30 @@ class _Handler(BaseHTTPRequestHandler):
                 return self._json({"error": "Erreur interne du serveur"}, 500)
             return self._json({"ok": True})
 
+        if path == "/api/sessions/batch-delete":
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            body = self._read_body()
+            ids = body.get("ids", [])
+            if not ids or not isinstance(ids, list):
+                return self._json({"error": "ids requis (liste)"}, 400)
+            try:
+                int_ids = [int(i) for i in ids]
+            except (ValueError, TypeError):
+                return self._json({"error": "ids invalides"}, 400)
+            # Exclude active session
+            my_sid = self._get_session_id()
+            int_ids = [i for i in int_ids if i != my_sid]
+            if not int_ids:
+                return self._json({"ok": True, "deleted": 0})
+            try:
+                count = db.delete_sessions_batch(int_ids)
+            except Exception as exc:
+                print(f"[ERROR] batch-delete: {exc}")
+                return self._json({"error": "Erreur interne du serveur"}, 500)
+            _sse_emit("sessions_cleared", {"message": f"{count} session(s) déconnectée(s) supprimée(s)"})
+            return self._json({"ok": True, "deleted": count})
+
         self.send_error(404)
 
     def do_DELETE(self) -> None:
@@ -1209,9 +1233,7 @@ class _Handler(BaseHTTPRequestHandler):
             except (ValueError, IndexError):
                 return self._json({"error": "id invalide"}, 400)
             try:
-                sessions = db.list_sessions()
-                kicked = [s for s in sessions if s.get("id") == sid]
-                kicked_email = kicked[0].get("email", "") if kicked else ""
+                kicked_email = db.get_session_email(sid)
                 db.close_session(sid)
                 db.add_notification("Session déconnectée", json.dumps({"user": kicked_email, "session_id": sid, "action": "deconnexion par admin"}, ensure_ascii=False), "warning")
             except Exception as exc:
@@ -1233,12 +1255,8 @@ class _Handler(BaseHTTPRequestHandler):
             if not email:
                 return self._json({"error": "Email requis"}, 400)
             try:
-                sessions = db.list_sessions()
-                target = next((s for s in sessions if s["id"] == sid), None)
-                if not target:
-                    return self._json({"error": "Session introuvable"}, 404)
-                admin_email = target.get("email", "admin")
-                db.ban_user(email, banned_by=admin_email, motif=motif)
+                session_email = db.get_session_email(sid)
+                db.ban_user(email, banned_by=session_email or "admin", motif=motif)
                 db.close_session(sid)
             except Exception as exc:
                 return self._json({"error": "Erreur interne du serveur"}, 500)
@@ -1275,9 +1293,7 @@ class _Handler(BaseHTTPRequestHandler):
             except ValueError:
                 return self._json({"error": "id invalide"}, 400)
             try:
-                sessions = db.list_sessions()
-                del_sess = [s for s in sessions if s.get("id") == sid]
-                del_email = del_sess[0].get("email", "") if del_sess else ""
+                del_email = db.get_session_email(sid)
                 db.delete_session(sid)
             except Exception as exc:
                 return self._json({"error": "Erreur interne du serveur"}, 500)

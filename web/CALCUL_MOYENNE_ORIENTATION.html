@@ -4136,22 +4136,24 @@ async function deleteSelectedUsers(){
   if(!ids.length){toast('Aucune session supprimable (session active exclue).',true);return;}
   const skipped=getSelectedUserIds().length-ids.length;
   if(!confirm('Supprimer '+ids.length+' session(s) sélectionnée(s) ?'+(skipped?' La session active sera conservée.':'')+' Cette action est irréversible.')) return;
-  for(const id of ids){
-    try{await fetch('/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});}catch(e){}
-  }
-  toast(ids.length+' session(s) supprimée(s)'+(skipped?' (session active conservée)':''));
-  await loadUsers();
+  try{
+    const r=await fetch('/api/sessions/batch-delete',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({ids})});
+    const data=await r.json().catch(()=>({}));
+    if(r.ok){toast((data.deleted||ids.length)+' session(s) supprimée(s)'+(skipped?' (session active conservée)':''));loadUsers();}
+    else{toast('Erreur : '+(data.error||r.status),true);}
+  }catch(e){toast('Erreur réseau',true);}
 }
 
 async function clearAllUsers(){
   const ids=_allSessions.map(s=>s.id).filter(id=>id!==_sessionId);
   if(!ids.length){toast('Aucune autre session à supprimer.',true);return;}
   if(!confirm('Supprimer '+ids.length+' session(s) ?\nVotre session active sera conservée.\nCette action est irréversible.')) return;
-  for(const id of ids){
-    try{await fetch('/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});}catch(e){}
-  }
-  toast(ids.length+' session(s) supprimée(s) (session active conservée)');
-  await loadUsers();
+  try{
+    const r=await fetch('/api/sessions/batch-delete',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({ids})});
+    const data=await r.json().catch(()=>({}));
+    if(r.ok){toast((data.deleted||ids.length)+' session(s) supprimée(s) (session active conservée)');loadUsers();}
+    else{toast('Erreur : '+(data.error||r.status),true);}
+  }catch(e){toast('Erreur réseau',true);}
 }
 
 async function clearOfflineSessions(){
@@ -4161,10 +4163,12 @@ async function clearOfflineSessions(){
   });
   if(!ids.length){toast('Sélectionnez des sessions déconnectées à supprimer.',true);return;}
   if(!confirm('Supprimer '+ids.length+' session(s) déconnectée(s) sélectionnée(s) ?')) return;
-  for(const id of ids){
-    try{await fetch('/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});}catch(e){}
-  }
-  toast(ids.length+' session(s) déconnectée(s) supprimée(s) ✔');
+  try{
+    const r=await fetch('/api/sessions/batch-delete',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({ids})});
+    const data=await r.json().catch(()=>({}));
+    if(r.ok){toast((data.deleted||ids.length)+' session(s) déconnectée(s) supprimée(s) ✔');}
+    else{toast('Erreur : '+(data.error||r.status),true);}
+  }catch(e){toast('Erreur réseau',true);}
   await loadUsers();
 }
 

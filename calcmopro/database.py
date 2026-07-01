@@ -805,6 +805,17 @@ def delete_session(session_id: int) -> None:
     conn.close()
 
 
+def get_session_email(session_id: int) -> str:
+    """Get the email of a session by ID. Lightweight lookup."""
+    if _turso_enabled():
+        rows = _turso_exec("SELECT email FROM sessions WHERE id=?", [session_id])
+        return rows[0].get("email", "") if rows else ""
+    conn = _connect()
+    row = conn.execute("SELECT email FROM sessions WHERE id=?", (session_id,)).fetchone()
+    conn.close()
+    return row["email"] if row else ""
+
+
 def clear_sessions() -> None:
     """Delete all sessions and activities."""
     if _turso_enabled():
@@ -816,6 +827,24 @@ def clear_sessions() -> None:
     conn.execute("DELETE FROM sessions")
     conn.commit()
     conn.close()
+
+
+def delete_sessions_batch(session_ids: list[int]) -> int:
+    """Delete multiple sessions by ID and their activities. Returns count deleted."""
+    if not session_ids:
+        return 0
+    if _turso_enabled():
+        placeholders = ",".join("?" * len(session_ids))
+        _turso_exec_write(f"DELETE FROM activity_log WHERE session_id IN ({placeholders})", session_ids)
+        _turso_exec_write(f"DELETE FROM sessions WHERE id IN ({placeholders})", session_ids)
+        return len(session_ids)
+    conn = _connect()
+    placeholders = ",".join("?" * len(session_ids))
+    conn.execute(f"DELETE FROM activity_log WHERE session_id IN ({placeholders})", session_ids)
+    conn.execute(f"DELETE FROM sessions WHERE id IN ({placeholders})", session_ids)
+    conn.commit()
+    conn.close()
+    return len(session_ids)
 
 
 def clear_offline_sessions() -> int:
