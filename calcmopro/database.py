@@ -752,25 +752,29 @@ def heartbeat(session_id: int) -> None:
 
 def mark_stale_sessions(timeout_seconds: int = 1200) -> int:
     """Mark sessions as offline (set logout_at) if no heartbeat received within timeout.
+    Also marks sessions without last_heartbeat if login_at is older than timeout.
     Returns number of sessions marked offline."""
     from datetime import timedelta
     cutoff = (datetime.now() - timedelta(seconds=timeout_seconds)).strftime("%Y-%m-%d %H:%M:%S")
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     if _turso_enabled():
-        rows = _turso_exec("SELECT id, last_heartbeat, logout_at FROM sessions WHERE logout_at = ''")
+        rows = _turso_exec("SELECT id, last_heartbeat, login_at, logout_at FROM sessions WHERE logout_at = ''")
         count = 0
         for r in rows:
             hb = r.get("last_heartbeat", "")
-            if hb and hb < cutoff:
+            login = r.get("login_at", "")
+            # Mark offline if heartbeat is stale OR if no heartbeat and login is old
+            if (hb and hb < cutoff) or (not hb and login and login < cutoff) or (not hb and not login):
                 _turso_exec_write("UPDATE sessions SET logout_at=? WHERE id=?", [now, r["id"]])
                 count += 1
         return count
     conn = _connect()
-    rows = conn.execute("SELECT id, last_heartbeat, logout_at FROM sessions WHERE logout_at = ''").fetchall()
+    rows = conn.execute("SELECT id, last_heartbeat, login_at, logout_at FROM sessions WHERE logout_at = ''").fetchall()
     count = 0
     for r in rows:
         hb = r["last_heartbeat"] or ""
-        if hb and hb < cutoff:
+        login = r["login_at"] or ""
+        if (hb and hb < cutoff) or (not hb and login and login < cutoff) or (not hb and not login):
             conn.execute("UPDATE sessions SET logout_at=? WHERE id=?", (now, r["id"]))
             count += 1
     conn.commit()
