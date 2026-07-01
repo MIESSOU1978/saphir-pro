@@ -839,38 +839,45 @@ def log_activity(session_id: int, role: str, action: str, module: str = "", deta
 def list_sessions() -> list[dict]:
     """List all sessions with activity summary."""
     if _turso_enabled():
-        rows = _turso_exec("SELECT * FROM sessions ORDER BY id DESC")
+        rows = _turso_exec("""
+            SELECT s.*,
+                   COALESCE(ac.cnt, 0) as activity_count,
+                   COALESCE(ac.last_action, '') as last_activity,
+                   COALESCE(ac.last_at, '') as last_activity_at
+            FROM sessions s
+            LEFT JOIN (
+                SELECT session_id,
+                       COUNT(*) as cnt,
+                       MAX(action) as last_action,
+                       MAX(created_at) as last_at
+                FROM activity_log
+                GROUP BY session_id
+            ) ac ON s.id = ac.session_id
+            ORDER BY s.id DESC
+        """)
         for d in rows:
             d["id"] = int(d["id"]) if d.get("id") is not None else d["id"]
-            try:
-                cnt = _turso_exec("SELECT COUNT(*) as n FROM activity_log WHERE session_id=?", [d["id"]])
-                d["activity_count"] = cnt[0]["n"] if cnt else 0
-                last = _turso_exec("SELECT action, created_at FROM activity_log WHERE session_id=? ORDER BY id DESC LIMIT 1", [d["id"]])
-                d["last_activity"] = last[0]["action"] if last else ""
-                d["last_activity_at"] = last[0]["created_at"] if last else ""
-            except Exception:
-                d["activity_count"] = 0
-                d["last_activity"] = ""
-                d["last_activity_at"] = ""
+            d["activity_count"] = int(d["activity_count"]) if d.get("activity_count") is not None else 0
         return rows
     conn = _connect()
-    rows = conn.execute("SELECT * FROM sessions ORDER BY id DESC").fetchall()
-    result = []
-    for r in rows:
-        d = dict(r)
-        try:
-            cnt = conn.execute("SELECT COUNT(*) as n FROM activity_log WHERE session_id=?", (d["id"],)).fetchone()
-            d["activity_count"] = cnt["n"] if cnt else 0
-            last = conn.execute("SELECT action, created_at FROM activity_log WHERE session_id=? ORDER BY id DESC LIMIT 1", (d["id"],)).fetchone()
-            d["last_activity"] = last["action"] if last else ""
-            d["last_activity_at"] = last["created_at"] if last else ""
-        except Exception:
-            d["activity_count"] = 0
-            d["last_activity"] = ""
-            d["last_activity_at"] = ""
-        result.append(d)
+    rows = conn.execute("""
+        SELECT s.*,
+               COALESCE(ac.cnt, 0) as activity_count,
+               COALESCE(ac.last_action, '') as last_activity,
+               COALESCE(ac.last_at, '') as last_activity_at
+        FROM sessions s
+        LEFT JOIN (
+            SELECT session_id,
+                   COUNT(*) as cnt,
+                   MAX(action) as last_action,
+                   MAX(created_at) as last_at
+            FROM activity_log
+            GROUP BY session_id
+        ) ac ON s.id = ac.session_id
+        ORDER BY s.id DESC
+    """).fetchall()
     conn.close()
-    return result
+    return [dict(r) for r in rows]
 
 
 def list_activity_logs(limit: int = 200) -> list[dict]:
