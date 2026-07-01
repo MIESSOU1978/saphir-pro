@@ -3793,6 +3793,14 @@ function renderKnownDevices(){
     }
     deviceMap[fp].sessions.push(s);
   });
+  _knownDevices.forEach(kd=>{
+    if(!kd.fingerprint) return;
+    if(!deviceMap[kd.fingerprint]){
+      deviceMap[kd.fingerprint]={fingerprint:kd.fingerprint,label:kd.label||'',os:'',navigateur:'',ip:'',kd:kd,sessions:[]};
+    }else{
+      deviceMap[kd.fingerprint].kd=kd;
+    }
+  });
   const devices=Object.values(deviceMap);
   if(!devices.length){
     countEl.textContent='0 appareil(s)';
@@ -3839,6 +3847,8 @@ function renderKnownDevices(){
       detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${esc(uniqueEmails[0])}</div>`;
     }else if(uniqueEmails.length>1){
       detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${uniqueEmails.length} utilisateurs associés <span class="users-device-detail-link" onclick="showDeviceUsers(${idx})">Voir</span></div>`;
+    }else if(d.kd){
+      detailLine=`<div class="users-device-detail">${esc(d.kd.label||d.label||'Appareil')} · Aucune session active</div>`;
     }else{
       detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · Session active</div>`;
     }
