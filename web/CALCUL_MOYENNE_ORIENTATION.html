@@ -3815,7 +3815,7 @@ function renderKnownDevices(){
     }else if(kd){
       badge=trusted
         ?'<span class="users-device-badge users-device-trusted">&#10003; Fiable</span>'
-        :'<span class="users-device-badge users-device-untrusted">&#9888; Inconnu</span>';
+        :'<span class="users-device-badge users-device-untrusted">&#10008; Non fiable</span>';
     }else{
       badge='<span class="users-device-badge users-device-untrusted">&#9888; Nouvel appareil</span>';
     }
@@ -3831,7 +3831,7 @@ function renderKnownDevices(){
       }
       actions+=`<button class="btn-icon-danger" onclick="deleteKnownDevice(${kd.id})" title="Supprimer cet appareil connu" style="width:36px;height:36px;"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
     }else{
-      actions=`<button class="users-trust-btn users-trust-add" onclick="trustNewDevice('${d.fingerprint}','${(d.label||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer comme fiable"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></button>`;
+      actions=`<button class="users-trust-btn users-trust-add" onclick="trustNewDevice('${d.fingerprint}','${(d.label||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer comme fiable"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></button><button class="users-trust-btn users-trust-remove" onclick="blockNewDevice('${d.fingerprint}','${(d.label||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer comme non fiable"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10a20.29 20.29 0 0 0 5.62-4.38"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>`;
     }
     const uniqueEmails=[...new Set(d.sessions.map(s=>s.email||'').filter(Boolean))];
     let detailLine='';
@@ -3984,7 +3984,25 @@ function trustNewDevice(fingerprint, label) {
   }).then(r => r.json().catch(()=>({})).then(data => {
     if (r.ok) {
       toast('Appareil marqué comme fiable ✔');
-      sendNotification('Sécurité', 'Nouvel appareil enregistré : ' + (label || 'inconnu'), 'success');
+      sendNotification('Sécurité', 'Appareil marqué fiable : ' + (label || 'inconnu'), 'success');
+      loadUsers();
+    } else {
+      toast('Erreur : ' + (data.error || r.status));
+    }
+  })).catch(e => { toast('Erreur réseau'); });
+}
+
+function blockNewDevice(fingerprint, label) {
+  if(!confirm('Voulez-vous vraiment marquer cet appareil comme NON fiable ?')) return;
+  toast('Enregistrement en cours…');
+  fetch(API + '/api/known-devices', {
+    method: 'POST', credentials: 'same-origin',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({fingerprint: fingerprint, label: label, trusted: 0})
+  }).then(r => r.json().catch(()=>({})).then(data => {
+    if (r.ok) {
+      toast('Appareil marqué comme non fiable ✔');
+      sendNotification('Sécurité', 'Appareil marqué non fiable : ' + (label || 'inconnu'), 'warning');
       loadUsers();
     } else {
       toast('Erreur : ' + (data.error || r.status));
