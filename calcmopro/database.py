@@ -913,6 +913,9 @@ def list_sessions() -> list[dict]:
         for d in rows:
             d["id"] = int(d["id"]) if d.get("id") is not None else d["id"]
             d["activity_count"] = int(d["activity_count"]) if d.get("activity_count") is not None else 0
+        for d in rows:
+            if not d.get("fingerprint"):
+                d["fingerprint"] = _fp_from_user_agent(d.get("user_agent", ""))
         return rows
     conn = _connect()
     rows = conn.execute("""
@@ -932,10 +935,24 @@ def list_sessions() -> list[dict]:
         ORDER BY s.id DESC
     """).fetchall()
     conn.close()
-    return [dict(r) for r in rows]
+    rows = [dict(r) for r in rows]
+    for d in rows:
+        if not d.get("fingerprint"):
+            d["fingerprint"] = _fp_from_user_agent(d.get("user_agent", ""))
+    return rows
 
 
-def list_activity_logs(limit: int = 200) -> list[dict]:
+def _fp_from_user_agent(ua: str) -> str:
+    """Compute a fingerprint from user_agent for old sessions without stored fingerprint."""
+    if not ua:
+        return ""
+    info = _parse_user_agent(ua)
+    key = f"{info['os']}|{info['navigateur']}|{info['appareil']}"
+    h = 0x811c9dc5
+    for c in key:
+        h ^= ord(c)
+        h = (h * 0x01000193) & 0xFFFFFFFF
+    return format(h, '08x')[:16]
     """List recent activity logs."""
     if _turso_enabled():
         rows = _turso_exec(f"SELECT * FROM activity_log ORDER BY id DESC LIMIT {limit}")
