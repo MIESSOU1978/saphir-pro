@@ -2133,7 +2133,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
           <svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
           Sélection
         </button>
-        <button class="btn-icon-danger" onclick="clearOfflineSessions()" title="Supprimer les sessions déconnectées" style="border-color:#F59E0B;color:#92400E;">
+        <button class="btn-icon-danger" id="users-delete-offline" onclick="clearOfflineSessions()" title="Supprimer les sessions déconnectées sélectionnées" style="display:none;border-color:#F59E0B;color:#92400E;">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
           Hors ligne
         </button>
@@ -4104,6 +4104,15 @@ function updateDeleteBtn(){
   const n=document.querySelectorAll('.users-cb:checked').length;
   const btn=document.getElementById('users-delete-selected');
   if(btn) btn.style.display=n>0?'':'none';
+  const offBtn=document.getElementById('users-delete-offline');
+  if(offBtn){
+    let hasOffline=false;
+    document.querySelectorAll('.users-cb:checked').forEach(cb=>{
+      const s=_allSessions.find(x=>x.id===parseInt(cb.value));
+      if(s&&s.logout_at) hasOffline=true;
+    });
+    offBtn.style.display=hasOffline?'':'none';
+  }
 }
 
 function getSelectedUserIds(){
@@ -4146,15 +4155,17 @@ async function clearAllUsers(){
 }
 
 async function clearOfflineSessions(){
-  const offline=_allSessions.filter(s=>s.logout_at&&s.id!==_sessionId);
-  if(!offline.length){toast('Aucune session déconnectée à supprimer.');return;}
-  if(!confirm('Supprimer '+offline.length+' session(s) déconnectée(s) ?')) return;
-  try{
-    const r=await fetch(API+'/api/sessions/clear-offline',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin'});
-    const d=await r.json().catch(()=>({}));
-    if(r.ok){toast((d.deleted||0)+' session(s) déconnectée(s) supprimée(s) ✔');loadUsers();}
-    else{toast('Erreur : '+(d.error||r.status),true);}
-  }catch(e){toast('Erreur réseau',true);}
+  const ids=getSelectedUserIds().filter(id=>{
+    const s=_allSessions.find(x=>x.id===id);
+    return s&&s.logout_at&&id!==_sessionId;
+  });
+  if(!ids.length){toast('Sélectionnez des sessions déconnectées à supprimer.',true);return;}
+  if(!confirm('Supprimer '+ids.length+' session(s) déconnectée(s) sélectionnée(s) ?')) return;
+  for(const id of ids){
+    try{await fetch('/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});}catch(e){}
+  }
+  toast(ids.length+' session(s) déconnectée(s) supprimée(s) ✔');
+  await loadUsers();
 }
 
 async function disconnectUser(id,email){
