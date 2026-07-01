@@ -4679,8 +4679,11 @@ _startHeartbeat();
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){_sendHeartbeat();}else{_startHeartbeat();}
 });
-window.addEventListener('beforeunload',()=>{const sid=localStorage.getItem('saphir_session_id');if(sid){navigator.sendBeacon(API+'/api/heartbeat',new Blob([JSON.stringify({session_id:parseInt(sid)})],{type:'application/json'}));}});
-window.addEventListener('pagehide',()=>{const sid=localStorage.getItem('saphir_session_id');if(sid){navigator.sendBeacon(API+'/api/heartbeat',new Blob([JSON.stringify({session_id:parseInt(sid)})],{type:'application/json'}));}});
+window.addEventListener('pagehide',()=>{
+  const sid=localStorage.getItem('saphir_session_id');
+  if(!sid)return;
+  try{navigator.sendBeacon(API+'/api/heartbeat',new Blob([JSON.stringify({session_id:parseInt(sid)})],{type:'application/json'}));}catch(e){}
+});
 
 </body>
 </html>
