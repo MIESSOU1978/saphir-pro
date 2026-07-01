@@ -4659,6 +4659,28 @@ loadHistory();
 checkDraft();
 window.addEventListener('beforeprint',buildBulletin);
 if(new URLSearchParams(window.location.search).get('bulletin-preview')==='demo') loadBulletinPreview();
-</script>
+
+/* ── HEARTBEAT: keep session alive + detect disconnection ── */
+let _heartbeatInterval=null;
+function _sendHeartbeat(){
+  const sid=localStorage.getItem('saphir_session_id');
+  if(!sid)return;
+  fetch(API+'/api/heartbeat',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({session_id:parseInt(sid)})}).catch(()=>{});
+}
+function _startHeartbeat(){
+  if(_heartbeatInterval) clearInterval(_heartbeatInterval);
+  _sendHeartbeat();
+  _heartbeatInterval=setInterval(_sendHeartbeat,15000);
+}
+function _stopHeartbeat(){
+  if(_heartbeatInterval){clearInterval(_heartbeatInterval);_heartbeatInterval=null;}
+}
+_startHeartbeat();
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){_sendHeartbeat();}else{_startHeartbeat();}
+});
+window.addEventListener('beforeunload',()=>{const sid=localStorage.getItem('saphir_session_id');if(sid){navigator.sendBeacon(API+'/api/heartbeat',new Blob([JSON.stringify({session_id:parseInt(sid)})],{type:'application/json'}));}});
+window.addEventListener('pagehide',()=>{const sid=localStorage.getItem('saphir_session_id');if(sid){navigator.sendBeacon(API+'/api/heartbeat',new Blob([JSON.stringify({session_id:parseInt(sid)})],{type:'application/json'}));}});
+
 </body>
 </html>

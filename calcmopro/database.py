@@ -205,7 +205,8 @@ def init_db() -> None:
                 username    TEXT DEFAULT '',
                 email       TEXT DEFAULT '',
                 login_at    TEXT DEFAULT (datetime('now','localtime')),
-                logout_at   TEXT DEFAULT ''
+                logout_at   TEXT DEFAULT '',
+                last_heartbeat TEXT DEFAULT ''
             )
         """)
         # Add missing columns for existing tables
@@ -213,6 +214,7 @@ def init_db() -> None:
             ("username", "TEXT", "''"),
             ("email", "TEXT", "''"),
             ("ville", "TEXT", "''"),
+            ("last_heartbeat", "TEXT", "''"),
         ]:
             try:
                 _turso_exec(f"ALTER TABLE sessions ADD COLUMN {col} {typ} DEFAULT {default}")
@@ -331,7 +333,8 @@ def init_db() -> None:
             username    TEXT DEFAULT '',
             email       TEXT DEFAULT '',
             login_at    TEXT DEFAULT (datetime('now','localtime')),
-            logout_at   TEXT DEFAULT ''
+            logout_at   TEXT DEFAULT '',
+            last_heartbeat TEXT DEFAULT ''
         );
         CREATE TABLE IF NOT EXISTS activity_log (
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -388,7 +391,7 @@ def init_db() -> None:
     """)
     # Add missing columns for existing tables
     conn = _connect()
-    for col, typ in [("username", "TEXT"), ("email", "TEXT"), ("ville", "TEXT")]:
+    for col, typ in [("username", "TEXT"), ("email", "TEXT"), ("ville", "TEXT"), ("last_heartbeat", "TEXT")]:
         try:
             conn.execute(f"ALTER TABLE sessions ADD COLUMN {col} {typ} DEFAULT ''")
         except Exception:
@@ -706,15 +709,15 @@ def create_session(role: str, ip: str = "", user_agent: str = "", email: str = "
                 print(f"[DB geoloc] {svc_name} failed: {e}")
     if _turso_enabled():
         sid = _turso_exec_insert(
-            "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            [role, ip, user_agent, ville, info["os"], info["navigateur"], info["appareil"], now, email],
+            "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, email, last_heartbeat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [role, ip, user_agent, ville, info["os"], info["navigateur"], info["appareil"], now, email, now],
         )
         print(f"[DB create_session] id={sid} role={role} ip={ip} ville={ville} os={info['os']} nav={info['navigateur']}")
         return sid
     conn = _connect()
     cur = conn.execute(
-        "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        (role, ip, user_agent, ville, info["os"], info["navigateur"], info["appareil"], now, email),
+        "INSERT INTO sessions (role, ip, user_agent, ville, os, navigateur, appareil, login_at, email, last_heartbeat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (role, ip, user_agent, ville, info["os"], info["navigateur"], info["appareil"], now, email, now),
     )
     sid = cur.lastrowid
     conn.commit()
@@ -727,12 +730,52 @@ def close_session(session_id: int) -> None:
     """Mark session as logged out."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     if _turso_enabled():
-        _turso_exec_write("UPDATE sessions SET logout_at=? WHERE id=?", [now, session_id])
+        _turso_exec_write("UPDATE sessions SET logout_at=?, last_heartbeat=? WHERE id=?", [now, now, session_id])
         return
     conn = _connect()
-    conn.execute("UPDATE sessions SET logout_at=? WHERE id=?", (now, session_id))
+    conn.execute("UPDATE sessions SET logout_at=?, last_heartbeat=? WHERE id=?", (now, now, session_id))
     conn.commit()
     conn.close()
+
+
+def heartbeat(session_id: int) -> None:
+    """Update last_heartbeat for a session."""
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if _turso_enabled():
+        _turso_exec_write("UPDATE sessions SET last_heartbeat=? WHERE id=?", [now, session_id])
+        return
+    conn = _connect()
+    conn.execute("UPDATE sessions SET last_heartbeat=? WHERE id=?", (now, session_id))
+    conn.commit()
+    conn.close()
+
+
+def mark_stale_sessions(timeout_seconds: int = 45) -> int:
+    """Mark sessions as offline (set logout_at) if no heartbeat received within timeout.
+    Returns number of sessions marked offline."""
+    from datetime import timedelta
+    cutoff = (datetime.now() - timedelta(seconds=timeout_seconds)).strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if _turso_enabled():
+        rows = _turso_exec("SELECT id, last_heartbeat, logout_at FROM sessions WHERE logout_at = ''")
+        count = 0
+        for r in rows:
+            hb = r.get("last_heartbeat", "")
+            if hb and hb < cutoff:
+                _turso_exec_write("UPDATE sessions SET logout_at=? WHERE id=?", [now, r["id"]])
+                count += 1
+        return count
+    conn = _connect()
+    rows = conn.execute("SELECT id, last_heartbeat, logout_at FROM sessions WHERE logout_at = ''").fetchall()
+    count = 0
+    for r in rows:
+        hb = r["last_heartbeat"] or ""
+        if hb and hb < cutoff:
+            conn.execute("UPDATE sessions SET logout_at=? WHERE id=?", (now, r["id"]))
+            count += 1
+    conn.commit()
+    conn.close()
+    return count
 
 
 def delete_session(session_id: int) -> None:

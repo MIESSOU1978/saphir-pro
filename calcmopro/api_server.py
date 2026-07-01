@@ -967,6 +967,13 @@ class _Handler(BaseHTTPRequestHandler):
                 banned = False
             return self._json({"banned": banned})
 
+        if path == "/api/heartbeat":
+            body = self._read_body()
+            session_id = int(body.get("session_id", 0))
+            if session_id:
+                db.heartbeat(session_id)
+            return self._json({"ok": True})
+
         if not self._require_auth():
             return
 
@@ -1319,6 +1326,22 @@ def start_server(html_path: Path, port: int = 0, host: str = "127.0.0.1",
     bound = _server.server_address[1]
     _thread = threading.Thread(target=_server.serve_forever, daemon=True)
     _thread.start()
+    # Background thread: mark stale sessions offline every 15s
+    def _heartbeat_checker():
+        while True:
+            time.sleep(15)
+            try:
+                n = db.mark_stale_sessions(timeout_seconds=45)
+                if n:
+                    print(f"[HEARTBEAT] Marked {n} stale session(s) offline")
+                    try:
+                        _sse_emit("session_offline", {"message": f"{n} session(s) marquée(s) hors ligne"})
+                    except Exception:
+                        pass
+            except Exception as e:
+                print(f"[HEARTBEAT ERROR] {e}")
+    _hc = threading.Thread(target=_heartbeat_checker, daemon=True)
+    _hc.start()
     return bound
 
 
