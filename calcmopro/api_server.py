@@ -996,7 +996,7 @@ class _Handler(BaseHTTPRequestHandler):
                     mention=body.get("mention", ""),
                     matieres=body.get("matieres"),
                     annee_scolaire=body.get("annee_scolaire", ""),
-                    created_by=body.get("created_by", ""),
+                    created_by=body.get("created_by", "") or self._get_email(),
                 )
                 if result.get("error"):
                     return self._json(result, 500)

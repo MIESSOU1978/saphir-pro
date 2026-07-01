@@ -2736,7 +2736,7 @@ let histData=[];
 let editingId=null;
 let selectedIds=[];
 
-const API='';
+const API='';let _userEmail='';
 
 /* ── MODE BROUILLON ── */
 function saveDraft(){
@@ -2861,7 +2861,7 @@ async function saveToHistory(){
     else{d.bepc=parseNoteValue(document.getElementById(m.id+'_bepc')?.value);}
     matieres[m.id]=d;
   });
-  const payload={nom,matricule,classe,etablissement:etab,annee:anneeScolaire,annee_scolaire:anneeScolaire,total:parseFloat(String(total).replace(',','.'))||0,mo:parseFloat(String(mo).replace(',','.'))||0,mention,matieres,created_by:localStorage.getItem('saphir_email')||'',to_mode:_toMode};
+  const payload={nom,matricule,classe,etablissement:etab,annee:anneeScolaire,annee_scolaire:anneeScolaire,total:parseFloat(String(total).replace(',','.'))||0,mo:parseFloat(String(mo).replace(',','.'))||0,mention,matieres,created_by:_userEmail||localStorage.getItem('saphir_email')||'',to_mode:_toMode};
   try{
     let r;let savedId=editingId||null;
     if(editingId){
@@ -4230,7 +4230,7 @@ function downloadBulletinFromAct(idx){
   });
   const total=parseFloat(String(d.total||'0').replace(',','.'))||0;
   const mo=parseFloat(String(d.mo||'0').replace(',','.'))||0;
-  const payload={nom,matricule:d.matricule||'—',classe:d.classe||'—',etablissement:d.etablissement||'—',annee_scolaire:d.annee_scolaire||'—',total,mo,mention:d.mention||'—',matieres,created_by:localStorage.getItem('saphir_email')||''};
+  const payload={nom,matricule:d.matricule||'—',classe:d.classe||'—',etablissement:d.etablissement||'—',annee_scolaire:d.annee_scolaire||'—',total,mo,mention:d.mention||'—',matieres,created_by:_userEmail||localStorage.getItem('saphir_email')||''};
   fetch(API+'/api/eleves',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify(payload)})
     .then(r=>{if(!r.ok) throw r;return r.json();})
     .then(res=>{const nid=res.eleve&&res.eleve.id?res.eleve.id:null;if(nid)markPrinted(nid);toast('Bulletin enregistré dans l\'historique ✔');loadHistory();logActivity('Enregistrement bulletin','Calcul MO',nom+' — '+d.classe,'succes');})
@@ -4646,7 +4646,8 @@ function filterByYear(){
     const r=await fetch(API+'/api/role',{credentials:'same-origin'});
     const d=await r.json();
     _role=d.role||'guest';
-    if(d.email) localStorage.setItem('saphir_email',d.email);
+    if(d.email){_userEmail=d.email;localStorage.setItem('saphir_email',d.email);}
+    else{_userEmail=localStorage.getItem('saphir_email')||'';}
   }catch(e){_role='guest';}
   applyRole();
   setTimeout(_sseStart,1000);

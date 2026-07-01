@@ -149,9 +149,7 @@ def audit_js(content):
         if opens != closes:
             error("Script #{}: Crochets desequilibres ({} vs {})".format(i, opens, closes))
 
-        # Variables globales non déclarées suspects
-        undeclared = re.findall(r'(?<!var |let |const |function )([a-zA-Z_]\w*)\s*=\s*(?!=)', js)
-        # Too many false positives, skip
+        # Variables globales non declarees suspects (skip — too many false positives)
 
         # Console.log en prod
         logs = len(re.findall(r'console\.(log|debug|info)\(', js))

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=overlays-content">
 <meta name="google-site-verification" content="YZf2o0U5chCswRvGy9i2XFqozxTBtVfAy2wnlYH-Yj0" />
-<title></title>
+<title>SAPHIR Pro — Calcul MO</title>
 <style>
 :root {
   --navy:    #050b14;
@@ -412,7 +412,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 /* ── HISTORIQUE ── */
 .hist-container{
   background:#fff;border:1px solid #d9e5de;border-radius:14px;
-  padding:24px 26px 20px;box-shadow:0 1px 8px rgba(0,0,0,.04);
+  padding:24px 26px 20px;box-shadow:0 1px 8px rgba(0,0,0,.04);overflow-x:auto;
 }
 .hist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
 .hist-header-left{display:flex;align-items:center;gap:12px;}
@@ -432,10 +432,10 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
   white-space:nowrap;
 }
 .hist-btn-print{
-  background:#064E3B;color:#fff;border:1px solid #064E3B;
+  background:#fff;color:#064E3B;border:1px solid #a3c4b5;
 }
 .hist-btn-print:hover{
-  background:#053d2e;box-shadow:0 3px 10px rgba(6,78,59,.25);
+  background:#F4FAF7;border-color:#064E3B;color:#053d2e;box-shadow:0 2px 8px rgba(6,78,59,.1);
 }
 .hist-btn-refresh{
   background:#fff;color:#064E3B;border:1px solid #a3c4b5;
@@ -454,7 +454,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-card{
   background:#fff;border:1px solid #e5ece8;border-radius:12px;
   padding:16px 18px;margin-bottom:10px;transition:all .2s ease;
-  display:grid;grid-template-columns:auto 1fr 155px 150px auto;align-items:center;gap:14px;
+  display:grid;grid-template-columns:auto auto 1fr 155px 150px auto;align-items:center;gap:14px;
 }
 .hist-card:last-child{margin-bottom:0;}
 .hist-card:hover{border-color:#b8d4c7;box-shadow:0 4px 16px rgba(6,78,59,.1);transform:translateY(-1px);}
@@ -462,6 +462,10 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-card-info{min-width:0;}
 .hist-card-name{font-size:.9rem;font-weight:700;color:#003b32;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .hist-card-meta{font-size:.72rem;color:#60736d;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hist-card-date{font-size:.68rem;color:#064E3B;margin-top:5px;font-weight:600;display:inline-flex;align-items:center;gap:3px;background:#F4FAF7;padding:2px 8px;border-radius:6px;border:1px solid #D5E5DE;}
+.hist-card-author{font-size:.65rem;color:#60736d;margin-top:4px;font-weight:500;display:inline-flex;align-items:center;gap:3px;background:#F8F6F3;padding:2px 8px;border-radius:6px;border:1px solid #E0DDD8;}
+.hist-badge-printed{font-size:.72rem;font-weight:600;color:#064E3B;background:#EAF5F0;border:1px solid #B8CEC3;border-radius:5px;padding:3px 8px;display:flex;align-items:center;justify-content:center;}
+.hist-badge-notprinted{color:#B8CEC3;background:transparent;border-color:#E0DDD8;}
 
 .hist-card-mo{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -496,10 +500,20 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-btn-pdf-icon{font-size:.82rem;color:#fff;}
 .hist-btn-del{
   display:inline-flex;align-items:center;gap:5px;padding:7px 14px;
-  border-radius:8px;border:1px solid #b8d4c7;background:#fff;
-  color:#4a6b5a;cursor:pointer;font-size:.78rem;font-weight:600;transition:all .2s;
+  border-radius:8px;border:1px solid #E7A6A0;background:#fff;
+  color:#B42318;cursor:pointer;font-size:.78rem;font-weight:600;transition:all .2s;
 }
-.hist-btn-del:hover{background:#FDECEA;border-color:#E7A6A0;color:#B42318;}
+.hist-btn-del:hover{background:#FDECEA;border-color:#D92D20;color:#B42318;box-shadow:0 2px 8px rgba(180,35,24,.12);}
+.hist-btn-icon{
+  display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;
+  border-radius:8px;border:1px solid #D5E5DE;background:#fff;
+  color:#064E3B;cursor:pointer;transition:all .2s;padding:0;
+}
+.hist-btn-icon:hover{background:#F4FAF7;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
+.hist-btn-icon-del{
+  border-color:#E7A6A0;color:#B42318;
+}
+.hist-btn-icon-del:hover{background:#FDECEA;border-color:#D92D20;color:#B42318;box-shadow:0 2px 8px rgba(180,35,24,.12);}
 .hist-btn-edit{
   display:inline-flex;align-items:center;gap:5px;padding:7px 14px;
   border-radius:8px;border:1px solid #b8d4c7;background:#fff;
@@ -566,6 +580,336 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-empty-text{font-size:.9rem;color:#003b32;font-weight:600;}
 .hist-empty-sub{font-size:.76rem;color:#9fb0a6;margin-top:6px;line-height:1.5;}
 
+/* ── USERS PAGE ── */
+.users-container{
+  background:#fff;border:1px solid #d9e5de;border-radius:14px;
+  padding:24px 26px 20px;box-shadow:0 1px 8px rgba(0,0,0,.04);
+}
+.users-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.users-header-left{display:flex;align-items:center;gap:10px;}
+.users-header-ico{width:36px;height:36px;border-radius:10px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;}
+.users-title{font-size:.95rem;font-weight:700;color:#003b32;letter-spacing:.2px;}
+.users-subtitle{font-size:.74rem;color:#60736d;margin-top:2px;}
+.users-header-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.users-header-right .btn,.users-header-right .btn-icon-danger{min-height:36px;padding:6px 16px;font-size:.8rem;line-height:1.2;}
+
+/* ── Per-action button styles ── */
+.users-actions-cell{display:flex;gap:5px;align-items:center;flex-wrap:nowrap;}
+.users-actions-wrap{position:relative;display:inline-flex;}
+.users-actions-more{
+  width:30px;height:28px;border-radius:6px;border:1px solid #D5E5DE;background:#fff;
+  color:#60736D;cursor:pointer;font-size:.85rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;
+  transition:all .18s ease;padding:0;
+}
+.users-actions-more:hover{background:#F3F8F5;border-color:#064E3B;color:#064E3B;}
+.users-actions-dropdown{
+  display:none;position:fixed;min-width:180px;
+  background:#fff;border:1px solid #d9e5de;border-radius:10px;
+  box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:9999;padding:4px;
+}
+.users-actions-dropdown.show{display:block;}
+.users-actions-dropdown button{
+  display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;
+  border:none;background:transparent;border-radius:6px;cursor:pointer;
+  font-size:.74rem;font-weight:600;text-align:left;transition:background .15s;
+  font-family:inherit;
+}
+.users-actions-dropdown button:hover{background:#f4f8f6;}
+.users-actions-dropdown .dd-msg{color:#064E3B;}
+.users-actions-dropdown .dd-msg:hover{background:#EAF5F0;}
+.users-actions-dropdown .dd-msg svg{stroke:#064E3B;}
+.users-actions-dropdown .dd-ban{color:#B42318;}
+.users-actions-dropdown .dd-ban:hover{background:#FEF2F2;}
+.users-actions-dropdown .dd-ban svg{stroke:#B42318;}
+.users-actions-dropdown .dd-delete{color:#D92D20;}
+.users-actions-dropdown .dd-delete:hover{background:#FDECEA;}
+.users-actions-dropdown .dd-delete svg{stroke:#D92D20;}
+.users-actions-dropdown svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+/* ── Device badges ── */
+.users-device-badge{
+  display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;
+  font-size:.62rem;font-weight:700;white-space:nowrap;vertical-align:middle;
+}
+.users-device-trusted{background:#EAF5F0;color:#064E3B;border:1px solid #B8CEC3;}
+.users-device-untrusted{background:#FFF3D6;color:#A85B00;border:1px solid #F5A623;}
+.users-device-current{background:#EFF6FF;color:#1D4ED8;border:1px solid #93C5FD;}
+.users-device-other{background:#F3F4F6;color:#6B7280;border:1px solid #D1D5DB;}
+.users-filters{display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;}
+.users-search{
+  flex:1 1 220px;padding:8px 12px;border:1.5px solid #AFC6BA;border-radius:10px;
+  font-size:.8rem;color:#064E3B;background:#FDFEFE;font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  transition:all .18s ease;
+}
+.users-search:hover{background:#F3F8F5;border-color:#8FB7A4;}
+.users-search:focus{background:#EEF7F2;border-color:#0B6B50;outline:none;box-shadow:0 0 0 3px rgba(11,107,80,.12);}
+.users-filter-select{
+  flex:0 0 auto;min-width:140px;padding:8px 12px;border:1.5px solid #AFC6BA;border-radius:10px;
+  font-size:.8rem;color:#064E3B;background:#FDFEFE;font-family:'Ebrima','Segoe UI',Arial,sans-serif;
+  cursor:pointer;transition:all .18s ease;
+}
+.users-filter-select:hover{background:#F3F8F5;border-color:#8FB7A4;}
+.users-filter-select:focus{background:#EEF7F2;border-color:#0B6B50;outline:none;}
+.users-table-wrap{
+  overflow-x:auto;overflow-y:auto;
+  max-height:220px;
+  border:1px solid #d9e5de;border-radius:10px;background:#fff;
+  scrollbar-width:thin;scrollbar-color:#c5d5cb #f4f8f6;
+}
+.users-table-wrap::-webkit-scrollbar{width:6px;}
+.users-table-wrap::-webkit-scrollbar-track{background:#f4f8f6;border-radius:3px;}
+.users-table-wrap::-webkit-scrollbar-thumb{background:#c5d5cb;border-radius:3px;transition:background .2s;}
+.users-table-wrap::-webkit-scrollbar-thumb:hover{background:#9fb0a6;}
+.users-table{width:100%;min-width:1400px;border-collapse:separate;border-spacing:0;font-size:.78rem;table-layout:auto;}
+.users-table th{
+  padding:10px 10px;background:#f4f8f6;color:#064E3B;font-weight:700;font-size:.7rem;
+  text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #d5e5de;text-align:left;white-space:nowrap;
+  position:sticky;top:0;z-index:3;
+  box-shadow:0 1px 0 #d5e5de;
+}
+.users-table td{
+  padding:9px 10px;border-bottom:1px solid #eef3f0;color:#1a3a2e;vertical-align:middle;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.users-table th:last-child,.users-table td:last-child{
+  position:sticky;right:0;z-index:2;
+}
+.users-table th:last-child{background:#f4f8f6;border-left:2px solid #d5e5de;}
+.users-table td:last-child{background:#fff;border-left:1px solid #eef3f0;}
+.users-cb-self{opacity:.3;cursor:not-allowed;}
+.users-table tbody tr:hover td:last-child{background:#f8fbf9;}
+.users-table tbody tr:last-child td{border-bottom:none;}
+.users-role-badge{
+  display:inline-block;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700;
+  white-space:nowrap;
+}
+.users-role-admin{background:#EAF5F0;color:#064E3B;border:1px solid #b8d4c7;}
+.users-role-student{background:#FFF7ED;color:#B45309;border:1px solid #FDBA74;}
+.users-status{display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:600;}
+.users-status-dot{width:6px;height:6px;border-radius:50%;}
+.users-status-online .users-status-dot{background:#16a34a;}
+.users-status-online{color:#16a34a;}
+.users-status-offline .users-status-dot{background:#9ca3af;}
+.users-status-offline{color:#9ca3af;}
+.users-statut-badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:.72rem;font-weight:700;white-space:nowrap;}
+.users-statut-online{background:#EAF5F0;color:#064E3B;border:1px solid #B8CEC3;}
+.users-statut-offline{background:#F3F4F6;color:#6B7280;border:1px solid #D1D5DB;}
+.users-statut-banned{background:#FEF2F2;color:#B42318;border:1px solid #FECACA;}
+/* ── Per-action button styles ── */
+.users-btn-disconnect{
+  height:32px;padding:0 10px;border-radius:8px;border:1.5px solid #B8CEC3;background:#fff;
+  color:#064E3B;cursor:pointer;font-size:.7rem;font-weight:600;font-family:inherit;
+  display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:all .18s ease;
+}
+.users-btn-disconnect svg{width:14px;height:14px;stroke:#064E3B;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.users-btn-disconnect:hover{background:#EAF5F0;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
+
+.users-act-btn{
+  width:32px;height:32px;border-radius:8px;border:1.5px solid #BFDBFE;background:#fff;
+  color:#2563EB;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
+  padding:0;transition:all .18s ease;
+}
+.users-act-btn svg{width:16px;height:16px;stroke:#2563EB;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.users-act-btn:hover{background:#EFF6FF;border-color:#2563EB;box-shadow:0 2px 8px rgba(37,99,235,.12);}
+
+.btn-icon-danger{border-radius:8px;background:#fff;border:1.5px solid #F3B8B2;color:#D92D20;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s ease;padding:0 10px;font-size:.72rem;font-weight:600;gap:5px;white-space:nowrap;}
+.btn-icon-danger svg{width:15px;height:15px;stroke:#D92D20;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.btn-icon-danger:hover{background:#FDECEA;border-color:#D92D20;box-shadow:0 2px 6px rgba(217,45,32,.10);}
+.btn-icon-danger:active{transform:scale(.95);}
+
+/* ── Actions dropdown menu ── */
+.users-actions-cell{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;}
+.users-actions-wrap{position:relative;display:inline-flex;}
+.users-actions-more{
+  width:32px;height:32px;border-radius:8px;border:1.5px solid #D5E5DE;background:#fff;
+  color:#60736D;cursor:pointer;font-size:.85rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;
+  transition:all .18s ease;padding:0;
+}
+.users-actions-more:hover{background:#F3F8F5;border-color:#064E3B;color:#064E3B;}
+.users-actions-dropdown{
+  display:none;position:fixed;min-width:200px;
+  background:#fff;border:1px solid #d9e5de;border-radius:10px;
+  box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:9999;padding:4px;
+}
+.users-actions-dropdown.show{display:block;}
+.users-actions-dropdown button{
+  display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;
+  border:none;background:transparent;border-radius:6px;cursor:pointer;
+  font-size:.74rem;font-weight:600;text-align:left;transition:background .15s;
+  font-family:inherit;
+}
+.users-actions-dropdown button:hover{background:#f4f8f6;}
+.users-actions-dropdown .dd-ban{color:#B42318;}
+.users-actions-dropdown .dd-ban:hover{background:#FEF2F2;}
+.users-actions-dropdown .dd-ban svg{stroke:#B42318;}
+.users-actions-dropdown .dd-delete{color:#D92D20;}
+.users-actions-dropdown .dd-delete:hover{background:#FDECEA;}
+.users-actions-dropdown .dd-delete svg{stroke:#D92D20;}
+.users-actions-dropdown .dd-msg{color:#064E3B;}
+.users-actions-dropdown .dd-msg:hover{background:#EAF5F0;}
+.users-actions-dropdown .dd-msg svg{stroke:#064E3B;}
+
+/* ── Message popup (dialog) ── */
+msg-dialog{
+  border:none;border-radius:16px;padding:0;width:420px;max-width:92vw;
+  box-shadow:0 20px 60px rgba(0,0,0,.22);font-family:inherit;
+  color:#1a3a2e;overflow:hidden;
+}
+msg-dialog::backdrop{background:rgba(0,20,15,.45);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
+msg-dialog .msg-dlg-header{
+  display:flex;align-items:center;gap:10px;padding:16px 20px;
+  background:linear-gradient(135deg,#064E3B 0%,#0B6B50 100%);color:#fff;
+}
+msg-dialog .msg-dlg-header .msg-dlg-icon{font-size:1.3rem;}
+msg-dialog .msg-dlg-header .msg-dlg-sender{font-size:.88rem;font-weight:700;flex:1;}
+msg-dialog .msg-dlg-header .msg-dlg-close{
+  background:rgba(255,255,255,.15);border:none;border-radius:8px;width:30px;height:30px;
+  color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .15s;
+}
+msg-dialog .msg-dlg-header .msg-dlg-close:hover{background:rgba(255,255,255,.3);}
+msg-dialog .msg-dlg-body{padding:20px;font-size:.84rem;line-height:1.65;color:#1a3a2e;}
+msg-dialog .msg-dlg-footer{
+  display:flex;align-items:center;justify-content:space-between;padding:12px 20px;
+  border-top:1px solid #EAF5F0;
+}
+msg-dialog .msg-dlg-time{font-size:.7rem;color:#9fb0a6;}
+msg-dialog .msg-dlg-actions{display:flex;gap:8px;}
+msg-dialog .msg-dlg-btn{
+  padding:7px 16px;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;
+  border:1.5px solid transparent;transition:all .15s;font-family:inherit;
+}
+msg-dialog .msg-dlg-btn-close{background:#fff;border-color:#D5E5DE;color:#60736D;}
+msg-dialog .msg-dlg-btn-close:hover{background:#F3F8F5;border-color:#064E3B;}
+msg-dialog .msg-dlg-btn-read{background:#064E3B;color:#fff;border-color:#064E3B;}
+msg-dialog .msg-dlg-btn-read:hover{background:#0B6B50;}
+
+/* ── Messages reçus panel ── */
+.msg-history-panel{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9500;
+  background:#fff;border-radius:16px;width:480px;max-width:94vw;max-height:80vh;
+  box-shadow:0 20px 60px rgba(0,0,0,.22);display:none;flex-direction:column;overflow:hidden;
+}
+.msg-history-panel.open{display:flex;}
+.msg-history-header{
+  display:flex;align-items:center;gap:10px;padding:16px 20px;
+  background:linear-gradient(135deg,#064E3B 0%,#0B6B50 100%);color:#fff;flex-shrink:0;
+}
+.msg-history-header .msg-history-title{font-size:.92rem;font-weight:700;flex:1;}
+.msg-history-header .msg-history-close{
+  background:rgba(255,255,255,.15);border:none;border-radius:8px;width:30px;height:30px;
+  color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.msg-history-header .msg-history-close:hover{background:rgba(255,255,255,.3);}
+.msg-history-body{overflow-y:auto;flex:1;padding:8px 0;}
+.msg-history-body::-webkit-scrollbar{width:5px;}
+.msg-history-body::-webkit-scrollbar-thumb{background:#c5d5cb;border-radius:10px;}
+.msg-history-item{
+  display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid #f0f4f2;
+  transition:background .12s;cursor:default;
+}
+.msg-history-item:hover{background:#f8faf9;}
+.msg-history-item.unread{background:#f0faf4;border-left:3px solid #064E3B;}
+.msg-history-item .msg-hi-icon{
+  width:36px;height:36px;border-radius:10px;background:#EAF5F0;
+  display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;
+}
+.msg-history-item .msg-hi-content{flex:1;min-width:0;}
+.msg-history-item .msg-hi-sender{font-size:.78rem;font-weight:700;color:#064E3B;}
+.msg-history-item .msg-hi-text{font-size:.76rem;color:#1a3a2e;margin-top:2px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.msg-history-item .msg-hi-meta{display:flex;align-items:center;gap:8px;margin-top:4px;}
+.msg-history-item .msg-hi-time{font-size:.66rem;color:#9fb0a6;}
+.msg-history-item .msg-hi-badge{font-size:.62rem;padding:1px 6px;border-radius:6px;font-weight:600;}
+.msg-hi-badge.badge-unread{background:#DCFCE7;color:#166534;}
+.msg-hi-badge.badge-read{background:#F1F5F9;color:#64748B;}
+.msg-history-empty{text-align:center;padding:40px 20px;color:#9fb0a6;font-size:.82rem;}
+.msg-history-backdrop{
+  position:fixed;inset:0;background:rgba(0,20,15,.35);z-index:9400;display:none;
+}
+.msg-history-backdrop.open{display:block;}
+
+/* ── Admin message status badges ── */
+.msg-status-badge{
+  display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:8px;
+  font-size:.62rem;font-weight:600;
+}
+.msg-status-sent{background:#DBEAFE;color:#1E40AF;}
+.msg-status-shown{background:#FEF3C7;color:#92400E;}
+.msg-status-closed{background:#F1F5F9;color:#64748B;}
+.msg-status-read{background:#DCFCE7;color:#166534;}
+.users-actions-dropdown svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+.users-trust-btn{
+  width:36px;height:36px;border-radius:8px;border:1.5px solid #D5E5DE;background:#fff;
+  cursor:pointer;transition:all .18s ease;display:inline-flex;align-items:center;justify-content:center;
+}
+.users-trust-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.users-trust-add{color:#064E3B;border-color:#B8CEC3;}
+.users-trust-add:hover{background:#F0F7F3;border-color:#064E3B;}
+.users-trust-remove{color:#A85B00;border-color:#F5C56B;}
+.users-trust-remove:hover{background:#FFF7E8;border-color:#F5A623;}
+
+.users-devices-alert{
+  display:flex;align-items:center;gap:8px;padding:10px 16px;
+  background:#FFF3D6;border:1px solid #F5A623;border-radius:10px;
+  font-size:.8rem;font-weight:600;color:#A85B00;
+}
+.users-devices-section{
+  margin-top:20px;border:1.5px solid #d5e5de;border-radius:12px;
+  background:#fff;overflow:hidden;
+}
+.users-devices-header{
+  display:flex;align-items:center;gap:8px;padding:14px 18px;
+  background:linear-gradient(180deg,#f6f9f5 0%,#eaf3eb 100%);
+  border-bottom:1px solid #d5e5de;
+}
+.users-devices-title{font-size:.88rem;font-weight:700;color:#003b32;flex:1;}
+.users-devices-count{font-size:.72rem;color:#60736d;font-weight:600;background:#EAF5F0;padding:2px 8px;border-radius:8px;}
+.users-devices-list{padding:0;max-height:320px;overflow-y:auto;}
+.users-device-card{
+  display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;
+  padding:12px 18px;border-bottom:1px solid #eef3f0;transition:background .15s;
+}
+.users-device-card:last-child{border-bottom:none;}
+.users-device-card:hover{background:#f8faf9;}
+.users-device-info{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.users-device-label{font-size:.82rem;font-weight:600;color:#003b32;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.users-device-detail{font-size:.68rem;color:#60736d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.users-device-detail-link{font-size:.68rem;color:#064E3B;font-weight:600;cursor:pointer;text-decoration:underline;white-space:nowrap;}
+.users-device-detail-link:hover{color:#043d2b;}
+.users-device-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.users-device-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.users-devices-empty{text-align:center;padding:30px 16px;color:#60736d;font-size:.8rem;}
+.users-activity-panel{
+  margin-top:20px;border:1px solid #d5e5de;border-radius:12px;
+  background:#fafcfb;padding:18px 20px;
+}
+.users-activity-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.users-activity-title{font-size:.88rem;font-weight:700;color:#003b32;}
+.users-activity-list{max-height:400px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#c5d5cb #f4f8f6;}
+.users-activity-list::-webkit-scrollbar{width:5px;}
+.users-activity-list::-webkit-scrollbar-track{background:#f4f8f6;border-radius:3px;}
+.users-activity-list::-webkit-scrollbar-thumb{background:#c5d5cb;border-radius:3px;}
+.users-activity-item{
+  display:grid;grid-template-columns:130px 1fr 100px;gap:10px;
+  padding:10px 12px;border-bottom:1px solid #eef3f0;font-size:.76rem;align-items:start;
+}
+.users-activity-item:last-child{border-bottom:none;}
+.users-activity-date{color:#60736d;font-weight:600;white-space:nowrap;font-size:.72rem;}
+.users-activity-action{color:#1a3a2e;font-weight:600;}
+.users-activity-detail{color:#60736d;font-size:.72rem;margin-top:2px;}
+.users-activity-result{font-weight:600;text-align:right;font-size:.72rem;}
+.users-activity-result.ok{color:#16a34a;}
+.users-activity-result.fail{color:#B42318;}
+.users-activity-module{color:#9fb0a6;font-weight:400;font-size:.72rem;}
+.users-act-label{color:#60736d;font-weight:600;font-size:.72rem;min-width:90px;display:inline-block;}
+.users-activity-detail{display:flex;flex-direction:column;gap:3px;margin-top:4px;}
+.users-act-preview-btn,.users-act-save-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:5px 12px;min-height:28px;border:1.2px solid #B8CEC3;border-radius:6px;background:#fff;color:#064E3B;font-family:inherit;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;line-height:1;box-sizing:border-box;}
+.users-act-preview-btn:hover,.users-act-save-btn:hover{background:#EAF5F0;border-color:#064E3B;}
+.users-act-btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.users-empty-state{text-align:center;padding:40px 20px;color:#9fb0a6;font-size:.85rem;}
+.users-empty-sub{font-size:.74rem;color:#b8c8be;margin-top:6px;}
+
 /* ── TOAST ── */
 #toast{
   position:fixed;bottom:26px;right:26px;
@@ -591,6 +935,9 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .bulletin-sheet{
   width:190mm;
   margin:0 auto;
+  max-height:297mm;
+  overflow:hidden;
+  padding-top:12mm;
   background:#fff;
   color:#1a2420;
   font-family:'Ebrima','Segoe UI',Arial,sans-serif;
@@ -608,8 +955,9 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .bp-tricolor span:nth-child(2){display:flex;align-items:center;justify-content:center;padding:0 5mm;background:#fff;color:#0b3d2e;font-size:10.5pt;font-weight:900;line-height:1;white-space:nowrap;text-align:center;}
 .bp-tricolor span:nth-child(2) strong{color:#d99a13;}
 .bp-tricolor span:nth-child(3){background:#009e60;height:3.5mm;align-self:start;}
-.bp-header{display:block;position:relative;top:auto;width:auto;padding:6mm 10mm 5mm;border:1px solid #dfe7e2;border-top:0;border-radius:0 0 2.5mm 2.5mm;background:#fff;color:#0b3d2e;box-shadow:none;}
+.bp-header{display:block;position:relative;top:auto;width:auto;padding:5mm 10mm 4mm;border:1px solid #dfe7e2;border-top:0;border-radius:0 0 2.5mm 2.5mm;background:#fff;color:#0b3d2e;box-shadow:none;}
 .bp-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10mm;}
+.bp-ministry{display:flex;flex-direction:column;align-items:center;text-align:center;color:#0b3d2e;font-size:10pt;font-weight:900;line-height:1.15;text-transform:uppercase;}
 .bp-state{width:max-content;text-align:center;margin-left:auto;}
 .bp-republique{font-size:10pt;font-weight:900;line-height:1.15;text-transform:uppercase;white-space:nowrap;}
 .bp-devise{width:84%;margin:1mm auto 0;color:#d99a13;font-size:8.5pt;font-style:italic;line-height:1.15;letter-spacing:0;word-spacing:0;white-space:nowrap;text-align:center;}
@@ -619,18 +967,19 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .bp-brand-sub{margin-top:1.2mm;color:#6b7a70;font-size:9pt;}
 .bp-brand-contact{margin-top:1.2mm;color:#0b4a35;font-size:8.5pt;font-weight:800;letter-spacing:.15mm;}
 .bp-header-rule{height:1px;margin:4mm 0;background:#dfe7e2;}
-.bp-title-row{position:relative;min-height:14mm;display:flex;align-items:center;justify-content:center;text-align:center;}
-.bp-title-row>div:last-child{width:100%;padding:0 18mm;}
+.bp-title-row{position:relative;min-height:14mm;display:flex;align-items:center;justify-content:space-between;text-align:center;}
+.bp-title-row>div:last-of-type{flex:1;min-width:0;padding:0 4mm;}
 .bp-mark{position:absolute;left:0;top:50%;transform:translateY(-50%);width:14mm;height:14mm;border:.5mm solid #f2b632;border-radius:2.5mm;background:#0b4a35;color:#f2b632;display:flex;align-items:center;justify-content:center;box-shadow:0 0.8mm 2mm rgba(11,74,53,.14);}
 .bp-mark svg{width:7mm;height:7mm;display:block;}
 .bp-title{font-size:15pt;font-weight:900;line-height:1.2;}
+.bp-to-badge{display:inline-flex;align-items:center;justify-content:center;width:10mm;height:10mm;border-radius:50%;border:0.5mm solid #f2b632;background:#064E3B;color:#fff;font-size:9pt;font-weight:900;letter-spacing:.5px;line-height:1;flex-shrink:0;margin-left:auto;box-shadow:0 0.5mm 2mm rgba(6,78,59,.3);}
 .bp-subtitle{margin-top:1mm;color:#6b7a70;font-size:9pt;line-height:1.3;}
 
-.bp-content{padding-top:5mm;}
+.bp-content{padding-top:4mm;}
 .bp-section-title{display:flex;align-items:center;gap:2mm;margin-bottom:3mm;color:#0b3d2e;font-size:9.5pt;font-weight:900;text-transform:uppercase;}
 .bp-section-num{width:6.5mm;height:6.5mm;border-radius:1.5mm;background:#0b3d2e;color:#f2b632;display:flex;align-items:center;justify-content:center;font-size:8.5pt;flex:0 0 auto;}
-.bp-section-line{height:1px;background:#dfe7e2;flex:1;}
-.bp-student{min-height:22mm;margin-bottom:5mm;padding:3.5mm 5mm 3.5mm 6mm;border:1px solid #eadfbe;border-left:1.2mm solid #f2b632;border-radius:2.5mm;background:#fbf7ec;display:flex;align-items:center;gap:4mm;}
+.bp-section-line{height:1px;background:linear-gradient(90deg,#0b3d2e 0%,#b8cec3 50%,transparent 100%);flex:1;}
+.bp-student{min-height:22mm;margin-bottom:3mm;padding:3.5mm 5mm 3.5mm 6mm;border:1px solid #eadfbe;border-left:1.2mm solid #f2b632;border-radius:2.5mm;background:#fbf7ec;display:flex;align-items:center;gap:4mm;}
 .bp-avatar{width:15mm;height:15mm;border-radius:50%;border:.8mm solid #f2b632;background:#0b4a35;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13pt;font-weight:900;flex:0 0 auto;}
 .bp-student-info{min-width:0;flex:1;}
 .bp-student-name{color:#0b3d2e;font-size:14pt;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -639,13 +988,13 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .bp-student-sep{color:#c7a84f;}
 .bp-matricule{min-width:30mm;padding:2.5mm 4mm;border-radius:2mm;background:#0b4a35;color:#fff;text-align:center;font-size:10.5pt;font-weight:800;}
 .bp-matricule small{display:block;margin-bottom:0.8mm;color:#f2b632;font-size:7.5pt;font-weight:900;text-transform:uppercase;}
-.bp-table-wrap{margin-bottom:5mm;border:1px solid #bdcdc4;border-radius:2.5mm;overflow:hidden;}
+.bp-table-wrap{margin-bottom:1mm;border:1px solid #bdcdc4;border-radius:2.5mm;overflow:hidden;}
 .bp-grades{width:100%;border-collapse:collapse;table-layout:fixed;}
 .bp-grades col:nth-child(1){width:22%;}.bp-grades col:nth-child(2){width:12%;}.bp-grades col:nth-child(3){width:20%;}.bp-grades col:nth-child(4){width:16%;}.bp-grades col:nth-child(5){width:10%;}.bp-grades col:nth-child(6){width:14%;}
 .bp-grades th{padding:3.5mm 1.5mm;background:#0b3d2e;color:#fff;font-size:8.5pt;font-weight:900;text-align:center;text-transform:uppercase;}
 .bp-grades th:first-child,.bp-grades td:first-child{text-align:left;padding-left:5mm;}
 .bp-grades th:last-child{background:#0f5132;}
-.bp-grades td{height:15mm;padding:2.5mm 1.5mm;border-bottom:1px solid #e9efeb;text-align:center;font-size:11pt;vertical-align:middle;}
+.bp-grades td{height:17mm;padding:2.5mm 1.5mm;border-bottom:1px solid #e9efeb;text-align:center;font-size:11pt;vertical-align:middle;}
 .bp-grades tr:last-child td{border-bottom:none;}
 .bp-grades tbody tr:nth-child(even) td:not(:last-child){background:#fafbf9;}
 .bp-matiere{color:#0b3d2e;font-weight:900;font-size:10.5pt;}
@@ -658,9 +1007,9 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .bp-sum{color:#0b3d2e;font-weight:900;font-variant-numeric:tabular-nums;}
 .bp-coef{width:8mm;height:8mm;margin:auto;border:1px solid #f2b632;border-radius:50%;background:#fff7df;color:#8a6a12;display:flex;align-items:center;justify-content:center;font-weight:900;}
 .bp-result{border-left:1px solid #e0e8e3;background:#fff!important;color:#0b4a35;font-size:11.5pt!important;font-weight:900;font-variant-numeric:tabular-nums;}
-.bp-table-note{margin-top:1.5mm;color:#87958d;font-size:7.5pt;font-style:italic;text-align:right;}
-.bp-summary{display:grid;grid-template-columns:1fr 1.35fr;gap:4mm;margin-bottom:5mm;}
-.bp-summary-box{min-height:30mm;padding:5mm 7mm;border-radius:3mm;display:flex;flex-direction:column;justify-content:center;border:1px solid #dfe7e2;background:#f4f8f5;}
+.bp-table-note{margin-top:0;margin-bottom:2mm;color:#87958d;font-size:7.5pt;font-style:italic;text-align:right;}
+.bp-summary{display:grid;grid-template-columns:1fr 1.35fr;gap:4mm;margin-bottom:2mm;}
+.bp-summary-box{padding:6mm 7mm;border-radius:3mm;display:flex;flex-direction:column;justify-content:center;border:1px solid #dfe7e2;background:#f4f8f5;}
 .bp-summary-total{align-items:center;text-align:center;background:linear-gradient(180deg,#f8faf9 0%,#eef4f0 100%);border:1.2px solid #d5e5de;}
 .bp-summary-mo{align-items:center;background:linear-gradient(180deg,#f6f9f5 0%,#eaf3eb 100%);color:#0b3d2e;text-align:center;border:1.2px solid #d5e5de;}
 .bp-summary-label{color:#6b7a70;font-size:8pt;font-weight:900;text-transform:uppercase;letter-spacing:.4px;}
@@ -678,12 +1027,19 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .bp-mention.mention-pass{background:rgba(8,116,67,.12);color:#087443;}
 .bp-mention.mention-warn{background:rgba(217,154,19,.15);color:#92710a;}
 .bp-mention.mention-fail{background:#FDECEA;color:#B42318;}
-.bp-footer{padding-top:3.5mm;border-top:.4mm solid #0b3d2e;display:flex;justify-content:space-between;align-items:flex-end;color:#87958d;font-size:8pt;}
+.bp-footer{padding-top:1.5mm;border-top:.4mm solid #0b3d2e;display:flex;justify-content:space-between;align-items:flex-end;color:#87958d;font-size:8pt;}
 #bp-filename{color:#0b3d2e;font-size:8pt;font-weight:700;text-align:center;align-self:center;display:none;}
 .bp-footer strong{color:#0b3d2e;}
 .bp-footer-right{text-align:left;}
 .bp-footer-date{color:#0b3d2e;font-weight:700;}
-.bp-nonprofit{margin-top:3mm;text-align:center;color:#87958d;font-size:7pt;font-style:italic;line-height:1.4;}
+.bp-nonprofit{margin-top:0.5mm;text-align:center;color:#87958d;font-size:7pt;font-style:italic;line-height:1.4;}
+
+.bp-bottom-brand{margin-top:2mm;padding-top:1.5mm;text-align:center;}
+.bp-bottom-brand-line{height:1px;margin:0 auto 1.5mm;max-width:60%;background:linear-gradient(90deg,transparent,#dfe7e2 30%,#0b4a35 50%,#dfe7e2 70%,transparent);}
+.bp-bottom-brand-name{font-size:15pt;font-weight:900;color:#0b4a35;line-height:1;}
+.bp-bottom-brand-name span{color:#f2b632;}
+.bp-bottom-brand-sub{margin-top:1.5mm;color:#6b7a70;font-size:8.5pt;font-style:italic;}
+.bp-bottom-brand-contact{margin-top:1.5mm;color:#0b4a35;font-size:8.5pt;font-weight:800;letter-spacing:.3mm;}
 
 /* ── IDENTITÉ VISUELLE SAPHIR / BULLETIN ── */
 :root{
@@ -974,12 +1330,14 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 .note-input{
   width:82px;
   padding:7px;
-  background:#fbfcfa;
-  border:1px solid #cedbd3;
-  border-radius:6px;
-  color:#183f31;
+  background:#FDFEFE;
+  border:1.5px solid #AFC6BA;
+  border-radius:10px;
+  color:#60736D;
+  transition:all .18s ease;
 }
-.note-input:focus{border-color:#f5a623;box-shadow:0 0 0 3px rgba(245,166,35,.14);background:#fff;}
+.note-input:hover{background:#F3F8F5;border-color:#8FB7A4;color:#064E3B;box-shadow:0 2px 6px rgba(6,78,59,.08);}
+.note-input:focus{border-color:#0B6B50;background:#EEF7F2;color:#064E3B;outline:none;box-shadow:0 0 0 3px rgba(11,107,80,.12);}
 .note-input::placeholder{color:#9aa79f;}
 .note-sub-label{color:#7b887f;}
 .computed-val{color:#0b4a35;}
@@ -1036,30 +1394,51 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 .btn-icon{font-size:.85rem;line-height:1;}
 
 .btn-ghost{
-  background:#fff;color:#064E3B;border:1px solid #c4d4cb;
+  background:#fff;color:#064E3B;border:1.5px solid #B8CEC3;transition:all .18s ease;
 }
-.btn-ghost:hover{background:#f4faf6;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
+.btn-ghost:hover{background:#F3F7F5;border-color:#9FB9AD;color:#064E3B;box-shadow:0 2px 8px rgba(107,122,112,.1);}
+
+.btn-reset{background:#fff;color:#064E3B;border:1.5px solid #B8CEC3;transition:all .18s ease;}
+.btn-reset:hover{background:#F3F7F5;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
+
+.btn-save{background:#fff;color:#064E3B;border:1.5px solid #B8CEC3;transition:all .18s ease;}
+.btn-save:hover{background:#EAF5F0;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
+
+.btn-preview{background:#fff;color:#064E3B;border:1.5px solid #B8CEC3;transition:all .18s ease;}
+.btn-preview:hover{background:#FFF7E8;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
+
+.btn-download{background:#fff;color:#064E3B;border:1.5px solid #B8CEC3;transition:all .18s ease;}
+.btn-download:hover{background:#FFF3D6;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
 
 .btn-success{
-  background:#fff;color:#064E3B;border:1px solid #c4d4cb;
+  background:#fff;color:#064E3B;border:1.5px solid #064E3B;transition:all .18s ease;
 }
-.btn-success:hover{background:#f4faf6;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
+.btn-success:hover{background:#EAF5F0;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
 
 .btn-primary{
-  background:#fff;color:#064E3B;border:1px solid #c4d4cb;
+  background:#fff;color:#064E3B;border:1.5px solid #064E3B;transition:all .18s ease;
 }
-.btn-primary:hover{background:#f4faf6;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
+.btn-primary:hover{background:#EAF5F0;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.1);}
 
-.btn-accent{
-  background:#F5A623;color:#fff;border:1px solid #F5A623;
+.btn-orange{
+  background:#fff;color:#064E3B;border:1.5px solid #F5A623;transition:all .18s ease;
 }
-.btn-accent:hover{background:#e09520;border-color:#e09520;box-shadow:0 3px 12px rgba(245,166,35,.25);}
+.btn-orange:hover{background:#FFF7E8;border-color:#F5A623;box-shadow:0 2px 8px rgba(245,166,35,.1);}
 
 /* ── CONFORT TYPOGRAPHIQUE : MODULES MGA ET MO (+2 pt) ── */
 #page-mga .section-title,
 #page-mo .section-title{margin-bottom:18px;padding-bottom:10px;font-size:.987rem;line-height:1.35;letter-spacing:1.35px;}
+.section-title-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.section-title-row .section-title{margin-bottom:0;padding-bottom:0;}
+.to-toggle{width:36px;height:36px;border-radius:50%;border:2px solid #B8CEC3;background:#fff;color:#60736D;font-size:.72rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s ease;flex-shrink:0;}
+.to-toggle:hover{border-color:#064E3B;color:#064E3B;background:#F3F8F5;}
+.to-toggle.active{background:#064E3B;color:#fff;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.25);}
+.to-toggle.active:hover{background:#0B6B50;}
+.to-toggle .to-label{pointer-events:none;line-height:1;}
+.two-notes.to-single{display:flex;justify-content:center;}
+.two-notes.to-single .note-input{width:100%;max-width:none;}
 #page-mga .eleve-grid,
-#page-mo .eleve-grid{gap:16px;grid-template-columns:2.1fr 0.5fr 0.5fr 0.5fr 3.5fr;}
+#page-mo .eleve-grid{gap:14px 16px;grid-template-columns:1.9fr 0.6fr 0.6fr 1fr 2.4fr;}
 #page-mga .field-group,
 #page-mo .field-group{gap:6px;}
 #page-mga .field-group label,
@@ -1070,6 +1449,28 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 #page-mo .field-group select{height:42px;padding:9px 14px;border-color:#d1ddd6;font-size:.88rem;border-radius:8px;box-shadow:none;}
 #page-mga #etablissement,
 #page-mo #mo-etablissement{width:100%;}
+
+/* ── Établissement toggle ── */
+.etab-wrap{display:flex;flex-direction:column;gap:6px;}
+.etab-row{position:relative;display:flex;align-items:center;gap:0;}
+.etab-row input{flex:1;padding-right:32px;border-radius:0 5px 5px 0;}
+.etab-abg{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:0 6px;height:28px;border-radius:5px 0 0 5px;border:1px solid #B8CEC3;
+  background:#F4FAF7;color:#064E3B;font-size:.6rem;font-weight:600;
+  letter-spacing:.2px;cursor:pointer;transition:all .15s;line-height:1;
+  white-space:nowrap;flex-shrink:0;border-right:none;
+}
+.etab-abg:hover{background:#EAF5F0;border-color:#064E3B;color:#064E3B;}
+.etab-abg.active{background:#064E3B;color:#fff;border-color:#064E3B;}
+.etab-toggle{
+  position:absolute;right:4px;top:50%;transform:translateY(-50%);
+  width:26px;height:26px;border-radius:6px;border:1px solid #D5E5DE;background:#F4F8F6;
+  color:#60736D;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;transition:all .15s;line-height:1;
+}
+.etab-toggle:hover{background:#EAF5F0;border-color:#064E3B;color:#064E3B;}
+.etab-toggle.active{background:#064E3B;color:#fff;border-color:#064E3B;}
 #page-mga .field-group input:hover,
 #page-mga .field-group select:hover,
 #page-mo .field-group input:hover,
@@ -1082,9 +1483,11 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 #page-mga .mat-label,
 #page-mo .mat-label{font-size:1.05rem;line-height:1.25;}
 #page-mga .note-input,
-#page-mo .note-input{width:80px;padding:8px;border-color:#a9bbb0;background:#f9fbf9;font-size:1.087rem;box-shadow:inset 0 0 0 1px rgba(11,74,53,.025);}
+#page-mo .note-input{width:80px;padding:8px;border:1.5px solid #AFC6BA;background:#FDFEFE;color:#60736D;border-radius:10px;font-size:1.087rem;box-shadow:inset 0 0 0 1px rgba(11,74,53,.025);transition:all .18s ease;}
 #page-mga .note-input:hover,
-#page-mo .note-input:hover{border-color:#829b8d;}
+#page-mo .note-input:hover{background:#F3F8F5;border-color:#8FB7A4;color:#064E3B;box-shadow:0 2px 6px rgba(6,78,59,.08);}
+#page-mga .note-input:focus,
+#page-mo .note-input:focus{background:#EEF7F2;border-color:#0B6B50;color:#064E3B;outline:none;box-shadow:0 0 0 3px rgba(11,107,80,.12);}
 #page-mo #mo-tbody tr:has(.two-notes) td:nth-child(2),
 #page-mo #mo-tbody tr:has(.two-notes) td:nth-child(3){vertical-align:top;}
 #page-mo .two-notes{justify-content:center;}
@@ -1163,7 +1566,7 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
   .result-item.result-mo{border-radius:0 0 12px 12px !important;}
   .actions{display:grid;grid-template-columns:1fr 1fr;width:100%;}
   .actions .btn{width:100%;justify-content:center;}
-  .hist-card{grid-template-columns:auto 1fr;gap:10px;padding:14px;}
+  .hist-card{grid-template-columns:auto auto 1fr;gap:10px;padding:14px;}
   .hist-card-mo{justify-self:start;min-width:110px;}
   .hist-badge{width:auto;justify-self:start;}
   .hist-btn-pdf{width:auto;justify-self:start;}
@@ -1216,8 +1619,54 @@ body.bulletin-preview>header,body.bulletin-preview>nav,body.bulletin-preview>mai
 body.bulletin-preview #bulletin-print{display:block;width:210mm;min-height:297mm;margin:0 auto;padding:8mm;background:#fff;box-shadow:0 18px 55px rgba(0,0,0,0.25);}
 body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-shadow:none;}
 
+.notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:440px;max-height:520px;background:#fff;border:1px solid #d9e5de;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.15);z-index:9999;overflow:hidden;display:none;}
+.notif-panel.open{display:block;animation:fadeSlideDown .2s ease;}
+.notif-panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #e5ebe7;background:#f9fbfa;}
+.notif-panel-hdr h4{margin:0;font-size:.88rem;font-weight:700;color:#003b32;}
+.notif-panel-hdr button{background:none;border:none;cursor:pointer;color:#60736d;font-size:.72rem;font-weight:600;padding:4px 8px;border-radius:6px;transition:all .18s;}
+.notif-panel-hdr button:hover{background:#f0f4f1;color:#064e3b;}
+.notif-list{max-height:430px;overflow-y:auto;padding:6px;}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all .18s;margin-bottom:2px;}
+.notif-item:hover{background:#f4f8f6;}
+.notif-item.unread{background:#eaf5f0;border-left:3px solid #064e3b;}
+.notif-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.8rem;}
+.notif-icon.info{background:#dbeafe;color:#2563eb;}
+.notif-icon.success{background:#d1fae5;color:#059669;}
+.notif-icon.warning{background:#fef3c7;color:#d97706;}
+.notif-icon.error{background:#fee2e2;color:#dc2626;}
+.notif-icon.critique{background:#fee2e2;color:#B42318;}
+.notif-icon.suspect{background:#FFF7ED;color:#A85B00;}
+.notif-text{flex:1;min-width:0;}
+.notif-text strong{font-size:.78rem;font-weight:600;color:#003b32;display:block;margin-bottom:2px;}
+.notif-text p{margin:0;font-size:.7rem;color:#60736d;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.notif-text .notif-time{font-size:.64rem;color:#9aa79f;margin-top:3px;}
+.notif-empty{text-align:center;padding:30px 16px;color:#60736d;font-size:.8rem;}
+/* ── Detailed attempt info ── */
+.notif-detail{margin-top:6px;padding:8px 10px;background:#f9fbfa;border-radius:8px;border:1px solid #e5ebe7;font-size:.68rem;line-height:1.6;}
+.notif-detail-row{display:flex;gap:6px;align-items:baseline;}
+.notif-detail-label{color:#60736d;font-weight:600;white-space:nowrap;min-width:70px;}
+.notif-detail-value{color:#1a3a2e;font-weight:500;}
+.notif-badge-niveau{display:inline-block;padding:2px 8px;border-radius:6px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+.notif-badge-normal{background:#d1fae5;color:#059669;border:1px solid #6ee7b7;}
+.notif-badge-suspect{background:#FFF7ED;color:#A85B00;border:1px solid #F5A623;}
+.notif-badge-critique{background:#FEF2F2;color:#B42318;border:1px solid #FECACA;}
+.notif-actions{display:flex;gap:4px;margin-top:6px;}
+.notif-action-btn{
+  padding:3px 8px;border-radius:5px;border:1px solid #D5E5DE;background:#fff;
+  color:#064E3B;cursor:pointer;font-size:.64rem;font-weight:600;font-family:inherit;
+  transition:all .15s;display:inline-flex;align-items:center;gap:3px;
+}
+.notif-action-btn:hover{background:#F0F7F3;border-color:#064E3B;}
+.notif-action-btn.danger{color:#B42318;border-color:#FECACA;}
+.notif-action-btn.danger:hover{background:#FEF2F2;border-color:#B42318;}
+
+.hist-year-filter{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+.hist-year-filter label{font-size:.78rem;font-weight:600;color:#60736d;}
+.hist-year-filter select{padding:7px 12px;border:1.5px solid #b8cec3;border-radius:8px;font-size:.8rem;color:#064e3b;background:#fff;font-family:'Ebrima',sans-serif;cursor:pointer;}
+.hist-year-filter select:focus{outline:none;border-color:#064e3b;box-shadow:0 0 0 3px rgba(11,107,80,.1);}
+
 @media print{
-  @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;@top-left{content:none;}@top-center{content:none;}@top-right{content:none;}@bottom-left{content:none;}@bottom-center{content:none;}@bottom-right{content:none;}}
+  @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;@top-left{content:none;}@top-center{content:none;}@top-right{content:none;}@bottom-left{content:none;}@bottom-center{content:none;}@bottom-right{content:none;}}
   html,body{width:auto!important;min-height:0!important;background:#fff!important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
   body{display:block!important;}
   body>header,body>nav,body>main,body>#toast{display:none!important;}
@@ -1260,7 +1709,23 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
     <div class="nav-item" onclick="showPage('hist')" id="nav-hist">
       <span class="nav-ico">03</span> Historique
     </div>
+     <div class="nav-sep" id="nav-sep-users"></div>
+    <div class="nav-item" onclick="showPage('users')" id="nav-users">
+      <span class="nav-ico">04</span> Utilisateurs
+    </div>
   </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div class="notif-bell" onclick="toggleNotifPanel()" title="Notifications" id="notif-bell" style="display:none;position:relative;cursor:pointer;width:32px;height:32px;border-radius:8px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span id="notif-badge" style="display:none;position:absolute;top:-2px;right:-2px;background:#B42318;color:#fff;font-size:.6rem;font-weight:700;border-radius:50%;width:16px;height:16px;align-items:center;justify-content:center;">0</span>
+    </div>
+    <div class="notif-panel" id="notif-panel">
+      <div class="notif-panel-hdr"><h4>Notifications</h4><div style="display:flex;gap:6px;"><button onclick="markAllRead()">Tout marquer lu</button><button onclick="clearAllNotifs()" style="color:#B42318;">Vider</button></div></div>
+      <div class="notif-list" id="notif-list"><div class="notif-empty">Aucune notification</div></div>
+    </div>
+    <div id="msg-history-btn" onclick="openMsgHistory()" title="Messages reçus" style="display:none;position:relative;cursor:pointer;width:32px;height:32px;border-radius:8px;background:#EAF5F0;align-items:center;justify-content:center;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    </div>
   <button class="logout-btn" onclick="doLogout()" title="Se déconnecter">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
   </button>
@@ -1324,15 +1789,26 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       </div>
       <div class="field-group">
         <label>CLASSE</label>
-        <input type="text" id="classe" placeholder="Ex : 3ème A">
+        <input type="text" id="classe" list="classe-list" placeholder="Saisir ou sélectionner...">
       </div>
       <div class="field-group">
         <label>ANNÉE SCOLAIRE</label>
-        <input type="text" id="annee" value="2025–2026">
+        <select id="annee_scolaire">
+          <option value="">— Sélectionner —</option>
+          <option value="2025-2026">2025–2026</option>
+          <option value="2026-2027">2026–2027</option>
+          <option value="2027-2028">2027–2028</option>
+        </select>
       </div>
       <div class="field-group">
         <label>ÉTABLISSEMENT</label>
-        <input type="text" id="etablissement" list="etablissement-list" placeholder="Taper pour rechercher...">
+        <div class="etab-wrap">
+          <div class="etab-row">
+            <button type="button" class="etab-abg" id="etab-abg" onclick="toggleEtabList('etablissement','etab-abg','etab-toggle')" title="Afficher les établissements par défaut">ABG</button>
+            <input type="text" id="etablissement" placeholder="Saisir ou sélectionner...">
+            <button type="button" class="etab-toggle" id="etab-toggle" onclick="toggleEtabList('etablissement','etab-abg','etab-toggle')" title="Afficher les établissements par défaut">&#9660;</button>
+          </div>
+        </div>
         <datalist id="etablissement-list">
           <option>COLLÈGE DÉPARTEMENTAL AGNIBILÉKROU</option>
           <option>COLLÈGE MODERNE ABENGOUROU</option>
@@ -1411,6 +1887,16 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
           <option>COLLÈGE SAINT JOSEPH ABENGOUROU</option>
           <option>COURS SECONDAIRE NANAN ATTA ANO APPOISSO</option>
         </datalist>
+        <datalist id="classe-list">
+          <option>3ème 1</option>
+          <option>3ème 2</option>
+          <option>3ème 3</option>
+          <option>3ème 4</option>
+          <option>3ème A</option>
+          <option>3ème B</option>
+          <option>3ème C</option>
+          <option>3ème D</option>
+        </datalist>
       </div>
     </div>
   </div>
@@ -1479,21 +1965,37 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       </div>
       <div class="field-group">
         <label>CLASSE</label>
-        <input type="text" id="mo-classe" placeholder="Ex : 3ème A">
+        <input type="text" id="mo-classe" list="classe-list" placeholder="Saisir ou sélectionner...">
       </div>
       <div class="field-group">
         <label>ANNÉE SCOLAIRE</label>
-        <input type="text" id="mo-annee" value="2025–2026">
+        <select id="mo-annee_scolaire">
+          <option value="">— Sélectionner —</option>
+          <option value="2025-2026">2025–2026</option>
+          <option value="2026-2027">2026–2027</option>
+          <option value="2027-2028">2027–2028</option>
+        </select>
       </div>
       <div class="field-group">
         <label>ÉTABLISSEMENT</label>
-        <input type="text" id="mo-etablissement" list="etablissement-list" placeholder="Taper pour rechercher...">
+        <div class="etab-wrap">
+          <div class="etab-row">
+            <button type="button" class="etab-abg" id="mo-etab-abg" onclick="toggleEtabList('mo-etablissement','mo-etab-abg','mo-etab-toggle')" title="Afficher les établissements par défaut">ABG</button>
+            <input type="text" id="mo-etablissement" placeholder="Saisir ou sélectionner...">
+            <button type="button" class="etab-toggle" id="mo-etab-toggle" onclick="toggleEtabList('mo-etablissement','mo-etab-abg','mo-etab-toggle')" title="Afficher les établissements par défaut">&#9660;</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <div class="section-title">Saisie MA et notes au BEPC — Calcul de la Moyenne d'Orientation</div>
+    <div class="section-title-row">
+      <div class="section-title">Saisie MA et notes au BEPC — Calcul de la Moyenne d'Orientation</div>
+      <button class="to-toggle" id="to-toggle" onclick="toggleTO()" title="Traitement Oral — Masque l'Anglais oral du calcul">
+        <span class="to-label">TO</span>
+      </button>
+    </div>
     <table class="mat-table" style="table-layout:fixed;">
       <colgroup>
         <col style="width:18%;">
@@ -1541,21 +2043,21 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
   </div>
 
   <div class="actions">
-    <button class="btn btn-ghost" onclick="resetMO()">
-      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+    <button class="btn btn-reset" onclick="resetMO()">
+      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
       Réinitialiser
     </button>
-    <button class="btn btn-success" onclick="saveToHistory()">
-      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    <button class="btn btn-save" onclick="saveToHistory()">
+      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       Enregistrer
     </button>
-    <button class="btn btn-primary" onclick="printBulletin()">
-      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-      Imprimer
+    <button class="btn btn-preview" onclick="previewMO()">
+      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Aperçu
     </button>
-    <button class="btn btn-accent" onclick="exportPDF()">
-      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Exporter PDF
+    <button class="btn btn-download" onclick="exportPDF()">
+      <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Télécharger
     </button>
   </div>
 
@@ -1587,6 +2089,12 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         </button>
       </div>
     </div>
+    <div class="hist-year-filter" id="hist-year-filter" style="display:none;">
+      <label>&#128197; Année scolaire :</label>
+      <select id="hist-year-select" onchange="filterByYear()">
+        <option value="">Toutes les années</option>
+      </select>
+    </div>
     <div class="hist-sel-bar" id="hist-sel-bar">
       <div class="hist-sel-count"><span id="hist-sel-count-num">0</span> calcul(s) sélectionné(s)</div>
       <div class="hist-sel-actions">
@@ -1597,6 +2105,167 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       </div>
     </div>
     <div id="hist-list"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PAGE 4 : UTILISATEURS (Admin)
+════════════════════════════════════════════ -->
+<div class="page" id="page-users">
+  <div class="users-container">
+    <div class="users-header">
+      <div class="users-header-left">
+        <div class="users-header-ico">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <div class="users-title">Utilisateurs</div>
+          <div class="users-subtitle" id="users-count">Aucune session enregistrée</div>
+          <div id="users-sse-timestamp" style="font-size:.65rem;color:#9fb0a6;margin-top:2px;">Mise à jour automatique activée</div>
+        </div>
+      </div>
+      <div class="users-header-right">
+        <button class="btn-icon-danger" id="users-delete-selected" onclick="deleteSelectedUsers()" style="display:none;" title="Supprimer les sessions sélectionnées">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+          Sélection
+        </button>
+        <button class="btn-icon-danger" id="users-delete-all" onclick="clearAllUsers()" title="Supprimer toutes les sessions" style="background:#FDECEA;border-color:#D92D20;">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          Tout
+        </button>
+        <button class="btn btn-reset" onclick="loadUsers()" title="Rafraîchir">
+          <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Rafraîchir
+        </button>
+        <button class="btn btn-reset" onclick="exportUsersPDF()" title="Exporter en PDF">
+          <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exporter
+        </button>
+      </div>
+    </div>
+
+    <div class="users-devices-alert" id="users-devices-alert" style="display:none;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A85B00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <span id="users-devices-alert-text"></span>
+    </div>
+
+    <div class="users-devices-section" id="users-devices-section">
+</div>
+</div>
+<div class="users-devices-section" id="users-devices-section">
+  <div class="users-devices-header">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+    <span class="users-devices-title">Appareils connus</span>
+    <span class="users-devices-count" id="users-devices-count">0 appareil(s)</span>
+  </div>
+  <div class="users-devices-list" id="users-devices-list"></div>
+</div>
+<dialog id="msg-dialog">
+  <div class="msg-dlg-header">
+    <span class="msg-dlg-icon">&#128172;</span>
+    <span class="msg-dlg-sender" id="msg-dlg-sender">Administration</span>
+    <button class="msg-dlg-close" onclick="closeMsgDialog()" title="Fermer">&#10005;</button>
+  </div>
+  <div class="msg-dlg-body" id="msg-dlg-body"></div>
+  <div class="msg-dlg-footer">
+    <span class="msg-dlg-time" id="msg-dlg-time"></span>
+    <div class="msg-dlg-actions">
+      <button class="msg-dlg-btn msg-dlg-btn-close" onclick="closeMsgDialog()">Fermer</button>
+      <button class="msg-dlg-btn msg-dlg-btn-read" onclick="markMsgAndClose()">Marquer comme lu</button>
+    </div>
+  </div>
+</dialog>
+<div class="msg-history-backdrop" id="msg-history-backdrop" onclick="closeMsgHistory()"></div>
+<div class="msg-history-panel" id="msg-history-panel">
+  <div class="msg-history-header">
+    <span style="font-size:1.1rem;">&#128172;</span>
+    <span class="msg-history-title">Messages reçus</span>
+    <button class="msg-history-close" onclick="closeMsgHistory()" title="Fermer">&#10005;</button>
+  </div>
+  <div class="msg-history-body" id="msg-history-body">
+    <div class="msg-history-empty">Chargement...</div>
+  </div>
+</div>
+<div id="msg-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9000;align-items:center;justify-content:center;" onclick="closeMsgModal()">
+  <div style="background:#fff;border-radius:14px;padding:24px 26px;width:420px;max-width:90vw;box-shadow:0 12px 40px rgba(0,0,0,.18);" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:.9rem;font-weight:700;color:#003b32;">Envoyer un message</div>
+      <button onclick="closeMsgModal()" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:#60736D;">&#10005;</button>
+    </div>
+    <div style="font-size:.76rem;color:#60736D;margin-bottom:12px;">Destinataire : <strong id="msg-recipient"></strong></div>
+    <textarea id="msg-input" rows="4" placeholder="Écrivez votre message ici..." style="width:100%;padding:10px 12px;border:1.5px solid #D5E5DE;border-radius:8px;font-size:.82rem;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">
+      <button onclick="closeMsgModal()" class="btn btn-reset" style="min-height:34px;padding:6px 14px;font-size:.78rem;">Annuler</button>
+      <button onclick="sendMsg()" class="btn" style="min-height:34px;padding:6px 14px;font-size:.78rem;background:#064E3B;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">Envoyer</button>
+    </div>
+  </div>
+</div>
+<div class="users-filters">
+  <input type="text" class="users-search" id="users-search" placeholder="Rechercher..." oninput="filterUsers()">
+  <select class="users-filter-select" id="users-filter-role" onchange="filterUsers()">
+    <option value="">Tous les rôles</option>
+    <option value="admin">Admin</option>
+    <option value="student">Élève</option>
+  </select>
+  <select class="users-filter-select" id="users-filter-device" onchange="filterUsers()">
+    <option value="">Tous les appareils</option>
+    <option value="Ordinateur">Ordinateur</option>
+    <option value="Téléphone">Téléphone</option>
+    <option value="Tablette">Tablette</option>
+  </select>
+  <select class="users-filter-select" id="users-filter-status" onchange="filterUsers()">
+    <option value="">Tous les états</option>
+    <option value="online">En ligne</option>
+    <option value="offline">Déconnecté</option>
+  </select>
+</div>
+
+    <div class="users-table-wrap">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="users-select-all" onchange="toggleSelectAll(this)"></th>
+            <th>Utilisateur</th>
+            <th>Rôle</th>
+            <th>Appareil</th>
+            <th>Statut</th>
+            <th>Ville</th>
+            <th>IP</th>
+            <th>Connexion</th>
+            <th>Déconnexion</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="users-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="users-activity-panel" id="users-activity-panel" style="display:none;">
+      <div class="users-activity-header">
+        <div class="users-activity-title" id="users-activity-title">Historique des activités</div>
+        <button class="btn btn-reset" onclick="closeActivityPanel()" style="min-height:32px;padding:4px 12px;font-size:.76rem;">
+          <svg class="btn-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Fermer
+        </button>
+      </div>
+      <div class="users-activity-list" id="users-activity-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MESSAGE -->
+<div id="msg-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9000;align-items:center;justify-content:center;" onclick="closeMsgModal()">
+  <div style="background:#fff;border-radius:14px;padding:24px 26px;width:420px;max-width:90vw;box-shadow:0 12px 40px rgba(0,0,0,.18);" onclick="event.stopPropagation()">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:.9rem;font-weight:700;color:#003b32;">Envoyer un message</div>
+      <button onclick="closeMsgModal()" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:#60736D;">&#10005;</button>
+    </div>
+    <div style="font-size:.76rem;color:#60736D;margin-bottom:12px;">Destinataire : <strong id="msg-recipient"></strong></div>
+    <textarea id="msg-input" rows="4" placeholder="Écrivez votre message ici..." style="width:100%;padding:10px 12px;border:1.5px solid #D5E5DE;border-radius:8px;font-size:.82rem;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">
+      <button onclick="closeMsgModal()" class="btn btn-reset" style="min-height:34px;padding:6px 14px;font-size:.78rem;">Annuler</button>
+      <button onclick="sendMsg()" class="btn" style="min-height:34px;padding:6px 14px;font-size:.78rem;background:#064E3B;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">Envoyer</button>
+    </div>
   </div>
 </div>
 
@@ -1614,10 +2283,10 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
     <div class="bp-tricolor"><span></span><span>SAPHIR <strong>&nbsp;Pro</strong>-Orientation en seconde</span><span></span></div>
     <header class="bp-header">
       <div class="bp-header-top">
-        <div class="bp-brand">
-          <div class="bp-brand-name">SAPHIR <span>Pro</span></div>
-          <div class="bp-brand-sub">Système d'Aide à l'Orientation Scolaire</div>
-          <div class="bp-brand-contact">0708109840 / 0152030622</div>
+        <div class="bp-ministry">
+          <span>Ministère de l'Éducation Nationale,</span>
+          <span>de l'Alphabétisation</span>
+          <span>et de l'Enseignement Technique</span>
         </div>
         <div class="bp-state">
           <div class="bp-republique">République de Côte d'Ivoire</div>
@@ -1680,6 +2349,13 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       </div>
     </div>
 
+    <div class="bp-bottom-brand">
+      <div class="bp-bottom-brand-line"></div>
+      <div class="bp-bottom-brand-name">SAPHIR <span>Pro</span></div>
+      <div class="bp-bottom-brand-sub">Système d'Aide à l'Orientation Scolaire</div>
+      <div class="bp-bottom-brand-contact">07 08 10 98 40 / 01 52 03 06 22</div>
+    </div>
+
     <footer class="bp-footer">
       <div>Édité via <strong>SAPHIR Pro</strong></div>
       <div id="bp-filename"></div>
@@ -1698,17 +2374,20 @@ const MATIERES = [
   { id:'anglais',   label:'Anglais',        coef:1, anglais:true  },
 ];
 const TOTAL_COEF = MATIERES.reduce((s,m)=>s+m.coef,0);
+let _toMode = false;
 
 /* ── NAVIGATION ── */
+let _role='guest';
 function showPage(id){
-  const role=localStorage.getItem('saphir_role');
-  if(id==='hist'&&role!=='admin') return;
+  if(id==='hist'&&_role!=='admin') return;
+  if(id==='users'&&_role!=='admin') return;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.getElementById('nav-'+id).classList.add('active');
   window.scrollTo({top:0,left:0,behavior:'auto'});
   if(id==='hist') loadHistory();
+  if(id==='users') loadUsers();
 }
 
 /* ════ PAGE MGA ════ */
@@ -1768,7 +2447,7 @@ function resetMGA(){
   document.getElementById('nomEleve').value='';
   document.getElementById('matricule').value='';
   document.getElementById('classe').value='';
-  document.getElementById('annee').value='';
+  document.getElementById('annee_scolaire').value='';
   document.getElementById('etablissement').value='';
   MATIERES.forEach(m=>{
     ['t1','t2','t3'].forEach(t=>{const el=document.getElementById(m.id+'_'+t);if(el)el.value='';});
@@ -1811,18 +2490,20 @@ function exportMGAtoMO(){
   const nom=document.getElementById('nomEleve').value;
   const mat=document.getElementById('matricule')?.value || '';
   const cls=document.getElementById('classe')?.value || '';
-  const annee=document.getElementById('annee')?.value || '';
+  const anneeScolaire=document.getElementById('annee_scolaire')?.value || '';
   const etab=document.getElementById('etablissement')?.value || '';
   if(nom){ document.getElementById('mo-nom').value=nom; }
   if(mat){ document.getElementById('mo-matricule').value=mat; }
   if(cls){ document.getElementById('mo-classe').value=cls; }
-  if(annee){ document.getElementById('mo-annee').value=annee; }
+  if(anneeScolaire){ document.getElementById('mo-annee_scolaire').value=anneeScolaire; }
   if(etab){ document.getElementById('mo-etablissement').value=etab; }
   // Badge
   document.getElementById('mga-badge').style.display='inline';
   updateMOInfo();
   showPage('mo');
   toast('MA transférées vers le module MO ✔');
+  logActivity('Transfert vers MO','MGA → MO','Transfert de '+MATIERES.length+' matières','succes');
+  sendNotification('Transfert MA→MO','Valeurs MA transférées vers le module MO','success');
 }
 
 /* ════ PAGE MO ════ */
@@ -1851,12 +2532,41 @@ function buildMOTable(){
   });
 }
 
+function toggleTO(){
+  _toMode=!_toMode;
+  const btn=document.getElementById('to-toggle');
+  if(btn) btn.classList.toggle('active',_toMode);
+  MATIERES.forEach(m=>{
+    if(!m.anglais) return;
+    const oralEl=document.getElementById(m.id+'_bepc_o');
+    const ecritEl=document.getElementById(m.id+'_bepc_e');
+    if(!oralEl) return;
+    const wrap=oralEl.closest('.two-notes');
+    if(_toMode){
+      oralEl.value='';
+      oralEl.style.display='none';
+      oralEl.disabled=true;
+      if(wrap) wrap.classList.add('to-single');
+      if(ecritEl) ecritEl.focus();
+    } else {
+      oralEl.style.display='';
+      oralEl.disabled=false;
+      if(wrap) wrap.classList.remove('to-single');
+    }
+  });
+  MATIERES.forEach(m=>calcRowMO(m.id));
+}
+
 function calcRowMO(mid){
   const m=MATIERES.find(x=>x.id===mid);
   const mga=getVal(mid+'_mga');
   let bepc=0;
   if(m.anglais){
-    bepc=(getVal(mid+'_bepc_e')+getVal(mid+'_bepc_o'))/2;
+    if(_toMode){
+      bepc=getVal(mid+'_bepc_e');
+    } else {
+      bepc=(getVal(mid+'_bepc_e')+getVal(mid+'_bepc_o'))/2;
+    }
   } else {
     bepc=getVal(mid+'_bepc');
   }
@@ -1864,7 +2574,7 @@ function calcRowMO(mid){
   const mgaEl=document.getElementById(mid+'_mga');
   const bepcEl=m.anglais?null:document.getElementById(mid+'_bepc');
   const bepcE=m.anglais?document.getElementById(mid+'_bepc_e'):null;
-  const bepcO=m.anglais?document.getElementById(mid+'_bepc_o'):null;
+  const bepcO=m.anglais&&!_toMode?document.getElementById(mid+'_bepc_o'):null;
   const hasInput=(mgaEl&&mgaEl.value!=='')||(bepcEl&&bepcEl.value!=='')||(bepcE&&bepcE.value!=='')||(bepcO&&bepcO.value!=='');
   document.getElementById(mid+'_sum').textContent  = hasInput ? fmtNum(sum,2)  : '—';
   document.getElementById(mid+'_prod').textContent = hasInput ? fmtNum(prod,2) : '—';
@@ -1877,7 +2587,11 @@ function calcTotalMO(){
     const mga=getVal(m.id+'_mga');
     let bepc=0;
     if(m.anglais){
-      bepc=(getVal(m.id+'_bepc_e')+getVal(m.id+'_bepc_o'))/2;
+      if(_toMode){
+        bepc=getVal(m.id+'_bepc_e');
+      } else {
+        bepc=(getVal(m.id+'_bepc_e')+getVal(m.id+'_bepc_o'))/2;
+      }
     } else {
       bepc=getVal(m.id+'_bepc');
     }
@@ -1885,7 +2599,7 @@ function calcTotalMO(){
     const mgaEl=document.getElementById(m.id+'_mga');
     const bepcEl=m.anglais?null:document.getElementById(m.id+'_bepc');
     const bepcE=m.anglais?document.getElementById(m.id+'_bepc_e'):null;
-    const bepcO=m.anglais?document.getElementById(m.id+'_bepc_o'):null;
+    const bepcO=m.anglais&&!_toMode?document.getElementById(m.id+'_bepc_o'):null;
     if((mgaEl&&mgaEl.value!=='')||(bepcEl&&bepcEl.value!=='')||(bepcE&&bepcE.value!=='')||(bepcO&&bepcO.value!=='')) count++;
   });
   const mo=total/(2*TOTAL_COEF);
@@ -1922,6 +2636,38 @@ function updateMOProgress(count){
     else if(count>=1) fill.classList.add('fill-started');
   }
   if(msg) msg.classList.toggle('show',count===4);
+  if(count===4){
+    const currentMO=document.getElementById('r-mo')?.textContent||'';
+    if(currentMO!==_lastLoggedMO){
+      _lastLoggedMO=currentMO;
+      logMOCompletion();
+    }
+  }
+  if(count<4) _lastLoggedMO='';
+}
+
+let _lastLoggedMO='';
+
+function logMOCompletion(){
+  const nom=(document.getElementById('mo-nom')?.value||'').trim()||'Non renseigné';
+  const matricule=(document.getElementById('mo-matricule')?.value||'').trim()||'—';
+  const classe=(document.getElementById('mo-classe')?.value||'').trim()||'—';
+  const etab=(document.getElementById('mo-etablissement')?.value||'').trim()||'—';
+  const anneeScolaire=(document.getElementById('mo-annee_scolaire')?.value||'').trim()||'—';
+  const mo=document.getElementById('r-mo')?.textContent||'—';
+  const mention=document.getElementById('r-mention')?.textContent||'—';
+  const total=document.getElementById('r-total')?.textContent||'—';
+  const matieres={};
+  MATIERES.forEach(m=>{
+    const d={mga:parseNoteValue(document.getElementById(m.id+'_mga')?.value),label:m.label,coef:m.coef};
+    if(m.anglais){d.bepc_ecrit=parseNoteValue(document.getElementById(m.id+'_bepc_e')?.value);d.bepc_oral=parseNoteValue(document.getElementById(m.id+'_bepc_o')?.value);}
+    else{d.bepc=parseNoteValue(document.getElementById(m.id+'_bepc')?.value);}
+    matieres[m.id]=d;
+  });
+  const payload={nom,matricule,classe,etablissement:etab,annee_scolaire:anneeScolaire,mo,mention,total,matieres,to_mode:_toMode};
+  const detail=JSON.stringify(payload);
+  logActivity('Saisie complète des matières dans Calcul MO','Calcul MO',detail,'succes');
+  sendNotification('Calcul MO terminé','Saisie complète des matières pour '+nom+' — '+classe,'success');
 }
 
 function setMOColor(mo){
@@ -1957,7 +2703,7 @@ function resetMO(){
   document.getElementById('mo-nom').value='';
   document.getElementById('mo-matricule').value='';
   document.getElementById('mo-classe').value='';
-  document.getElementById('mo-annee').value='2025–2026';
+  document.getElementById('mo-annee_scolaire').value='';
   document.getElementById('mo-etablissement').value='';
   document.querySelectorAll('#page-mo .note-input').forEach(el=>el.value='');
   document.querySelectorAll('#mo-tbody .computed-val, #mo-tbody .sum-val').forEach(el=>el.textContent='—');
@@ -1990,7 +2736,7 @@ let histData=[];
 let editingId=null;
 let selectedIds=[];
 
-const API='http://127.0.0.1:'+location.port;
+const API='';let _userEmail='';
 
 /* ── MODE BROUILLON ── */
 function saveDraft(){
@@ -1999,9 +2745,10 @@ function saveDraft(){
       nom:document.getElementById('mo-nom')?.value||'',
       matricule:document.getElementById('mo-matricule')?.value||'',
       classe:document.getElementById('mo-classe')?.value||'',
-      annee:document.getElementById('mo-annee')?.value||'',
+      annee_scolaire:document.getElementById('mo-annee_scolaire')?.value||'',
       etablissement:document.getElementById('mo-etablissement')?.value||'',
       tab:document.querySelector('.page.active')?.id||'',
+      toMode:_toMode,
       matieres:{}
     };
     MATIERES.forEach(m=>{
@@ -2034,7 +2781,7 @@ function restoreDraft(){
   if(d.nom) document.getElementById('mo-nom').value=d.nom;
   if(d.matricule) document.getElementById('mo-matricule').value=d.matricule;
   if(d.classe) document.getElementById('mo-classe').value=d.classe;
-  if(d.annee) document.getElementById('mo-annee').value=d.annee;
+  if(d.annee_scolaire) document.getElementById('mo-annee_scolaire').value=d.annee_scolaire;
   if(d.etablissement) document.getElementById('mo-etablissement').value=d.etablissement;
   if(d.matieres){
     MATIERES.forEach(m=>{
@@ -2049,6 +2796,7 @@ function restoreDraft(){
     });
     MATIERES.forEach(m=>calcRowMO(m.id));
   }
+  if(d.toMode && d.toMode!==_toMode) toggleTO();
   if(d.tab){
     showPage(d.tab==='page-mga'?'mga':d.tab==='page-mo'?'mo':'home');
   }
@@ -2073,38 +2821,49 @@ async function loadHistory(){
     if(r.redirected){toast('Session expirée. Reconnectez-vous.',true);histData=[];renderHistory();return;}
     if(!r.ok) throw 0;
     histData=await r.json();
+    histData.forEach(h=>{
+      h.id=Number(h.id);
+      if(h.annee_scolaire!=null&&typeof h.annee_scolaire==='object') h.annee_scolaire=h.annee_scolaire.value||'';
+      if(h.annee_scolaire==null) h.annee_scolaire='';
+      if(h.etablissement!=null&&typeof h.etablissement==='object') h.etablissement=h.etablissement.value||'';
+      if(h.etablissement==null) h.etablissement='';
+      if(h.printed!=null&&typeof h.printed==='object') h.printed=h.printed.value!=null?h.printed.value:0;
+      if(h.created_by!=null&&typeof h.created_by==='object') h.created_by=h.created_by.value!=null?h.created_by.value:'';
+    });
   }catch(e){histData=[];}
   selectedIds=[];
+  _histYearData=histData;
+  updateYearFilter();
   renderHistory();
 }
 
 async function saveToHistory(){
   const nom=(document.getElementById('mo-nom').value||document.getElementById('nomEleve').value).trim();
-  if(!nom){toast('Veuillez remplir les informations de l\'élève avant d\'enregistrer.',true);return;}
+  if(!nom){toast('Veuillez remplir les informations de l\'élève avant d\'enregistrer.',true);return null;}
   const matricule=(document.getElementById('mo-matricule').value||document.getElementById('matricule')?.value||'').trim();
   const classe=(document.getElementById('mo-classe').value||document.getElementById('classe')?.value||'').trim();
-  const annee=(document.getElementById('mo-annee')?.value||document.getElementById('annee')?.value||'').trim();
-  if(!matricule||!classe||!annee){
+  const anneeScolaire=(document.getElementById('mo-annee_scolaire')?.value||document.getElementById('annee_scolaire')?.value||'').trim();
+  if(!matricule||!classe||!anneeScolaire){
     const manquants=[];
     if(!matricule) manquants.push('Matricule');
     if(!classe) manquants.push('Classe');
-    if(!annee) manquants.push('Année');
-    toast('Champs manquants : '+manquants.join(', '),true);return;
+    if(!anneeScolaire) manquants.push('Année scolaire');
+    toast('Champs manquants : '+manquants.join(', '),true);return null;
   }
   const total=document.getElementById('r-total').textContent;
   const mo=document.getElementById('r-mo').textContent;
   const mention=document.getElementById('r-mention').textContent;
   const etab=(document.getElementById('mo-etablissement').value||document.getElementById('etablissement')?.value||'').trim();
-  const matieres={};
+  const matieres={_to_mode:_toMode};
   MATIERES.forEach(m=>{
     const d={mga:parseNoteValue(document.getElementById(m.id+'_mga')?.value)};
     if(m.anglais){d.bepc_ecrit=parseNoteValue(document.getElementById(m.id+'_bepc_e')?.value);d.bepc_oral=parseNoteValue(document.getElementById(m.id+'_bepc_o')?.value);}
     else{d.bepc=parseNoteValue(document.getElementById(m.id+'_bepc')?.value);}
     matieres[m.id]=d;
   });
-  const payload={nom,matricule,classe,etablissement:etab,annee,total:parseFloat(String(total).replace(',','.'))||0,mo:parseFloat(String(mo).replace(',','.'))||0,mention,matieres};
+  const payload={nom,matricule,classe,etablissement:etab,annee:anneeScolaire,annee_scolaire:anneeScolaire,total:parseFloat(String(total).replace(',','.'))||0,mo:parseFloat(String(mo).replace(',','.'))||0,mention,matieres,created_by:_userEmail||localStorage.getItem('saphir_email')||'',to_mode:_toMode};
   try{
-    let r;
+    let r;let savedId=editingId||null;
     if(editingId){
       r=await fetch(API+'/api/eleves/'+editingId,{method:'PUT',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify(payload)});
     } else {
@@ -2112,14 +2871,17 @@ async function saveToHistory(){
     }
     if(!r.ok){
       const err=await r.json().catch(()=>({}));
-      if(r.status===401||r.status===302){toast('Session expirée. Reconnectez-vous.',true);return;}
-      toast(err.error||'Erreur serveur ('+r.status+')',true);return;
+      if(r.status===401||r.status===302){toast('Session expirée. Reconnectez-vous.',true);return null;}
+      toast(err.error||'Erreur serveur ('+r.status+')',true);return null;
     }
-    if(editingId){toast('Calcul mis à jour avec succès ✔');cancelEdit();}
-    else{toast('Enregistré : '+nom);}
+    const res=await r.json().catch(()=>({}));
+    if(!editingId&&res&&res.eleve&&res.eleve.id) savedId=res.eleve.id;
+    if(editingId){toast('Calcul mis à jour avec succès ✔');cancelEdit();logActivity('Modification élève','Calcul MO','id='+editingId);sendNotification('Modification','Calcul de '+nom+' modifié (#'+editingId+')','info');}
+    else{toast('Enregistré : '+nom);logActivity('Création élève','Calcul MO',nom);sendNotification('Nouveau calcul','Calcul de '+nom+' enregistré avec succès','success');}
     localStorage.removeItem('saphir_draft');
     await loadHistory();
-  }catch(e){toast('Erreur lors de l\'enregistrement.',true);}
+    return savedId;
+  }catch(e){toast('Erreur lors de l\'enregistrement.',true);return null;}
 }
 
 async function supprimerCalculHistorique(id,btn){
@@ -2134,6 +2896,8 @@ async function supprimerCalculHistorique(id,btn){
     selectedIds=selectedIds.filter(x=>x!==id);
     await loadHistory();
     toast('Calcul supprimé définitivement.');
+    logActivity('Suppression élève','Historique','id='+id);
+    sendNotification('Suppression','Calcul #'+id+' supprimé','warning');
   }catch(e){
     toast(e.message||'Erreur lors de la suppression.',true);
     btn.disabled=false;btn.innerHTML='&#128465; Supprimer';
@@ -2159,6 +2923,8 @@ async function clearHistory(){
   histData=[];selectedIds=[];
   renderHistory();
   toast('Historique vidé.');
+  logActivity('Vider l historique','Historique','Tous les calculs supprimés');
+  sendNotification('Historique vidé','Tous les calculs ont été supprimés','warning');
 }
 
 function confirmClearHistory(){
@@ -2174,7 +2940,9 @@ function toggleSelect(id,cb){
   updateSelBar();
 }
 function selectAll(){
-  selectedIds=histData.map(h=>h.id);
+  const yearFilter=document.getElementById('hist-year-select')?.value||'';
+  const filtered=yearFilter?histData.filter(h=>h.annee_scolaire===yearFilter):histData;
+  selectedIds=filtered.map(h=>h.id);
   document.querySelectorAll('.hist-select').forEach(cb=>cb.checked=true);
   updateSelBar();
 }
@@ -2217,7 +2985,7 @@ function printSelection(){
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}</style></head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins — SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
 }
@@ -2228,7 +2996,7 @@ function exportSelection(){
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins - SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}</style></head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins — SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
 }
@@ -2242,6 +3010,7 @@ function editCalc(id){
   document.getElementById('edit-indicator').classList.add('show');
   showPage('mo');
   toast('Modification du calcul enregistré');
+  logActivity('Modification élève','Calcul MO','Chargement id='+id);
 }
 function duplicateCalc(id){
   const h=histData.find(x=>x.id===id);
@@ -2251,13 +3020,15 @@ function duplicateCalc(id){
   document.getElementById('edit-indicator').classList.remove('show');
   showPage('mo');
   toast('Calcul dupliqué. Vous pouvez le modifier puis l\'enregistrer comme nouveau calcul.');
+  logActivity('Duplication élève','Calcul MO','Duplication id='+id);
 }
 function loadCalcToMO(h){
   document.getElementById('mo-nom').value=h.nom||'';
   document.getElementById('mo-matricule').value=h.matricule||'';
   document.getElementById('mo-classe').value=h.classe||'';
-  document.getElementById('mo-annee').value=h.annee||'';
   document.getElementById('mo-etablissement').value=h.etablissement||'';
+  const asEl=document.getElementById('mo-annee_scolaire');
+  if(asEl) asEl.value=h.annee_scolaire||'';
   document.querySelectorAll('#page-mo .note-input').forEach(el=>el.value='');
   MATIERES.forEach(m=>{
     const d=(h.matieres||{})[m.id]||{};
@@ -2270,6 +3041,8 @@ function loadCalcToMO(h){
     }
     calcRowMO(m.id);
   });
+  const shouldTO=!!(h.to_mode||(h.matieres&&h.matieres._to_mode));
+  if(shouldTO!==_toMode) toggleTO();
   updateMOInfo();
 }
 function cancelEdit(){
@@ -2282,28 +3055,51 @@ function cancelEdit(){
 function renderHistory(){
   const div=document.getElementById('hist-list');
   const countEl=document.getElementById('hist-count');
-  const n=histData.length;
-  if(countEl) countEl.textContent=n+(n<=1?' calcul enregistré':' calculs enregistrés');
+  const yearFilter=document.getElementById('hist-year-select')?.value||'';
+  const filtered=yearFilter?histData.filter(h=>h.annee_scolaire===yearFilter):histData;
+  const n=filtered.length;
+  const totalCount=histData.length;
+  if(countEl) countEl.textContent=n+(n<=1?' calcul enregistré':' calculs enregistrés')+(yearFilter?' — Année : '+yearFilter:(totalCount!=n?' ('+totalCount+' au total)':''));
   const btnAll=document.getElementById('btn-print-all');
   if(btnAll) btnAll.style.display=n>1?'inline-flex':'none';
   if(!n){
-    div.innerHTML='<div class="hist-empty-state"><div class="hist-empty-icon">&#128196;</div><div class="hist-empty-text">Aucun calcul enregistré</div><div class="hist-empty-sub">Les calculs sauvegardés apparaîtront ici.</div></div>';
+    div.innerHTML=yearFilter?'<div class="hist-empty-state"><div class="hist-empty-icon">&#128197;</div><div class="hist-empty-text">Aucun calcul pour '+esc(yearFilter)+'</div><div class="hist-empty-sub">Essayez une autre année ou sélectionnez "Toutes les années".</div></div>':'<div class="hist-empty-state"><div class="hist-empty-icon">&#128196;</div><div class="hist-empty-text">Aucun calcul enregistré</div><div class="hist-empty-sub">Les calculs sauvegardés apparaîtront ici.</div></div>';
     selectedIds=[];updateSelBar();
     return;
   }
-  div.innerHTML='<div style="margin-bottom:10px;display:flex;align-items:center;gap:8px;"><input type="checkbox" class="hist-select" onchange="toggleSelectAll(this)" title="Tout sélectionner" '+(selectedIds.length===n?'checked':'')+'><span style="font-size:.78rem;color:#60736D;">Tout sélectionner</span></div>'+histData.map(h=>{
-    const moVal=h.mo!=null?Number(h.mo):null;
+  div.innerHTML='<div style="margin-bottom:10px;display:flex;align-items:center;gap:8px;"><input type="checkbox" class="hist-select" onchange="toggleSelectAll(this)" title="Tout sélectionner" '+(selectedIds.length===n?'checked':'')+'><span style="font-size:.78rem;color:#60736D;">Tout sélectionner</span></div>'+filtered.map(h=>{
+    const rawMo=h.mo!=null&&typeof h.mo==='object'?(h.mo.value!=null?h.mo.value:null):h.mo;
+    const moVal=rawMo!=null&&!isNaN(Number(rawMo))?Number(rawMo):null;
     const moDisplay=moVal!=null?truncate(moVal,2).replace('.',',')+' / 20':'\u2014';
-    const mention=h.mention||'\u2014';
+    const rawMention=h.mention!=null&&typeof h.mention==='object'?(h.mention.value!=null?h.mention.value:null):h.mention;
+    const mention=rawMention||'\u2014';
     let badgeClass='hist-badge-none';
     if(mention==='Très bien'||mention==='Bien'||mention==='Félicitations') badgeClass='hist-badge-pass';
     else if(mention==='Passable'||mention==='Assez bien') badgeClass='hist-badge-warn';
-    else if(mention.includes('Insuffisant')) badgeClass='hist-badge-fail';
+    else if(typeof mention==='string'&&mention.includes('Insuffisant')) badgeClass='hist-badge-fail';
     const dateStr=h.date_calc||h.created_at||'';
+    const datePart=dateStr?dateStr.split(' ')[0].split('T')[0]:'';
+    const dateDisplay=datePart?datePart.split('-').reverse().join('/'):'';
+    const timePart=dateStr?(dateStr.includes('T')?dateStr.split('T')[1]:dateStr.split(' ')[1]||''):'';
+    const timeDisplay=timePart?timePart.split('.')[0].substring(0,5):'';
     const checked=selectedIds.includes(h.id)?'checked':'';
-    return '<div class="hist-card"><input type="checkbox" class="hist-select" '+checked+' onchange="toggleSelect('+h.id+',this)" title="Sélectionner"><div class="hist-card-info"><div class="hist-card-name" title="'+(h.nom||'\u2014')+'">'+(h.nom||'\u2014')+'</div><div class="hist-card-meta" title="'+(h.matricule||'\u2014')+' · '+(h.classe||'\u2014')+' · '+(h.etablissement||'\u2014')+' · '+dateStr+'">'+(h.matricule||'\u2014')+' &middot; '+(h.classe||'\u2014')+' &middot; '+(h.etablissement||'\u2014')+' &middot; '+dateStr+'</div></div><div class="hist-card-mo"><div class="mo-value">'+moDisplay+'</div><div class="mo-label">Moyenne</div></div><span class="hist-badge '+badgeClass+'">'+mention+'</span><div class="hist-actions"><button class="hist-btn-edit" onclick="editCalc('+h.id+')" title="Modifier ce calcul">&#9998; Modifier</button><button class="hist-btn-dup" onclick="duplicateCalc('+h.id+')" title="Dupliquer ce calcul">&#128203; Dupliquer</button><button class="hist-btn-pdf" onclick="downloadBulletinPDF('+h.id+')" title="Télécharger le bulletin en PDF"><svg class="hist-btn-pdf-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> T\u00e9l\u00e9charger</button><button class="hist-btn-del" onclick="confirmDelHistory('+h.id+',this)" title="Supprimer ce calcul">&#128465; Supprimer</button></div></div>';
+    const yearBadge=h.annee_scolaire?'<span style="font-size:.66rem;font-weight:600;color:#064E3B;background:#EAF5F0;border:1px solid #B8CEC3;border-radius:5px;padding:1px 6px;margin-left:6px;">'+esc(h.annee_scolaire)+'</span>':'';
+    const rawCreatedBy=h.created_by!=null&&typeof h.created_by==='object'?(h.created_by.value!=null?h.created_by.value:null):h.created_by;
+    const authorEmail=rawCreatedBy||'Non renseigné';
+    const rawPrinted=h.printed!=null&&typeof h.printed==='object'?(h.printed.value!=null?h.printed.value:null):h.printed;
+    const isPrinted=Number(rawPrinted)===1;
+    const printedBadge=isPrinted?'<span class="hist-badge-printed" title="Bulletin imprimé"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>':'<span class="hist-badge-printed hist-badge-notprinted" title="Non imprimé"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B8CEC3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>';
+    return '<div class="hist-card"><input type="checkbox" class="hist-select" '+checked+' onchange="toggleSelect('+h.id+',this)" title="Sélectionner">'+printedBadge+'<div class="hist-card-info"><div class="hist-card-name" title="'+esc(h.nom||'\u2014')+'">'+esc(h.nom||'\u2014')+'</div><div class="hist-card-meta" title="'+esc((h.matricule||'\u2014')+' · '+(h.classe||'\u2014')+' · '+(h.etablissement||'\u2014'))+'">'+esc(h.matricule||'\u2014')+' &middot; '+esc(h.classe||'\u2014')+' &middot; '+esc(h.etablissement||'\u2014')+'</div>'+(dateDisplay?'<div class="hist-card-date" title="Enregistr\u00e9 le '+dateStr+'">&#128197; '+dateDisplay+(timeDisplay?' &agrave; '+timeDisplay:'')+'</div>':'')+'<div class="hist-card-author" title="Enregistr\u00e9 par">&#9993; '+esc(authorEmail)+'</div></div><div class="hist-card-mo"><div class="mo-value">'+moDisplay+'</div><div class="mo-label">Moyenne</div></div><span class="hist-badge '+badgeClass+'">'+esc(mention)+'</span><div class="hist-actions"><button class="hist-btn-edit" onclick="editCalc('+h.id+')" title="Modifier ce calcul">&#9998; Modifier</button><button class="hist-btn-icon" onclick="duplicateCalc('+h.id+')" title="Dupliquer ce calcul"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button><button class="hist-btn-icon" onclick="previewBulletinPDF('+h.id+')" title="Aperçu du bulletin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button class="hist-btn-icon" onclick="downloadBulletinPDF('+h.id+')" title="T\u00e9l\u00e9charger le bulletin en PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button><button class="hist-btn-icon hist-btn-icon-del" onclick="confirmDelHistory('+h.id+',this)" title="Supprimer ce calcul"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></div>';
   }).join('');
   updateSelBar();
+}
+
+/* ════ MARK PRINTED ════ */
+function markPrinted(id){
+  fetch(API+'/api/eleves/'+id+'/printed',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin'})
+    .then(r=>{if(!r.ok) throw r;return r.json();})
+    .then(()=>{const h=histData.find(x=>x.id===id);if(h)h.printed=1;renderHistory();})
+    .catch(e=>{console.error('markPrinted failed:',e);});
 }
 
 /* ════ TÉLÉCHARGEMENT PDF DEPUIS HISTORIQUE ════ */
@@ -2318,52 +3114,114 @@ async function downloadBulletinPDF(id){
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Bulletin — ${h.nom||'Élève'} — SAPHIR Pro</title>
+<title>Bulletin — ${esc(h.nom||'Élève')} — SAPHIR Pro</title>
 ${styles}
 <style>
   body{margin:0;padding:0;background:#fff;}
-  .bulletin-sheet{page-break-after:auto;margin:0;padding:0;}
-  @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
-</style></head><body>${page}</body></html>`);
+   .bulletin-sheet{page-break-after:auto;margin:0;padding:0;max-height:297mm;overflow:hidden;}
+  @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
+</head><body>${page}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
+  markPrinted(id);
+  logActivity('Téléchargement PDF','Bulletin',h.nom||'');
+}
+
+/* ════ APERÇU BULLETIN DEPUIS HISTORIQUE ════ */
+async function previewBulletinPDF(id){
+  let h=histData.find(x=>x.id===id);
+  if(!h){
+    try{const r=await fetch(API+'/api/eleves/'+id,{credentials:'same-origin'});if(r.ok)h=await r.json();}catch(e){}
+  }
+  if(!h||!h.matieres){toast('Données indisponibles.',true);return;}
+  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+  const page=buildBulletinHTML(h);
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Aperçu — ${h.nom||'Élève'} — SAPHIR Pro</title>
+${styles}
+<style>
+  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#e8ece9;font-family:'Ebrima','Segoe UI',Arial,sans-serif;width:100%;height:100%;}
+  .preview-toolbar{position:fixed;top:0;left:0;right:0;background:#064E3B;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .preview-toolbar-title{font-size:.9rem;font-weight:700;}
+  .preview-toolbar-btn{background:#fff;color:#064E3B;border:none;padding:8px 16px;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+  .preview-toolbar-btn:hover{background:#F4FAF7;}
+  .preview-page-wrap{display:flex;justify-content:center;padding:60px 16px 24px;min-height:100vh;}
+  .preview-a4{width:210mm;min-height:297mm;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.18);padding:4mm 10mm 1mm 12mm;overflow:hidden;}
+  .bulletin-sheet{width:100%;margin:0;padding:0;max-height:297mm;overflow:hidden;box-shadow:none;border:none;background:transparent;}
+  .bulletin-sheet .bp-header{box-shadow:none;border:1px solid #dfe7e2;border-top:0;}
+  .bulletin-sheet .bp-table-wrap{border:1px solid #bdcdc4;}
+  @media print{
+    html,body{margin:0;padding:0;background:#fff;width:auto;height:auto;}
+    .preview-toolbar{display:none!important;}
+    .preview-page-wrap{padding:0;margin:0;display:block;}
+    .preview-a4{width:100%;min-height:auto;padding:0;box-shadow:none;background:transparent;}
+    .bulletin-sheet{width:100%;margin:0;box-shadow:none;}
+    @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
+  }
+</head><body>
+<div class="preview-toolbar">
+  <span class="preview-toolbar-title">Aperçu du bulletin — ${h.nom||'Élève'}</span>
+  <button class="preview-toolbar-btn" onclick="window.print()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Imprimer / PDF</button>
+</div>
+<div class="preview-page-wrap">
+  <div class="preview-a4">${page}</div>
+</div>
+</body></html>`);
+  win.document.close();
+  markPrinted(id);
+  logActivity('Aperçu PDF','Bulletin',h.nom||'');
 }
 
 /* ════ IMPRESSION MULTIPLE ════ */
 function buildBulletinHTML(h){
-  const name=(h.nom||'NON RENSEIGNÉ').toUpperCase();
+  const isTO=!!(h.to_mode||(h.matieres&&h.matieres._to_mode));
+  const name=esc((h.nom||'NON RENSEIGNÉ').toUpperCase());
   const initials=(()=>{
-    const parts=name.trim().split(/\s+/).filter(Boolean);
+    const parts=(h.nom||'').trim().split(/\s+/).filter(Boolean);
     const f=parts[0]?.[0]||'';const l=parts.length>1?parts[parts.length-1][0]:'';
-    return(f+l).toUpperCase()||'--';
+    return esc((f+l).toUpperCase()||'--');
   })();
-  const classe=h.classe||'-';
-  const school=h.etablissement||'NON RENSEIGNÉ';
-  const year=h.annee||'-';
-  const matricule=h.matricule||'-';
-  const today=new Date().toLocaleDateString('fr-FR');
+  const classe=esc(h.classe||'-');
+  const school=esc(h.etablissement||'NON RENSEIGNÉ');
+  const year=esc(h.annee_scolaire||h.annee||'-')+(isTO?' — TEST D\'ORIENTATION':'');
+  const matricule=esc(h.matricule||'-');
+  const d=new Date();
+  const today=String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()+' à '+d.getHours()+' h '+String(d.getMinutes()).padStart(2,'0');
   let totalWeighted=0;
   const rows=MATIERES.map(m=>{
     const d=(h.matieres||{})[m.id]||{};
-    const mgaVal=d.mga!=null?d.mga:null;
-    const mga=mgaVal!=null?fmtNum(Number(mgaVal),2):'—';
-    let bepc,bepcDisplay,bepcSum;
+    const rawMga=d.mga!=null?Number(d.mga):null;
+    const mgaVal=Number.isFinite(rawMga)?rawMga:null;
+    const mga=mgaVal!=null?fmtNum(mgaVal,2):'—';
+    let bepc=0,bepcDisplay='',hasData=false;
     if(m.anglais){
-      const ecrit=d.bepc_ecrit!=null?Number(d.bepc_ecrit):null;
-      const oral=d.bepc_oral!=null?Number(d.bepc_oral):null;
-      bepc=ecrit!=null&&oral!=null?(ecrit+oral)/2:0;
+      const rawEcrit=d.bepc_ecrit!=null?Number(d.bepc_ecrit):null;
+      const rawOral=d.bepc_oral!=null?Number(d.bepc_oral):null;
+      const ecrit=Number.isFinite(rawEcrit)?rawEcrit:null;
+      const oral=Number.isFinite(rawOral)?rawOral:null;
+      bepc=ecrit!=null&&oral!=null?(ecrit+oral)/2:(ecrit!=null?ecrit:0);
+      if(isTO) bepc=ecrit!=null?ecrit:0;
+      hasData=mgaVal!=null||ecrit!=null||oral!=null;
       const ecritS=ecrit!=null?fmtNum(ecrit,2):'—';
       const oralS=oral!=null?fmtNum(oral,2):'—';
-      bepcDisplay=`<div class="bp-dual"><span class="bp-dual-item">${ecritS}<small>Écrit</small></span><span class="bp-dual-link"></span><span class="bp-dual-item">${oralS}<small>Oral</small></span></div>`;
+      if(isTO){
+        bepcDisplay=`<span class="bp-pill bp-pill-bepc">${ecritS}</span>`;
+      }else{
+        bepcDisplay=`<div class="bp-dual"><span class="bp-dual-item">${ecritS}<small>Écrit</small></span><span class="bp-dual-link"></span><span class="bp-dual-item">${oralS}<small>Oral</small></span></div>`;
+      }
     }else{
-      const b=d.bepc!=null?Number(d.bepc):null;
+      const rawB=d.bepc!=null?Number(d.bepc):null;
+      const b=Number.isFinite(rawB)?rawB:null;
       bepc=b!=null?b:0;
+      hasData=mgaVal!=null||b!=null;
       bepcDisplay=`<span class="bp-pill bp-pill-bepc">${b!=null?fmtNum(b,2):'—'}</span>`;
     }
-    const sum=mgaVal!=null?Number(mgaVal)+bepc:bepc;
+    const sum=mgaVal!=null?mgaVal+bepc:bepc;
     const prod=sum*m.coef;
     totalWeighted+=prod;
-    const hasData=mgaVal!=null||(m.anglais?(d.bepc_ecrit!=null||d.bepc_oral!=null):(d.bepc!=null));
     const sumS=hasData?fmtNum(sum,2):'—';
     const prodS=hasData?fmtNum(prod,2):'—';
     return `<tr><td class="bp-matiere">${m.label}</td><td><span class="bp-pill">${mga}</span></td><td>${bepcDisplay}</td><td class="bp-sum">${sumS}</td><td><span class="bp-coef">${m.coef}</span></td><td class="bp-result">${prodS}</td></tr>`;
@@ -2381,9 +3239,9 @@ function buildBulletinHTML(h){
   else if(mo>0){mention='Très insuffisant';mCls='mention-fail';}
   return `<article class="bulletin-sheet">
 <div class="bp-tricolor"><span></span><span>SAPHIR <strong>&nbsp;Pro</strong>-Orientation en seconde</span><span></span></div>
-<header class="bp-header"><div class="bp-header-top"><div class="bp-brand"><div class="bp-brand-name">SAPHIR <span>Pro</span></div><div class="bp-brand-sub">Système d'Aide à l'Orientation Scolaire</div><div class="bp-brand-contact">0708109840 / 0152030622</div></div><div class="bp-state"><div class="bp-republique">République de Côte d'Ivoire</div><div class="bp-devise">Union - Discipline - Travail</div></div></div>
+<header class="bp-header"><div class="bp-header-top"><div class="bp-ministry"><span>Ministère de l'Éducation Nationale,</span><span>de l'Alphabétisation</span><span>et de l'Enseignement Technique</span></div><div class="bp-state"><div class="bp-republique">République de Côte d'Ivoire</div><div class="bp-devise">Union - Discipline - Travail</div></div></div>
 <div class="bp-header-rule"></div>
-<div class="bp-title-row"><div class="bp-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10 12 5l10 5-10 5L2 10Z"/><path d="M6 12.5V17c2.8 2.4 9.2 2.4 12 0v-4.5"/><path d="M22 10v6"/></svg></div><div><div class="bp-title">Calcul de la Moyenne d'Orientation</div><div class="bp-subtitle">Fiche individuelle de calcul de la moyenne d'orientation</div></div></div>
+<div class="bp-title-row"><div class="bp-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 10 12 5l10 5-10 5L2 10Z"/><path d="M6 12.5V17c2.8 2.4 9.2 2.4 12 0v-4.5"/><path d="M22 10v6"/></svg></div><div><div class="bp-title">Calcul de la Moyenne d'Orientation</div><div class="bp-subtitle">Fiche individuelle de calcul de la moyenne d'orientation</div></div>${isTO?'<span class="bp-to-badge">TO</span>':''}</div>
 </header>
 <div class="bp-content">
 <div class="bp-section-title"><span class="bp-section-num">1</span><span>Informations de l'élève</span><span class="bp-section-line"></span></div>
@@ -2394,31 +3252,36 @@ function buildBulletinHTML(h){
 <div class="bp-section-title"><span class="bp-section-num">3</span><span>Synthèse</span><span class="bp-section-line"></span></div>
 <div class="bp-summary"><div class="bp-summary-box bp-summary-total"><div class="bp-summary-label">Total général pondéré</div><div class="bp-total-value">${totalDisplay}</div><div class="bp-summary-sub"></div></div><div class="bp-summary-box bp-summary-mo ${moClass}"><div class="bp-summary-label">Moyenne d'orientation</div><div class="bp-mo-value"><span>${moDisplay}</span><small>/ 20</small></div><div class="bp-mention ${mCls}">${mention}</div></div></div>
 </div>
+<div class="bp-bottom-brand"><div class="bp-bottom-brand-line"></div><div class="bp-bottom-brand-name">SAPHIR <span>Pro</span></div><div class="bp-bottom-brand-sub">Système d'Aide à l'Orientation Scolaire</div><div class="bp-bottom-brand-contact">07 08 10 98 40 / 01 52 03 06 22</div></div>
 <footer class="bp-footer"><div>Édité via <strong>SAPHIR Pro</strong></div><div></div><div class="bp-footer-right"><div class="bp-footer-date">Document généré le <span>${today}</span></div></div></footer>
 <div class="bp-nonprofit">Projet à but non lucratif, développé pour accompagner les utilisateurs et leur offrir un service utile, sans recherche de profit financier.</div>
 </article>`;
 }
 
 async function printAllBulletins(){
-  if(!histData.length){toast('Aucun élève enregistré.',true);return;}
+  const yearFilter=document.getElementById('hist-year-select')?.value||'';
+  const items=yearFilter?histData.filter(h=>h.annee_scolaire===yearFilter&&h.matieres):histData.filter(h=>h.matieres);
+  if(!items.length){toast('Aucun bulletin à imprimer'+(yearFilter?' pour '+yearFilter:'')+'.',true);return;}
   const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
-  const pages=histData.filter(h=>h.matieres).map(h=>buildBulletinHTML(h)).join('');
+  const pages=items.map(h=>buildBulletinHTML(h)).join('');
   if(!pages){toast('Aucune donnée bulletin trouvée.',true);return;}
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
   win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Bulletins - SAPHIR Pro</title>
+<title>Bulletins — SAPHIR Pro</title>
 ${styles}
 <style>
   *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
   body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
-  .bulletin-sheet{page-break-after:always;margin:0;padding:0;}
+  .bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}
   .bulletin-sheet:last-child{page-break-after:auto;}
-  @page{size:A4 portrait;margin:8mm 10mm 8mm 12mm;}
-</style></head><body>${pages}</body></html>`);
+  @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
+</head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>{win.print();},600);
-  toast('Impression de '+histData.filter(h=>h.matieres).length+' bulletins...');
+  items.forEach(h=>{if(h.id)markPrinted(h.id);});
+  toast('Impression de '+items.length+' bulletin(s)...');
+  logActivity('Impression multiple','Bulletin',histData.filter(h=>h.matieres).length+' bulletins');
 }
 
 /* ════ BULLETIN A4 ════ */
@@ -2448,17 +3311,30 @@ function buildBulletin(){
   document.getElementById('bp-initials').textContent=bulletinInitials(name);
   document.getElementById('bp-class').textContent=bulletinField('mo-classe');
   document.getElementById('bp-school').textContent=bulletinField('mo-etablissement','NON RENSEIGNÉ');
-  document.getElementById('bp-year').textContent=bulletinField('mo-annee');
+  document.getElementById('bp-year').textContent=bulletinField('mo-annee_scolaire')+(_toMode?' — TEST D\'ORIENTATION':'');
   document.getElementById('bp-matricule').textContent=bulletinField('mo-matricule');
+  const titleEl=document.querySelector('#bulletin-print .bp-title');
+  if(titleEl) titleEl.textContent='Calcul de la Moyenne d\'Orientation';
+  const titleRow=document.querySelector('#bulletin-print .bp-title-row');
+  if(titleRow){
+    let existing=titleRow.querySelector('.bp-to-badge');
+    if(_toMode){
+      if(!existing){existing=document.createElement('span');existing.className='bp-to-badge';existing.textContent='TO';titleRow.appendChild(existing);}
+    }else{if(existing) existing.remove();}
+  }
 
   document.getElementById('bp-grades-body').innerHTML=MATIERES.map(m=>{
     let bepc;
     if(m.anglais){
-      bepc=`<div class="bp-dual">
-        <span class="bp-dual-item">${bulletinEntry(m.id+'_bepc_e')}<small>Écrit</small></span>
-        <span class="bp-dual-link" aria-hidden="true"></span>
-        <span class="bp-dual-item">${bulletinEntry(m.id+'_bepc_o')}<small>Oral</small></span>
-      </div>`;
+      if(_toMode){
+        bepc=`<span class="bp-pill bp-pill-bepc">${bulletinEntry(m.id+'_bepc_e')}</span>`;
+      } else {
+        bepc=`<div class="bp-dual">
+          <span class="bp-dual-item">${bulletinEntry(m.id+'_bepc_e')}<small>Écrit</small></span>
+          <span class="bp-dual-link" aria-hidden="true"></span>
+          <span class="bp-dual-item">${bulletinEntry(m.id+'_bepc_o')}<small>Oral</small></span>
+        </div>`;
+      }
     }else{
       bepc=`<span class="bp-pill bp-pill-bepc">${bulletinEntry(m.id+'_bepc')}</span>`;
     }
@@ -2494,18 +3370,22 @@ function buildBulletin(){
   mentionEl.textContent=lbl;
   mentionEl.className='bp-mention '+cls;
 
-  document.getElementById('bp-date').textContent=new Date().toLocaleDateString('fr-FR');
+  const d2=new Date();
+  document.getElementById('bp-date').textContent=String(d2.getDate()).padStart(2,'0')+'/'+String(d2.getMonth()+1).padStart(2,'0')+'/'+d2.getFullYear()+' à '+d2.getHours()+' h '+String(d2.getMinutes()).padStart(2,'0');
 }
 
 function printBulletin(){
+  const nom=document.getElementById('mo-nom')?.value?.trim()||'Élève';
+  const origTitle=document.title;
+  document.title='Bulletin — '+nom+' — SAPHIR Pro';
   buildBulletin();
-  setTimeout(()=>window.print(),60);
+  setTimeout(()=>{window.print();setTimeout(()=>{document.title=origTitle;},100);},60);
 }
 
 function loadBulletinPreview(){
   const sample={
     'mo-nom':'YAO LIESSOU ALEXANDRE','mo-matricule':'240101245U','mo-classe':'3ème 2',
-    'mo-annee':'2025-2026','mo-etablissement':'Lycée Moderne Abengourou',
+    'mo-annee_scolaire':'2025-2026','mo-etablissement':'Lycée Moderne Abengourou',
     'redaction_mga':'10','redaction_bepc':'10','maths_mga':'15','maths_bepc':'14',
     'pc_mga':'10','pc_bepc':'11','anglais_mga':'11','anglais_bepc_e':'8','anglais_bepc_o':'12'
   };
@@ -2570,16 +3450,17 @@ function fmtMO(n,dec){
   return `${integer},${decimal}`;
 }
 function exportPDF(){
-  // Vérifie que toutes les matières ont MGA + BEPC renseignés dans MO
   const missing=[];
   MATIERES.forEach(m=>{
     const mgaEl=document.getElementById(m.id+'_mga');
     if(!mgaEl||mgaEl.value==='') missing.push(m.label+' → MA');
     if(m.anglais){
       const be=document.getElementById(m.id+'_bepc_e');
-      const bo=document.getElementById(m.id+'_bepc_o');
       if(!be||be.value==='') missing.push(m.label+' → BEPC Écrit');
-      if(!bo||bo.value==='') missing.push(m.label+' → BEPC Oral');
+      if(!_toMode){
+        const bo=document.getElementById(m.id+'_bepc_o');
+        if(!bo||bo.value==='') missing.push(m.label+' → BEPC Oral');
+      }
     } else {
       const bepcEl=document.getElementById(m.id+'_bepc');
       if(!bepcEl||bepcEl.value==='') missing.push(m.label+' → BEPC');
@@ -2588,7 +3469,90 @@ function exportPDF(){
   if(missing.length>0){
     toast('Note manquante : '+missing[0],true);return;
   }
-  buildBulletin();saveToHistory();window.print();toast('PDF exporté et enregistré ✔');
+  buildBulletin();
+  const nom=document.getElementById('mo-nom')?.value?.trim()||'Élève';
+  const origTitle=document.title;
+  document.title='Bulletin — '+nom+' — SAPHIR Pro';
+  saveToHistory().then(id=>{
+    if(id){
+      markPrinted(id);
+      window.print();
+      toast('PDF exporté et enregistré ✔');
+      logActivity('Export PDF','Calcul MO','Export depuis formulaire');
+      sendNotification('PDF exporté','Bulletin téléchargé depuis le formulaire','info');
+      setTimeout(()=>{document.title=origTitle;},100);
+    } else {
+      toast('Enregistrement échoué. PDF non imprimé.',true);
+    }
+  });
+}
+
+/* ════ APERÇU BULLETIN DEPUIS FORMULAIRE MO ════ */
+function previewMO(){
+  const missing=[];
+  MATIERES.forEach(m=>{
+    const mgaEl=document.getElementById(m.id+'_mga');
+    if(!mgaEl||mgaEl.value==='') missing.push(m.label+' → MA');
+    if(m.anglais){
+      const be=document.getElementById(m.id+'_bepc_e');
+      if(!be||be.value==='') missing.push(m.label+' → BEPC Écrit');
+      if(!_toMode){
+        const bo=document.getElementById(m.id+'_bepc_o');
+        if(!bo||bo.value==='') missing.push(m.label+' → BEPC Oral');
+      }
+    } else {
+      const bepcEl=document.getElementById(m.id+'_bepc');
+      if(!bepcEl||bepcEl.value==='') missing.push(m.label+' → BEPC');
+    }
+  });
+  if(missing.length>0){toast('Note manquante : '+missing[0],true);return;}
+  buildBulletin();
+  saveToHistory().then(id=>{
+    if(id){
+      markPrinted(id);
+      const page=document.getElementById('bulletin-print').innerHTML;
+      const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+      const nom=esc((document.getElementById('mo-nom')?.value||'Élève').trim());
+      const win=window.open('','_blank','width=900,height=700');
+      if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+      win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Aperçu — ${nom} — SAPHIR Pro</title>
+${styles}
+<style>
+  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:#e8ece9;font-family:'Ebrima','Segoe UI',Arial,sans-serif;width:100%;height:100%;}
+  .preview-toolbar{position:fixed;top:0;left:0;right:0;background:#064E3B;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .preview-toolbar-title{font-size:.9rem;font-weight:700;}
+  .preview-toolbar-btn{background:#fff;color:#064E3B;border:none;padding:8px 16px;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+  .preview-toolbar-btn:hover{background:#F4FAF7;}
+  .preview-page-wrap{display:flex;justify-content:center;padding:60px 16px 24px;min-height:100vh;}
+  .preview-a4{width:210mm;min-height:297mm;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.18);padding:4mm 10mm 1mm 12mm;overflow:hidden;}
+  .bulletin-sheet{width:100%;margin:0;padding:0;max-height:297mm;overflow:hidden;box-shadow:none;border:none;background:transparent;}
+  .bulletin-sheet .bp-header{box-shadow:none;border:1px solid #dfe7e2;border-top:0;}
+  .bulletin-sheet .bp-table-wrap{border:1px solid #bdcdc4;}
+  @media print{
+    html,body{margin:0;padding:0;background:#fff;width:auto;height:auto;}
+    .preview-toolbar{display:none!important;}
+    .preview-page-wrap{padding:0;margin:0;display:block;}
+    .preview-a4{width:100%;min-height:auto;padding:0;box-shadow:none;background:transparent;}
+    .bulletin-sheet{width:100%;margin:0;box-shadow:none;}
+    @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
+  }
+</head><body>
+<div class="preview-toolbar">
+  <span class="preview-toolbar-title">Aperçu du bulletin — ${nom}</span>
+  <button class="preview-toolbar-btn" onclick="window.print()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Imprimer / PDF</button>
+</div>
+<div class="preview-page-wrap">
+  <div class="preview-a4">${page}</div>
+</div>
+</body></html>`);
+      win.document.close();
+      logActivity('Aperçu PDF','Calcul MO',nom);
+    } else {
+      toast('Enregistrement échoué. Aperçu non généré.',true);
+    }
+  });
 }
 
 function toast(msg,isErr=false){
@@ -2602,18 +3566,39 @@ function toast(msg,isErr=false){
 
 /* ── ROLE-BASED UI ── */
 function doLogout(){
-  localStorage.removeItem('saphir_role');
-  localStorage.removeItem('saphir_pwd');
+  const sid=localStorage.getItem('saphir_session_id');
+  logActivity('Déconnexion','Authentification','Déconnexion utilisateur');
+  fetch(API+'/api/logout',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({session_id:sid?parseInt(sid):0})}).catch(()=>{});
+  localStorage.removeItem('saphir_session_id');
+  localStorage.removeItem('saphir_email');
+  document.cookie='saphir_session_id=; path=/; max-age=0';
   window.location.href='/login';
 }
 function applyRole(){
-  const role=localStorage.getItem('saphir_role');
-  if(role&&role!=='admin'){
+  const isWeb=location.hostname!=='localhost'&&location.hostname!=='127.0.0.1';
+  if(_role&&_role!=='admin'){
     const nav=document.getElementById('nav-hist');
     const page=document.getElementById('page-hist');
     if(nav){nav.style.display='none';nav.removeAttribute('onclick');}
     if(page){page.style.display='none';}
     if(page&&page.classList.contains('active')) showPage('mo');
+    const navUsers=document.getElementById('nav-users');
+    const sepUsers=document.getElementById('nav-sep-users');
+    if(navUsers) navUsers.style.display='none';
+    if(sepUsers) sepUsers.style.display='none';
+    const bell=document.getElementById('notif-bell');
+    if(bell) bell.style.display='none';
+    const msgBtn=document.getElementById('msg-history-btn');
+    if(msgBtn) msgBtn.style.display='none';
+  } else {
+    const navUsers=document.getElementById('nav-users');
+    const sepUsers=document.getElementById('nav-sep-users');
+    if(navUsers) navUsers.style.display=isWeb?'':'none';
+    if(sepUsers) sepUsers.style.display=isWeb?'':'none';
+    const bell=document.getElementById('notif-bell');
+    if(bell) bell.style.display='flex';
+    const msgBtn=document.getElementById('msg-history-btn');
+    if(msgBtn) msgBtn.style.display='flex';
   }
 }
 
@@ -2625,6 +3610,686 @@ function setVH(){
 setVH();
 window.addEventListener('resize',setVH);
 
+/* ════ UTILISATEURS ════ */
+let _sessionId=parseInt(localStorage.getItem('saphir_session_id')||'0',10);
+let _allSessions=[];
+let _knownDevices=[];
+let _bannedUsers=[];
+let _actBulletinData=[];
+
+function toggleEtabList(inputId, abgId, toggleId){
+  const input=document.getElementById(inputId);
+  const abg=document.getElementById(abgId);
+  const toggle=document.getElementById(toggleId);
+  if(!input) return;
+  const isActive=input.getAttribute('list');
+  if(isActive){
+    input.removeAttribute('list');
+    if(abg) abg.classList.remove('active');
+    if(toggle) toggle.classList.remove('active');
+  }else{
+    input.setAttribute('list','etablissement-list');
+    if(abg) abg.classList.add('active');
+    if(toggle) toggle.classList.add('active');
+    input.focus();
+  }
+}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+let _lastNotifId=0;
+let _notifPoll=null;
+function requestNotifPermission(){
+  if('Notification' in window && Notification.permission==='default'){
+    Notification.requestPermission();
+  }
+}
+function pushBrowserNotif(title,body){
+  if('Notification' in window && Notification.permission==='granted'){
+    try{new Notification(title,{body:body,icon:'saphir.ico',tag:'saphir-'+Date.now()});}catch(e){}
+  }
+}
+function sendNotification(titre,message,type){
+  const n={id:Date.now(),titre,message,type:type||'info',lu:0,created_at:new Date().toISOString()};
+  try{const arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');arr.unshift(n);if(arr.length>50)arr.length=50;localStorage.setItem('saphir_notifs',JSON.stringify(arr));}catch(e){}
+  fetch(API+'/api/notifications',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',
+    body:JSON.stringify({titre,message,type:type||'info'})
+  }).then(r=>{if(r.ok) loadNotifications();}).catch(()=>{loadNotifications();});
+}
+
+function logActivity(action,module,detail,resultat){
+  fetch(API+'/api/log-activity',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',
+    body:JSON.stringify({action,module,detail,resultat,session_id:_sessionId})
+  }).catch(()=>{});
+}
+
+async function loadUsers(){
+  try{
+    const [r,rd,rb]=await Promise.all([
+      fetch(API+'/api/sessions',{credentials:'same-origin'}),
+      fetch(API+'/api/known-devices',{credentials:'same-origin'}).catch(()=>({ok:false,json:()=>Promise.resolve([])})),
+      fetch(API+'/api/banned-users',{credentials:'same-origin'}).catch(()=>({ok:false,json:()=>Promise.resolve([])}))
+    ]);
+    if(!r.ok) return;
+    _allSessions=await r.json();
+    _knownDevices=rd.ok?await rd.json():[];
+    _bannedUsers=rb.ok?await rb.json():[];
+    renderUsers(_allSessions);
+    renderKnownDevices();
+  }catch(e){}
+}
+
+/* ════ SSE (Server-Sent Events) — Real-time updates ════ */
+let _sseSource=null;
+let _sseReconnectTimer=null;
+let _sseFallbackTimer=null;
+let _sseConnected=false;
+const _sseEventLabels={
+  login_success:'🟢 Nouvelle connexion',
+  login_failed:'🔴 Tentative échouée',
+  logout:'⚪ Déconnexion',
+  unknown_device:'🟠 Nouvel appareil détecté',
+  device_trusted:'🟢 Appareil marqué fiable',
+  device_removed:'🟠 Appareil retiré des fiables',
+  session_kicked:'🔴 Session déconnectée',
+  user_banned:'🔴 Utilisateur banni',
+  user_unbanned:'🟢 Utilisateur débanni',
+  session_deleted:'🔴 Session supprimée',
+  sessions_cleared:'🔴 Historique vidé',
+  new_message:'💬 Message reçu'
+};
+const _sseToastColors={
+  login_success:'#064E3B',login_failed:'#B42318',logout:'#6B7280',
+  unknown_device:'#A85B00',device_trusted:'#064E3B',device_removed:'#A85B00',
+  session_kicked:'#B42318',user_banned:'#B42318',user_unbanned:'#064E3B',
+  session_deleted:'#D92D20',sessions_cleared:'#D92D20',new_message:'#064E3B'
+};
+
+function _sseUpdateTimestamp(){
+  const el=document.getElementById('users-sse-timestamp');
+  if(el) el.textContent='Dernière mise à jour : '+new Date().toLocaleTimeString('fr-FR');
+}
+
+function _sseShowToast(type,message){
+  const label=_sseEventLabels[type]||type;
+  const color=_sseToastColors[type]||'#064E3B';
+  const c=document.createElement('div');
+  c.style.cssText='position:fixed;bottom:20px;right:20px;z-index:10000;background:#fff;border-left:4px solid '+color+';border-radius:8px;padding:10px 16px;box-shadow:0 4px 20px rgba(0,0,0,.15);font-size:.78rem;color:#1a3a2e;display:flex;align-items:center;gap:8px;max-width:360px;animation:fadeUp .3s ease;transition:opacity .3s;';
+  c.innerHTML='<strong style="white-space:nowrap;">'+label+'</strong><span style="color:#60736D;">'+esc(message)+'</span>';
+  document.body.appendChild(c);
+  setTimeout(()=>{c.style.opacity='0';setTimeout(()=>c.remove(),300);},4000);
+}
+
+function _sseOnEvent(data){
+  try{
+    const evt=JSON.parse(data);
+    const type=evt.type||'';
+    const msg=evt.message||'';
+    /* Handle new_message for students */
+    if(type==='new_message'&&evt.recipient){
+      const myEmail=localStorage.getItem('saphir_email')||'';
+      if(evt.recipient.toLowerCase()===myEmail.toLowerCase()){
+        showMsgDialog({id:evt.id,sender:evt.sender,message:evt.message,created_at:new Date().toLocaleString('fr-FR')});
+      }
+    }
+    /* Show toast notification */
+    _sseShowToast(type,msg);
+    /* Refresh users page if visible — debounced to avoid losing checkboxes */
+    _sseRefreshDebounced();
+  }catch(e){console.error('SSE parse error:',e);}
+}
+
+let _sseRefreshTimer=null;
+function _sseRefreshDebounced(){
+  if(_sseRefreshTimer) clearTimeout(_sseRefreshTimer);
+  _sseRefreshTimer=setTimeout(()=>{
+    _sseRefreshTimer=null;
+    const page=document.getElementById('page-users');
+    if(!page||!page.classList.contains('active')) return;
+    const wrap=document.querySelector('.users-table-wrap');
+    const scrollLeft=wrap?wrap.scrollLeft:0;
+    const scrollTop=wrap?wrap.scrollTop:0;
+    const selected=[];
+    document.querySelectorAll('.users-cb:checked:not(:disabled)').forEach(cb=>selected.push(cb.value));
+    loadUsers().then(()=>{
+      if(wrap){wrap.scrollLeft=scrollLeft;wrap.scrollTop=scrollTop;}
+      selected.forEach(id=>{
+        const cb=document.querySelector('.users-cb[value="'+id+'"]:not(:disabled)');
+        if(cb){cb.checked=true;}
+      });
+      updateDeleteBtn();
+      _sseUpdateTimestamp();
+    });
+  },1500);
+}
+
+function _sseConnect(){
+  if(_sseSource){try{_sseSource.close();}catch(e){}}
+  if(_sseFallbackTimer){clearInterval(_sseFallbackTimer);_sseFallbackTimer=null;}
+  try{
+    _sseSource=new EventSource(API+'/api/admin/events/stream',{withCredentials:true});
+    _sseSource.onopen=()=>{_sseConnected=true;};
+    _sseSource.onmessage=(e)=>{if(e.data&&e.data!==': ok'&&e.data!==': keepalive') _sseOnEvent(e.data);};
+    _sseSource.onerror=()=>{
+      _sseConnected=false;
+      _sseSource.close();
+      _sseSource=null;
+      /* Fallback: poll every 8s */
+      _sseStartFallback();
+    };
+  }catch(e){
+    _sseStartFallback();
+  }
+}
+
+function _sseStartFallback(){
+  if(_sseFallbackTimer) return;
+  _sseFallbackTimer=setInterval(()=>{
+    const page=document.getElementById('page-users');
+    if(page&&page.classList.contains('active')){
+      loadUsers().then(()=>_sseUpdateTimestamp());
+    }
+  },8000);
+}
+
+function _sseStart(){
+  if(_role!=='admin') return;
+  _sseConnect();
+  /* Also start fallback polling as safety net */
+  _sseStartFallback();
+}
+
+function _sseStop(){
+  if(_sseSource){try{_sseSource.close();}catch(e){}_sseSource=null;}
+  if(_sseReconnectTimer){clearTimeout(_sseReconnectTimer);_sseReconnectTimer=null;}
+  if(_sseFallbackTimer){clearInterval(_sseFallbackTimer);_sseFallbackTimer=null;}
+}
+
+/* Restart SSE when showPage('users') is called */
+const _origShowPage=showPage;
+showPage=function(id){
+  _origShowPage(id);
+  if(id==='users'&&!_sseConnected) _sseConnect();
+};
+
+function renderKnownDevices(){
+  const container=document.getElementById('users-devices-list');
+  const countEl=document.getElementById('users-devices-count');
+  const section=document.getElementById('users-devices-section');
+  if(!container||!section){return;}
+  section.style.display='block';
+  const knownMap={};
+  _knownDevices.forEach(d=>{knownMap[d.fingerprint]=d;});
+  const deviceMap={};
+  function _stableFingerprint(os,nav,device){
+    const key=(os||'Inconnu')+'|'+(nav||'Inconnu')+'|'+(device||'Ordinateur');
+    let h=0x811c9dc5;
+    for(let i=0;i<key.length;i++){h^=key.charCodeAt(i);h=(h*0x01000193)>>>0;}
+    return h.toString(16).padStart(8,'0').substring(0,16);
+  }
+  _allSessions.forEach(s=>{
+    const fp=_stableFingerprint(s.os,s.navigateur,s.appareil);
+    if(!fp) return;
+    if(!deviceMap[fp]){
+      deviceMap[fp]={fingerprint:fp,label:s.appareil||'',os:s.os||'',navigateur:s.navigateur||'',ip:s.ip||'',kd:knownMap[fp]||null,sessions:[]};
+    }
+    deviceMap[fp].sessions.push(s);
+  });
+  const devices=Object.values(deviceMap);
+  if(!devices.length){
+    countEl.textContent='0 appareil(s)';
+    container.innerHTML='<div class="users-devices-empty">Aucun appareil connecté</div>';
+    return;
+  }
+  countEl.textContent=devices.length+' appareil'+(devices.length>1?'s':'');
+  const unknownCount=devices.filter(d=>!d.kd||!d.kd.trusted).length;
+  const alertEl=document.getElementById('users-devices-alert');
+  const alertText=document.getElementById('users-devices-alert-text');
+  if(unknownCount>0){alertEl.style.display='flex';alertText.textContent=unknownCount+' appareil'+(unknownCount>1?'s':'')+' inconnu'+(unknownCount>1?'s':'')+' détecté'+(unknownCount>1?'s':'');}
+  else{alertEl.style.display='none';}
+  container.innerHTML=devices.map((d,idx)=>{
+    const kd=d.kd;
+    const trusted=kd?Number(kd.trusted):0;
+    const isCurrent=d.sessions.some(s=>s.id===_sessionId);
+    let badge='';
+    if(isCurrent){
+      badge=`<span class="users-device-badge users-device-current" title="Cet appareil est en cours d'utilisation">&#9679; Cet appareil</span>`;
+    }else if(kd){
+      badge=trusted
+        ?'<span class="users-device-badge users-device-trusted">&#10003; Fiable</span>'
+        :'<span class="users-device-badge users-device-untrusted">&#9888; Inconnu</span>';
+    }else{
+      badge='<span class="users-device-badge users-device-untrusted">&#9888; Nouvel appareil</span>';
+    }
+    let actions='';
+    if(kd){
+      const trustLabel=trusted?'Retirer des appareils fiables':'Marquer comme fiable';
+      if(trusted){
+        actions=`
+          <button class="users-trust-btn users-trust-remove" onclick="toggleDeviceTrust(${kd.id},0)" title="Retirer des appareils fiables"><svg viewBox="0 0 24 24"><path d="M19.69 14a6.9 6.9 0 0 0 .31-2V5l-8-3-3.16 1.18"/><path d="M4.73 4.73L4 5v7c0 6 8 10 8 10a20.29 20.29 0 0 0 5.62-4.38"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>`;
+      }else{
+        actions=`
+          <button class="users-trust-btn users-trust-add" onclick="toggleDeviceTrust(${kd.id},1)" title="Marquer comme fiable"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></button>`;
+      }
+      actions+=`<button class="btn-icon-danger" onclick="deleteKnownDevice(${kd.id})" title="Supprimer cet appareil connu" style="width:36px;height:36px;"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
+    }else{
+      actions=`<button class="users-trust-btn users-trust-add" onclick="trustNewDevice('${d.fingerprint}','${(d.label||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer comme fiable"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></button>`;
+    }
+    const uniqueEmails=[...new Set(d.sessions.map(s=>s.email||'').filter(Boolean))];
+    let detailLine='';
+    if(uniqueEmails.length===1){
+      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${esc(uniqueEmails[0])}</div>`;
+    }else if(uniqueEmails.length>1){
+      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${uniqueEmails.length} utilisateurs associés <span class="users-device-detail-link" onclick="showDeviceUsers(${idx})">Voir</span></div>`;
+    }else{
+      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · Session active</div>`;
+    }
+    return `<div class="users-device-card">
+      <div class="users-device-info">
+        <div class="users-device-label">${esc(d.label||'Appareil inconnu')} ${badge}</div>
+        ${detailLine}
+      </div>
+      <div class="users-device-actions">${actions}</div>
+    </div>`;
+  }).join('');
+  window._deviceUsersMap=devices.map(d=>[...new Set(d.sessions.map(s=>s.email||'').filter(Boolean))]);
+}
+
+function showDeviceUsers(idx){
+  const emails=window._deviceUsersMap?window._deviceUsersMap[idx]:[];
+  if(!emails||!emails.length)return;
+  const list=emails.map(e=>'<div style="padding:6px 0;border-bottom:1px solid #eef3f0;font-size:.8rem;color:#003b32;">'+esc(e)+'</div>').join('');
+  const modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:9999;';
+  modal.innerHTML=`<div style="background:#fff;border-radius:12px;padding:20px 24px;min-width:280px;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.18);">
+    <div style="font-size:.88rem;font-weight:700;color:#003b32;margin-bottom:12px;">Utilisateurs associés</div>
+    <div style="max-height:240px;overflow-y:auto;">${list}</div>
+    <div style="text-align:right;margin-top:14px;"><button onclick="this.closest('div[style*=fixed]').remove()" style="padding:6px 16px;border-radius:8px;border:1px solid #B8CEC3;background:#fff;color:#064E3B;font-size:.8rem;font-weight:600;cursor:pointer;">Fermer</button></div>
+  </div>`;
+  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
+  document.body.appendChild(modal);
+}
+
+function renderUsers(sessions){
+  const tb=document.getElementById('users-tbody');
+  const ct=document.getElementById('users-count');
+  if(!sessions.length){
+    ct.textContent='Aucune session enregistrée';
+    tb.innerHTML='<tr><td colspan="11" class="users-empty-state">Aucune session enregistrée<div class="users-empty-sub">Les connexions des utilisateurs apparaîtront ici.</div></td></tr>';
+    return;
+  }
+  const n=sessions.length;
+  ct.textContent=n+' session'+(n>1?'s':'')+' enregistrée'+(n>1?'s':'');
+  const knownMap={};
+  _knownDevices.forEach(d=>{knownMap[d.fingerprint]=d;});
+  function _stableFingerprint(os,nav,device){
+    const key=(os||'Inconnu')+'|'+(nav||'Inconnu')+'|'+(device||'Ordinateur');
+    let h=0x811c9dc5;
+    for(let i=0;i<key.length;i++){h^=key.charCodeAt(i);h=(h*0x01000193)>>>0;}
+    return h.toString(16).padStart(8,'0').substring(0,16);
+  }
+  tb.innerHTML=sessions.map(s=>{
+    const logoutAt=s.logout_at||'';
+    const isOnline=!logoutAt;
+    const loginDisplay=(s.login_at||'').replace('T',' ').substring(0,16);
+    const logoutDisplay=logoutAt?logoutAt.replace('T',' ').substring(0,16):'—';
+    const roleLabel=s.role==='admin'?'Admin':'Élève';
+    const roleCls=s.role==='admin'?'users-role-admin':'users-role-student';
+    const rawEmail=s.email||'';
+    const email=rawEmail||'—';
+    const isBanned=_bannedUsers.some(b=>b.email&&rawEmail&&b.email.toLowerCase()===rawEmail.toLowerCase());
+    const isSelf=s.id===_sessionId;
+    let statutLabel,statutCls;
+    if(isBanned){statutLabel='Banni';statutCls='users-statut-banned';}
+    else if(isOnline){statutLabel='En ligne';statutCls='users-statut-online';}
+    else{statutLabel='Déconnecté';statutCls='users-statut-offline';}
+    const ville=(s.ville||'—').replace(/Ivoiry Coast|Ivory Coast/g,'Côte d\'Ivoire');
+    const fp=_stableFingerprint(s.os,s.navigateur,s.appareil);
+    const kd=knownMap[fp];
+    const isCurrentSession=(s.id===_sessionId);
+    let badge='';
+    if(isCurrentSession){
+      badge='<span class="users-device-badge users-device-current" title="Votre session active">&#9679; Cet appareil</span>';
+    }else if(kd){
+      badge=Number(kd.trusted)
+        ?'<span class="users-device-badge users-device-trusted" title="Appareil fiable">&#10003; Fiable</span>'
+        :'<span class="users-device-badge users-device-untrusted" title="Appareil non fiable">&#9888; Inconnu</span>';
+    }else{
+      badge='<span class="users-device-badge users-device-untrusted" title="Nouvel appareil détecté">&#9888; Nouvel appareil</span>';
+    }
+    const emailLabel=email;
+    const disconnectBtn=isOnline?`<button class="users-btn-disconnect" onclick="disconnectUser(${s.id},'${esc(email).replace(/'/g,"\\'")}')" title="Déconnecter cette session"><svg viewBox="0 0 24 24"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg></button>`:'';
+    const showBan=!isSelf;
+    const showDelete=!isSelf||isOnline;
+    const showMsg=!!rawEmail&&!isSelf;
+    const hasDropdown=showBan||showDelete||showMsg;
+    let dropdownHTML='';
+    if(hasDropdown){
+      let items='';
+      if(showMsg) items+=`<button class="dd-msg" onclick="openMsgModal('${esc(rawEmail).replace(/'/g,"\\'")}')" title="Envoyer un message"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Message</button>`;
+      if(showBan) items+=`<button class="dd-ban" onclick="banUser(${s.id},'${esc(email).replace(/'/g,"\\'")}')" title="Bannir cet utilisateur"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Bannir</button>`;
+      if(showDelete) items+=`<button class="dd-delete" onclick="deleteSession(${s.id})" title="Supprimer cette session"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>Supprimer</button>`;
+      dropdownHTML=`<div class="users-actions-wrap">
+        <button class="users-actions-more" onclick="event.stopPropagation();toggleDropdown(this)" title="Plus d'actions">&#8943;</button>
+        <div class="users-actions-dropdown">${items}</div>
+      </div>`;
+    }
+    return `<tr title="${email} | ${s.os||''} | ${s.navigateur||''} | ${s.ip||''}">
+      <td style="text-align:center;"><input type="checkbox" class="users-cb${isSelf?' users-cb-self':''}" value="${s.id}" ${isSelf?'disabled title="Votre session active"':''} onchange="updateDeleteBtn()"></td>
+      <td title="${email}">${esc(emailLabel)}</td>
+      <td><span class="users-role-badge ${roleCls}">${roleLabel}</span></td>
+      <td title="${s.appareil||''}">${s.appareil||'—'} ${badge}</td>
+      <td><span class="users-statut-badge ${statutCls}">${statutLabel}</span></td>
+      <td title="${ville}">${ville}</td>
+      <td style="font-family:monospace;font-size:.72rem;" title="${s.ip||''}">${s.ip||'—'}</td>
+      <td style="font-size:.72rem;">${loginDisplay}</td>
+      <td style="font-size:.72rem;">${logoutDisplay}</td>
+      <td>
+        <div class="users-actions-cell">
+          ${disconnectBtn}
+          <button class="users-act-btn" onclick="showUserActivities(${s.id},'${email.replace(/'/g,"\\'")}')" title="Voir les activités"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button>
+          ${dropdownHTML}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleDeviceTrust(deviceId, trusted) {
+  if(trusted && !confirm('Voulez-vous vraiment marquer cet appareil comme fiable ?')) return;
+  if(!trusted && !confirm('Voulez-vous vraiment retirer cet appareil des appareils fiables ?')) return;
+  const action = trusted ? 'trust' : 'untrust';
+  const label = trusted ? 'fiable' : 'non reconnu';
+  toast('Mise à jour en cours…');
+  fetch(API + '/api/known-devices/' + deviceId + '/' + action, {
+    method: 'POST', credentials: 'same-origin'
+  }).then(r => r.json().catch(()=>({})).then(data => {
+    if (r.ok) {
+      toast('Appareil marqué comme ' + label + ' ✔');
+      sendNotification('Sécurité', 'Appareil marqué comme ' + label, 'info');
+      loadUsers();
+    } else {
+      toast('Erreur : ' + (data.error || r.status));
+    }
+  })).catch(e => { toast('Erreur réseau'); });
+}
+
+function trustNewDevice(fingerprint, label) {
+  if(!confirm('Voulez-vous vraiment marquer cet appareil comme fiable ?')) return;
+  toast('Enregistrement en cours…');
+  fetch(API + '/api/known-devices', {
+    method: 'POST', credentials: 'same-origin',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({fingerprint: fingerprint, label: label, trusted: 1})
+  }).then(r => r.json().catch(()=>({})).then(data => {
+    if (r.ok) {
+      toast('Appareil marqué comme fiable ✔');
+      sendNotification('Sécurité', 'Nouvel appareil enregistré : ' + (label || 'inconnu'), 'success');
+      loadUsers();
+    } else {
+      toast('Erreur : ' + (data.error || r.status));
+    }
+  })).catch(e => { toast('Erreur réseau'); });
+}
+
+function deleteKnownDevice(deviceId) {
+  if(!confirm('Voulez-vous vraiment supprimer cet appareil connu ? Cette action est irréversible.')) return;
+  toast('Suppression…');
+  fetch(API + '/api/known-devices/' + deviceId, {
+    method: 'DELETE', credentials: 'same-origin'
+  }).then(r => r.json().catch(()=>({})).then(data => {
+    if (r.ok) {
+      toast('Appareil supprimé ✔');
+      loadUsers();
+    } else {
+      toast('Erreur : ' + (data.error || r.status));
+    }
+  })).catch(e => { toast('Erreur réseau'); });
+}
+
+function filterUsers(){
+  const q=(document.getElementById('users-search').value||'').toLowerCase();
+  const roleF=document.getElementById('users-filter-role').value;
+  const devF=document.getElementById('users-filter-device').value;
+  const stF=document.getElementById('users-filter-status').value;
+  let filtered=_allSessions.filter(s=>{
+    if(roleF&&s.role!==roleF) return false;
+    if(devF&&(s.appareil||'')!==devF) return false;
+    if(stF==='online'&&s.logout_at) return false;
+    if(stF==='offline'&&!s.logout_at) return false;
+    if(q){
+      const hay=((s.email||'')+(s.ip||'')+(s.os||'')+(s.navigateur||'')+(s.appareil||'')+(s.role||'')+(s.ville||'')).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+  renderUsers(filtered);
+}
+
+function toggleSelectAll(cb){
+  document.querySelectorAll('.users-cb:not(:disabled)').forEach(c=>{c.checked=cb.checked;});
+  updateDeleteBtn();
+}
+
+function updateDeleteBtn(){
+  const n=document.querySelectorAll('.users-cb:checked').length;
+  const btn=document.getElementById('users-delete-selected');
+  if(btn) btn.style.display=n>0?'':'none';
+}
+
+function getSelectedUserIds(){
+  return Array.from(document.querySelectorAll('.users-cb:checked')).map(c=>parseInt(c.value));
+}
+
+async function deleteSession(id){
+  if(id===_sessionId){toast('Impossible de supprimer votre session active.',true);return;}
+  if(!confirm('Supprimer cette session ?')) return;
+  toast('Suppression…');
+  try{
+    const r=await fetch(API+'/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});
+    const data=await r.json().catch(()=>({}));
+    if(r.ok){toast('Session supprimée ✔');loadUsers();}
+    else{toast('Erreur : '+(data.error||r.status));}
+  }catch(e){toast('Erreur réseau');}
+}
+
+async function deleteSelectedUsers(){
+  const ids=getSelectedUserIds().filter(id=>id!==_sessionId);
+  if(!ids.length){toast('Aucune session supprimable (session active exclue).',true);return;}
+  const skipped=getSelectedUserIds().length-ids.length;
+  if(!confirm('Supprimer '+ids.length+' session(s) sélectionnée(s) ?'+(skipped?' La session active sera conservée.':'')+' Cette action est irréversible.')) return;
+  for(const id of ids){
+    try{await fetch('/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});}catch(e){}
+  }
+  toast(ids.length+' session(s) supprimée(s)'+(skipped?' (session active conservée)':''));
+  await loadUsers();
+}
+
+async function clearAllUsers(){
+  const ids=_allSessions.map(s=>s.id).filter(id=>id!==_sessionId);
+  if(!ids.length){toast('Aucune autre session à supprimer.',true);return;}
+  if(!confirm('Supprimer '+ids.length+' session(s) ?\nVotre session active sera conservée.\nCette action est irréversible.')) return;
+  for(const id of ids){
+    try{await fetch('/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});}catch(e){}
+  }
+  toast(ids.length+' session(s) supprimée(s) (session active conservée)');
+  await loadUsers();
+}
+
+async function disconnectUser(id,email){
+  if(!confirm('Voulez-vous vraiment déconnecter cet utilisateur ?')) return;
+  toast('Déconnexion en cours…');
+  try{
+    const r=await fetch(API+'/api/sessions/'+id+'/disconnect',{method:'POST',credentials:'same-origin'});
+    const data=await r.json().catch(()=>({}));
+    if(r.ok){
+      toast('Utilisateur déconnecté ✔');
+      logActivity('Déconnexion forcée','Sécurité','Utilisateur déconnecté : '+email,'succes');
+      loadUsers();
+    }else{toast('Erreur : '+(data.error||r.status),true);}
+  }catch(e){toast('Erreur réseau',true);}
+}
+
+async function banUser(id,email){
+  if(id===_sessionId){toast('Vous ne pouvez pas vous bannir vous-même.',true);return;}
+  const motif=prompt('Motif du bannissement (optionnel) :');
+  if(motif===null) return;
+  if(!confirm('Attention : cette action va bannir définitivement cet utilisateur.\nIl ne pourra plus accéder à l\'application.\nVoulez-vous continuer ?')) return;
+  if(!confirm('Dernière confirmation : bannir '+email+' définitivement ?')) return;
+  toast('Bannissement en cours…');
+  try{
+    const r=await fetch(API+'/api/sessions/'+id+'/ban',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({email,motif})});
+    const data=await r.json().catch(()=>({}));
+    if(r.ok){
+      toast(email+' a été banni ✔');
+      logActivity('Bannissement définitif','Sécurité',email+(motif?' — Motif : '+motif:''),'succes');
+      sendNotification('Sécurité',email+' a été banni définitivement','warning');
+      loadUsers();
+    }else{toast('Erreur : '+(data.error||r.status),true);}
+  }catch(e){toast('Erreur réseau',true);}
+}
+
+async function showUserActivities(sessionId,email){
+  const panel=document.getElementById('users-activity-panel');
+  const title=document.getElementById('users-activity-title');
+  const list=document.getElementById('users-activity-list');
+  _actBulletinData=[];
+  title.textContent='Activités — '+(email||'Session #'+sessionId);
+  panel.style.display='block';
+  list.innerHTML='<div class="users-empty-state">Chargement...</div>';
+  try{
+    const r=await fetch(API+'/api/sessions/'+sessionId+'/activities',{credentials:'same-origin'});
+    if(!r.ok){list.innerHTML='<div class="users-empty-state">Erreur de chargement</div>';return;}
+    const logs=await r.json();
+    if(!logs.length){list.innerHTML='<div class="users-empty-state">Aucune activité enregistrée<div class="users-empty-sub">Les actions de cet utilisateur apparaîtront ici.</div></div>';return;}
+    list.innerHTML=logs.map(l=>{
+      const dateStr=(l.created_at||'').replace('T',' ').substring(0,16);
+      const resCls=l.resultat==='succes'?'ok':'fail';
+      const resLabel=l.resultat==='succes'?'Succès':'Échec';
+      let detailHtml='';
+      let bulletinBtn='';
+      if(l.action==='Saisie complète des matières dans Calcul MO'){
+        try{
+          const d=JSON.parse(l.detail||'{}');
+          detailHtml=`<div class="users-activity-detail">
+            <div><span class="users-act-label">Élève :</span> <b>${esc(d.nom||'—')}</b></div>
+            <div><span class="users-act-label">Matricule :</span> ${esc(d.matricule||'—')}</div>
+            <div><span class="users-act-label">Classe :</span> ${esc(d.classe||'—')}</div>
+            <div><span class="users-act-label">Établissement :</span> ${esc(d.etablissement||'—')}</div>
+            <div><span class="users-act-label">Année scolaire :</span> ${esc(d.annee_scolaire||'—')}</div>
+            <div><span class="users-act-label">Moyenne :</span> <b>${esc(d.mo||'—')}</b></div>
+            <div><span class="users-act-label">Mention :</span> ${esc(d.mention||'—')}</div>
+            <div><span class="users-act-label">Total pondéré :</span> ${esc(d.total||'—')}</div>
+          </div>`;
+          _actBulletinData.push(d);
+          const idx=_actBulletinData.length-1;
+          bulletinBtn=`<div class="users-act-btns">
+            <button class="users-act-preview-btn" onclick="previewBulletinFromAct(${idx})" title="Aperçu du bulletin">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              Aperçu bulletin
+            </button>
+            <button class="users-act-save-btn" onclick="downloadBulletinFromAct(${idx})" title="Enregistrer le bulletin">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Enregistrer
+            </button>
+          </div>`;
+        }catch(e){}
+      } else {
+        detailHtml=l.detail?'<div class="users-activity-detail">'+l.detail+'</div>':'';
+      }
+      return `<div class="users-activity-item">
+        <div class="users-activity-date">${dateStr}</div>
+        <div>
+          <div class="users-activity-action">${l.action||'—'}${l.module?' <span class="users-activity-module">('+esc(l.module)+')</span>':''}</div>
+          ${detailHtml}
+          ${bulletinBtn}
+        </div>
+        <div class="users-activity-result ${resCls}">${resLabel}</div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    list.innerHTML='<div class="users-empty-state">Erreur réseau</div>';
+  }
+}
+
+function closeActivityPanel(){
+  document.getElementById('users-activity-panel').style.display='none';
+}
+
+function downloadBulletinFromAct(idx){
+  const d=_actBulletinData[idx];
+  if(!d){toast('Données bulletin introuvables.',true);return;}
+  const nom=(d.nom||'').trim();
+  if(!nom){toast('Nom de l\'élève manquant.',true);return;}
+  const matieres={};
+  MATIERES.forEach(m=>{
+    const src=(d.matieres||{})[m.id]||{};
+    const dd={mga:src.mga!=null?src.mga:null};
+    if(m.anglais){dd.bepc_ecrit=src.bepc_ecrit!=null?src.bepc_ecrit:null;dd.bepc_oral=src.bepc_oral!=null?src.bepc_oral:null;}
+    else{dd.bepc=src.bepc!=null?src.bepc:null;}
+    matieres[m.id]=dd;
+  });
+  const total=parseFloat(String(d.total||'0').replace(',','.'))||0;
+  const mo=parseFloat(String(d.mo||'0').replace(',','.'))||0;
+  const payload={nom,matricule:d.matricule||'—',classe:d.classe||'—',etablissement:d.etablissement||'—',annee_scolaire:d.annee_scolaire||'—',total,mo,mention:d.mention||'—',matieres,created_by:_userEmail||localStorage.getItem('saphir_email')||''};
+  fetch(API+'/api/eleves',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify(payload)})
+    .then(r=>{if(!r.ok) throw r;return r.json();})
+    .then(res=>{const nid=res.eleve&&res.eleve.id?res.eleve.id:null;if(nid)markPrinted(nid);toast('Bulletin enregistré dans l\'historique ✔');loadHistory();logActivity('Enregistrement bulletin','Calcul MO',nom+' — '+d.classe,'succes');})
+    .catch(()=>{toast('Erreur lors de l\'enregistrement.',true);logActivity('Enregistrement bulletin','Calcul MO',nom,'echec');});
+}
+
+function previewBulletinFromAct(idx){
+  const d=_actBulletinData[idx];
+  if(!d){toast('Données bulletin introuvables.',true);return;}
+  const html=buildBulletinHTML(d);
+  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Aperçu — ${esc(d.nom||'')} — SAPHIR Pro</title>
+${styles}
+<style>
+  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+  body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
+  .bulletin-sheet{margin:0;padding:0;max-height:297mm;overflow:hidden;}
+  @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
+</head><body>${html}</body></html>`);
+  win.document.close();
+  toast('Aperçu bulletin pour '+d.nom);
+}
+
+function exportUsersPDF(){
+  if(!_allSessions.length){toast('Aucune session à exporter.',true);return;}
+  const rows=_allSessions.map(s=>{
+    const logoutAt=s.logout_at||'—';
+    const status=s.logout_at?'Déconnecté':'En ligne';
+    return `<tr>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${s.email||'—'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${s.role==='admin'?'Admin':'Élève'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${s.appareil||'—'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${s.ville||'—'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;font-family:monospace;font-size:.72rem;">${s.ip||'—'}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${(s.login_at||'').substring(0,16)}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${logoutAt.substring(0,16)}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;">${status}</td>
+    </tr>`;
+  }).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Utilisateurs — SAPHIR Pro</title>
+    <style>body{font-family:'Ebrima',Arial,sans-serif;padding:20px;color:#1a3a2e;}
+    h1{font-size:1.1rem;color:#064E3B;margin-bottom:4px;}
+    p{font-size:.75rem;color:#60736d;margin-bottom:16px;}
+    table{width:100%;border-collapse:collapse;font-size:.75rem;}
+    th{background:#f4f8f6;padding:8px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#064E3B;border-bottom:2px solid #d5e5de;}
+    </head><body>
+    <h1>Liste des utilisateurs — SAPHIR Pro</h1>
+    <p>${_allSessions.length} session(s) • Exporté le ${new Date().toLocaleDateString('fr-FR')}</p>
+    <table><thead><tr><th>Utilisateur</th><th>Rôle</th><th>Appareil</th><th>Ville</th><th>IP</th><th>Connexion</th><th>Déconnexion</th><th>État</th></tr></thead><tbody>${rows}</tbody></table>
+    </body></html>`;
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
+  win.document.write(html);win.document.close();setTimeout(()=>win.print(),400);
+  logActivity('Export PDF','Utilisateurs',_allSessions.length+' session(s)');
+}
+
 /* ── INIT ── */
 buildMGATable();
 updateMGASummary();
@@ -2632,11 +4297,395 @@ buildMOTable();
 document.querySelectorAll('#page-mo .field-group input').forEach(el=>el.addEventListener('input',updateMOInfo));
 document.querySelectorAll('input').forEach(el=>{el.setAttribute('autocomplete','off');el.setAttribute('data-lpignore','true');});
 document.querySelectorAll('#page-mo .note-input, #page-mo .field-group input').forEach(el=>el.addEventListener('input',saveDraft));
-applyRole();
+document.querySelectorAll('#page-mo .field-group select').forEach(el=>el.addEventListener('change',saveDraft));
+
+/* ── ACTIVITY TRACKING: Saisies ── */
+const _inputLogTimers={};
+function _trackInput(e){
+  const el=e.target;
+  const id=el.id||'';
+  const val=(el.value||'').trim();
+  const key='input_'+id;
+  clearTimeout(_inputLogTimers[key]);
+  _inputLogTimers[key]=setTimeout(()=>{
+    if(!val) return;
+    let mod='',act='';
+    if(id.includes('_mga')){mod='Calcul MGA';act='Saisie note '+id.replace('_mga','').replace('_t1',' T1').replace('_t2',' T2').replace('_t3',' T3');}
+    else if(id.includes('_bepc')){mod='Calcul MO';act='Saisie BEPC '+id.replace('_bepc','');}
+    else if(id==='mo-nom'||id==='nomEleve'){mod='Informations élève';act='Modification nom';}
+    else if(id==='mo-matricule'||id==='matricule'){mod='Informations élève';act='Modification matricule';}
+    else if(id==='mo-classe'||id==='classe'){mod='Informations élève';act='Modification classe';}
+    else if(id==='mo-annee_scolaire'||id==='annee_scolaire'){mod='Informations élève';act='Modification année scolaire';}
+    else if(id==='mo-etablissement'||id==='etablissement'){mod='Informations élève';act='Modification établissement';}
+    else{mod='Saisie';act='Modification '+id;}
+    logActivity(act,mod,val);
+  },800);
+}
+document.querySelectorAll('#page-mga .note-input').forEach(el=>el.addEventListener('input',_trackInput));
+document.querySelectorAll('#page-mo .note-input').forEach(el=>el.addEventListener('input',_trackInput));
+document.querySelectorAll('#page-mo .field-group input, #page-mga .field-group input').forEach(el=>el.addEventListener('input',_trackInput));
+document.querySelectorAll('#page-mo .field-group select, #page-mga .field-group select').forEach(el=>el.addEventListener('change',_trackInput));
+
+/* ═══ NOTIFICATIONS ═══ */
+let _notifOpen=false;
+function toggleNotifPanel(){
+  const p=document.getElementById('notif-panel');
+  _notifOpen=!_notifOpen;
+  p.classList.toggle('open',_notifOpen);
+  if(_notifOpen) loadNotifications();
+}
+function closeNotifPanel(e){
+  const p=document.getElementById('notif-panel');
+  const b=document.getElementById('notif-bell');
+  if(!p.contains(e.target)&&!b.contains(e.target)){_notifOpen=false;p.classList.remove('open');}
+}
+document.addEventListener('click',closeNotifPanel);
+function toggleDropdown(btn){
+  const dd=btn.nextElementSibling;
+  const wasOpen=dd.classList.contains('show');
+  document.querySelectorAll('.users-actions-dropdown.show').forEach(d=>d.classList.remove('show'));
+  if(!wasOpen){
+    const rect=btn.getBoundingClientRect();
+    dd.style.top=(rect.bottom+4)+'px';
+    dd.style.left=Math.max(8,(window.innerWidth-220))+'px';
+    dd.classList.add('show');
+  }
+}
+document.addEventListener('click',function(e){
+  document.querySelectorAll('.users-actions-dropdown.show').forEach(dd=>{
+    if(!dd.parentElement.contains(e.target)) dd.classList.remove('show');
+  });
+});
+
+async function loadNotifications(){
+  let list=[];
+  try{
+    const r=await fetch(API+'/api/notifications',{credentials:'same-origin'});
+    if(r.ok){
+      list=await r.json();
+      if(list&&list.length){
+        renderNotifications(list);
+        updateNotifBadge(list.filter(n=>!n.lu).length);
+        list.forEach(n=>{if(n.id>_lastNotifId&&n.id){_lastNotifId=n.id;pushBrowserNotif(n.titre||'SAPHIR Pro',n.message||'');}});
+        if(list.length&&list[0].id) _lastNotifId=Math.max(_lastNotifId,list[0].id);
+        return;
+      }
+    }
+  }catch(e){}
+  try{
+    const arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');
+    renderNotifications(arr);
+    updateNotifBadge(arr.filter(n=>!n.lu).length);
+    arr.forEach(n=>{if(n.id>_lastNotifId&&n.id){_lastNotifId=n.id;pushBrowserNotif(n.titre||'SAPHIR Pro',n.message||'');}});
+  }catch(e){}
+}
+function renderNotifications(list){
+  const el=document.getElementById('notif-list');
+  if(!list||!list.length){el.innerHTML='<div class="notif-empty">Aucune notification</div>';return;}
+  el.innerHTML=list.map(n=>{
+    const cls=n.lu?'':'unread';
+    /* Parse JSON detail from message if present */
+    let d={};
+    try{d=JSON.parse(n.message||'{}');}catch(e){d={message:n.message||''};}
+    const isFailed=(n.titre||'').includes('connexion')||(n.titre||'').includes('Tentative')||(d.raison);
+    let iconCls,icon;
+    if(isFailed){
+      const niveau=d.niveau||n.type||'warning';
+      iconCls=niveau==='critique'?'critique':niveau==='suspect'?'suspect':'warning';
+      icon=niveau==='critique'?'&#128683;':niveau==='suspect'?'&#9888;':'&#128276;';
+    }else{
+      iconCls=n.type==='error'?'error':n.type==='warning'?'warning':n.type==='success'?'success':'info';
+      icon=n.type==='error'?'&#9888;':n.type==='warning'?'&#128276;':n.type==='success'?'&#10003;':'&#8505;';
+    }
+    const time=n.created_at?new Date(n.created_at.replace(' ','T')+'Z').toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+    const displayMsg=d.message||n.message||'';
+    let detail='';
+    if(isFailed&&(d.user||d.raison)){
+      const niveau=d.niveau||'normal';
+      const niveauCls=niveau==='critique'?'notif-badge-critique':niveau==='suspect'?'notif-badge-suspect':'notif-badge-normal';
+      detail=`<div class="notif-detail">
+        ${d.user?`<div class="notif-detail-row"><span class="notif-detail-label">E-mail :</span><span class="notif-detail-value">${esc(d.user)}</span></div>`:''}
+        ${d.raison?`<div class="notif-detail-row"><span class="notif-detail-label">Raison :</span><span class="notif-detail-value">${esc(d.raison)}</span></div>`:''}
+        ${d.ville?`<div class="notif-detail-row"><span class="notif-detail-label">Localisation :</span><span class="notif-detail-value">${esc(d.ville)}</span></div>`:''}
+        ${d.ip?`<div class="notif-detail-row"><span class="notif-detail-label">IP :</span><span class="notif-detail-value" style="font-family:monospace;">${esc(d.ip)}</span></div>`:''}
+        ${d.appareil||d.os||d.navigateur?`<div class="notif-detail-row"><span class="notif-detail-label">Appareil :</span><span class="notif-detail-value">${esc((d.appareil||'')+' '+(d.os||'')+' / '+(d.navigateur||''))}</span></div>`:''}
+        <div class="notif-detail-row"><span class="notif-detail-label">Niveau :</span><span class="notif-badge-niveau ${niveauCls}">${niveau==='critique'?'Critique':niveau==='suspect'?'Suspect':'Normal'}</span></div>
+        ${d.email_count?`<div class="notif-detail-row"><span class="notif-detail-label">Tentatives :</span><span class="notif-detail-value">${d.email_count} par e-mail${d.ip_count?' · '+d.ip_count+' par IP':''}</span></div>`:''}
+      </div>
+      <div class="notif-actions">
+        ${d.user?`<button class="notif-action-btn danger" onclick="event.stopPropagation();quickBan('${esc(d.user).replace(/'/g,"\\'")}')">⛔ Bannir</button>`:''}
+        <button class="notif-action-btn" onclick="event.stopPropagation();markNotifRead(${n.id})">✓ Marquer lu</button>
+      </div>`;
+    }
+    return `<div class="notif-item ${cls}" onclick="markNotifRead(${n.id})"><div class="notif-icon ${iconCls}">${icon}</div><div class="notif-text"><strong>${esc(n.titre||'Notification')}</strong><p>${esc(displayMsg)}</p><div class="notif-time">${time}</div>${detail}</div></div>`;
+  }).join('');
+}
+async function quickBan(email){
+  if(!email) return;
+  if(!confirm('Bannir définitivement '+email+' ?')) return;
+  try{
+    const sessions=await fetch(API+'/api/sessions',{credentials:'same-origin'}).then(r=>r.json()).catch(()=>[]);
+    const target=sessions.find(s=>(s.email||'').toLowerCase()===email.toLowerCase());
+    if(target){
+      await fetch(API+'/api/sessions/'+target.id+'/ban',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({email,motif:'Banni depuis les notifications'})});
+    }else{
+      await fetch(API+'/api/banned-users',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({email,banned_by:'admin',motif:'Banni depuis les notifications'})});
+    }
+    toast(email+' a été banni ✔');
+    loadNotifications();
+    if(typeof loadUsers==='function') loadUsers();
+  }catch(e){toast('Erreur',true);}
+}
+
+/* ── MODAL MESSAGE ── */
+let _msgRecipient='';
+function openMsgModal(email){
+  _msgRecipient=email;
+  document.getElementById('msg-recipient').textContent=email;
+  document.getElementById('msg-input').value='';
+  const overlay=document.getElementById('msg-modal-overlay');
+  overlay.style.display='flex';
+  setTimeout(()=>document.getElementById('msg-input').focus(),100);
+}
+function closeMsgModal(){
+  document.getElementById('msg-modal-overlay').style.display='none';
+  _msgRecipient='';
+}
+async function sendMsg(){
+  const msg=document.getElementById('msg-input').value.trim();
+  if(!msg){toast('Veuillez écrire un message.',true);return;}
+  if(!_msgRecipient){toast('Destinataire manquant.',true);return;}
+  try{
+    const r=await fetch(API+'/api/messages/send',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({recipient:_msgRecipient,message:msg})});
+    const d=await r.json();
+    if(d.ok){
+      toast('Message envoyé à '+_msgRecipient+' ✔');
+      logActivity('Message envoyé','Messages','À : '+_msgRecipient+' | '+msg.substring(0,50));
+      closeMsgModal();
+    }else{toast(d.error||'Erreur d\'envoi',true);}
+  }catch(e){toast('Erreur réseau',true);}
+}
+
+/* ── USER MESSAGE SYSTEM (dialog) ── */
+let _msgPoll=null;
+let _currentMsgId=null;
+let _lastShownMsgId=null;
+
+document.addEventListener('DOMContentLoaded',function(){
+  const dlg=document.getElementById('msg-dialog');
+  if(dlg){
+    dlg.addEventListener('close',function(){
+      if(_currentMsgId){
+        const email=localStorage.getItem('saphir_email')||'';
+        fetch(API+'/api/messages/'+_currentMsgId+'/close',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({email:email})}).catch(()=>{});
+        _currentMsgId=null;
+      }
+    });
+    dlg.addEventListener('click',function(e){
+      if(e.target===dlg) closeMsgDialog();
+    });
+  }
+});
+
+function startMsgPoll(){
+  if(_msgPoll) return;
+  _msgPoll=setInterval(async()=>{
+    try{
+      const email=localStorage.getItem('saphir_email')||'';
+      const r=await fetch(API+'/api/messages/unread?email='+encodeURIComponent(email),{credentials:'same-origin'});
+      const d=await r.json();
+      if(d.count>0) await loadIncomingMessages();
+    }catch(e){}
+  },10000);
+}
+
+async function loadIncomingMessages(){
+  try{
+    const email=localStorage.getItem('saphir_email')||'';
+    const r=await fetch(API+'/api/messages?email='+encodeURIComponent(email),{credentials:'same-origin'});
+    const msgs=await r.json();
+    const unread=msgs.filter(m=>(!m.lu||m.lu==0||m.lu==='0')&&!m.closed);
+    if(unread.length>0){
+      const m=unread[0];
+      if(_lastShownMsgId!==m.id){
+        showMsgDialog({id:m.id,sender:m.sender||'',msg_content:m.msg_content||m.message||'',created_at:m.created_at||''});
+      }
+    }
+  }catch(e){}
+}
+
+function showMsgDialog(m){
+  _currentMsgId=m.id;
+  _lastShownMsgId=m.id;
+  const dlg=document.getElementById('msg-dialog');
+  document.getElementById('msg-dlg-sender').textContent=m.sender||'Administration';
+  document.getElementById('msg-dlg-body').textContent=m.msg_content||m.message||'';
+  const time=m.created_at?new Date(m.created_at.replace(' ','T')+'Z').toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+  document.getElementById('msg-dlg-time').textContent=time?`Envoyé le ${time}`:'';
+  dlg.showModal();
+  dlg.querySelector('.msg-dlg-close').focus();
+  const email=localStorage.getItem('saphir_email')||'';
+  if(m.id){
+    fetch(API+'/api/messages/'+m.id+'/read',{method:'POST',credentials:'same-origin'}).catch(()=>{});
+    fetch(API+'/api/messages/'+m.id+'/close',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({email:email})}).catch(()=>{});
+  }
+}
+
+function closeMsgDialog(){
+  const dlg=document.getElementById('msg-dialog');
+  if(_currentMsgId){
+    const email=localStorage.getItem('saphir_email')||'';
+    fetch(API+'/api/messages/'+_currentMsgId+'/close',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({email:email})}).catch(()=>{});
+  }
+  dlg.close();
+  _currentMsgId=null;
+}
+
+function markMsgAndClose(){
+  closeMsgDialog();
+}
+
+function openMsgHistory(){
+  const panel=document.getElementById('msg-history-panel');
+  const backdrop=document.getElementById('msg-history-backdrop');
+  panel.classList.add('open');
+  backdrop.classList.add('open');
+  loadMsgHistory();
+}
+
+function closeMsgHistory(){
+  document.getElementById('msg-history-panel').classList.remove('open');
+  document.getElementById('msg-history-backdrop').classList.remove('open');
+}
+
+async function loadMsgHistory(){
+  const body=document.getElementById('msg-history-body');
+  body.innerHTML='<div class="msg-history-empty">Chargement...</div>';
+  try{
+    const email=localStorage.getItem('saphir_email')||'';
+    const r=await fetch(API+'/api/messages/history?email='+encodeURIComponent(email),{credentials:'same-origin'});
+    const msgs=await r.json();
+    if(!msgs.length){
+      body.innerHTML='<div class="msg-history-empty">Aucun message reçu</div>';
+      return;
+    }
+    body.innerHTML=msgs.map(m=>{
+      const content=m.msg_content||m.message||'';
+      let parsed={};
+      try{parsed=JSON.parse(content);}catch(e){parsed={message:content};}
+      const text=parsed.message||content;
+      const sender=parsed.sender||m.sender||'Administration';
+      const time=m.created_at?new Date(m.created_at.replace(' ','T')+'Z').toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+      const isUnread=!m.lu||m.lu==0||m.lu==='0';
+      const isClosed=m.closed;
+      let badge='';
+      if(isUnread&&!isClosed) badge='<span class="msg-hi-badge badge-unread">Non lu</span>';
+      else if(isClosed) badge='<span class="msg-hi-badge badge-read">Fermé</span>';
+      else badge='<span class="msg-hi-badge badge-read">Lu</span>';
+      return `<div class="msg-history-item${isUnread&&!isClosed?' unread':''}">
+        <div class="msg-hi-icon">&#128172;</div>
+        <div class="msg-hi-content">
+          <div class="msg-hi-sender">${esc(sender)}</div>
+          <div class="msg-hi-text">${esc(text)}</div>
+          <div class="msg-hi-meta"><span class="msg-hi-time">${time}</span>${badge}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    body.innerHTML='<div class="msg-history-empty">Erreur de chargement</div>';
+  }
+}
+
+function updateMsgPoll(){
+  const role=_role;
+  if(role==='admin'){startMsgPoll();return;}
+  if(role==='student'){startMsgPoll();return;}
+}
+
+function updateNotifBadge(count){
+  const badge=document.getElementById('notif-badge');
+  if(count>0){badge.textContent=count>99?'99+':count;badge.style.display='flex';}
+  else{badge.style.display='none';}
+}
+async function markNotifRead(id){
+  try{await fetch(API+'/api/notifications/'+id+'/read',{method:'POST',credentials:'same-origin'});}catch(e){}
+  try{let arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');arr=arr.map(n=>n.id===id?{...n,lu:1}:n);localStorage.setItem('saphir_notifs',JSON.stringify(arr));}catch(e){}
+  logActivity('Notification lue','Notifications','id='+id);
+  loadNotifications();
+}
+async function markAllRead(){
+  try{await fetch(API+'/api/notifications/read-all',{method:'POST',credentials:'same-origin'});}catch(e){}
+  try{let arr=JSON.parse(localStorage.getItem('saphir_notifs')||'[]');arr=arr.map(n=>({...n,lu:1}));localStorage.setItem('saphir_notifs',JSON.stringify(arr));}catch(e){}
+  logActivity('Toutes notifications lues','Notifications');
+  loadNotifications();
+}
+async function clearAllNotifs(){
+  try{await fetch(API+'/api/notifications/clear',{method:'POST',credentials:'same-origin'});}catch(e){}
+  try{localStorage.removeItem('saphir_notifs');}catch(e){}
+  logActivity('Notifications vidées','Notifications');
+  loadNotifications();
+}
+
+/* ═══ ANNÉE SCOLAIRE FILTRE ═══ */
+let _histYearData=[];
+function updateYearFilter(){
+  const years=[...new Set(_histYearData.map(h=>h.annee_scolaire).filter(Boolean))].sort().reverse();
+  const sel=document.getElementById('hist-year-select');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">Toutes les années</option>'+years.map(y=>`<option value="${esc(y)}">${esc(y)}</option>`).join('');
+  sel.value=cur;
+  document.getElementById('hist-year-filter').style.display=years.length?'flex':'none';
+}
+function filterByYear(){
+  renderHistory();
+}
+
+/* ── INIT: fetch role from server first ── */
+(async function(){
+  try{
+    const r=await fetch(API+'/api/role',{credentials:'same-origin'});
+    const d=await r.json();
+    _role=d.role||'guest';
+    if(d.email){_userEmail=d.email;localStorage.setItem('saphir_email',d.email);}
+    else{_userEmail=localStorage.getItem('saphir_email')||'';}
+  }catch(e){_role='guest';}
+  applyRole();
+  setTimeout(_sseStart,1000);
+  updateMsgPoll();
+})();
+requestNotifPermission();
+loadNotifications();
+_notifPoll=setInterval(loadNotifications,15000);
 loadHistory();
 checkDraft();
 window.addEventListener('beforeprint',buildBulletin);
 if(new URLSearchParams(window.location.search).get('bulletin-preview')==='demo') loadBulletinPreview();
+
+/* ── HEARTBEAT: keep session alive + detect disconnection ── */
+let _heartbeatInterval=null;
+function _sendHeartbeat(){
+  const sid=localStorage.getItem('saphir_session_id');
+  if(!sid)return;
+  fetch(API+'/api/heartbeat',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({session_id:parseInt(sid)})}).catch(()=>{});
+}
+function _startHeartbeat(){
+  if(_heartbeatInterval) clearInterval(_heartbeatInterval);
+  _sendHeartbeat();
+  _heartbeatInterval=setInterval(_sendHeartbeat,15000);
+}
+function _stopHeartbeat(){
+  if(_heartbeatInterval){clearInterval(_heartbeatInterval);_heartbeatInterval=null;}
+}
+_startHeartbeat();
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){_sendHeartbeat();}else{_startHeartbeat();}
+});
+window.addEventListener('pagehide',()=>{
+  const sid=localStorage.getItem('saphir_session_id');
+  if(!sid)return;
+  try{navigator.sendBeacon(API+'/api/heartbeat',new Blob([JSON.stringify({session_id:parseInt(sid)})],{type:'application/json'}));}catch(e){}
+});
+
 </script>
 </body>
 </html>
