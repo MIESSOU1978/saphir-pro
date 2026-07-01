@@ -204,6 +204,32 @@ def _record_failed_login(ip: str, email: str = "") -> int:
     return len(_LOGIN_ATTEMPTS[ip])
 
 
+def _record_success_login(handler, email: str, ip: str, role: str) -> None:
+    """Record a successful login in login_attempts table."""
+    ua = handler.headers.get("User-Agent", "")
+    info = db._parse_user_agent(ua)
+    ville = ""
+    if ip and ip not in ("127.0.0.1", "::1", ""):
+        try:
+            req = urllib.request.Request(f"https://ip-api.com/json/{ip}?fields=city,country")
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                geo = json.loads(resp.read())
+                city = geo.get("city", "")
+                country = geo.get("country", "")
+                country = "Côte d'Ivoire" if country in ("Ivory Coast", "Ivory Coast") else country
+                ville = f"{city}, {country}" if city else country
+        except Exception:
+            pass
+    try:
+        db.save_login_attempt(
+            email=email, ip=ip, ville=ville,
+            appareil=info.get("appareil", ""), os_name=info.get("os", ""),
+            navigateur=info.get("navigateur", ""), raison="Connexion réussie", niveau="normal",
+        )
+    except Exception as exc:
+        print(f"[ERROR] save_login_attempt success: {exc}")
+
+
 def _send_login_sms(role: str, ip: str, email: str) -> None:
     """Send WhatsApp message via Twilio on successful login (non-blocking)."""
     if not all([_TWILIO_SID, _TWILIO_TOKEN, _TWILIO_FROM, _TWILIO_TO]):
@@ -767,6 +793,7 @@ class _Handler(BaseHTTPRequestHandler):
                     ip = self._get_real_ip()
                     ua = self.headers.get("User-Agent", "")
                     sid = db.create_session("student", ip, ua, email)
+                    _record_success_login(self, email, ip, "student")
                     threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
                     threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
                     threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student"), daemon=True).start()
@@ -777,6 +804,7 @@ class _Handler(BaseHTTPRequestHandler):
                 ua = self.headers.get("User-Agent", "")
                 token = _create_session("admin")
                 sid = db.create_session("admin", ip, ua, email)
+                _record_success_login(self, email, ip, "admin")
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "admin"), daemon=True).start()
@@ -789,6 +817,7 @@ class _Handler(BaseHTTPRequestHandler):
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("admin", ip, ua, email)
+                _record_success_login(self, email, ip, "admin")
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "admin"), daemon=True).start()
@@ -801,6 +830,7 @@ class _Handler(BaseHTTPRequestHandler):
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
                 sid = db.create_session("student", ip, ua, email)
+                _record_success_login(self, email, ip, "student")
                 threading.Thread(target=_send_login_sms, args=("student", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("student", ip, email), daemon=True).start()
                 threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "student"), daemon=True).start()
