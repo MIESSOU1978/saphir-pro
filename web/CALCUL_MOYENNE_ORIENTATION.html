@@ -1689,12 +1689,13 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
   html,body{width:auto!important;min-height:0!important;background:#fff!important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
   body{display:block!important;}
   body>header,body>nav,body>main,body>#toast,body>.bpm-toolbar,body>.bpm-page-wrap{display:none!important;}
-  #bulletin-print{display:block!important;}
-  .bulletin-sheet{width:100%;margin:0;box-shadow:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+  body:not(.bpm-active) #bulletin-print{display:block!important;}
+  body.bpm-active #bulletin-print{display:none!important;}
   .bpm-overlay{position:static;display:block!important;background:none!important;backdrop-filter:none!important;}
   .bpm-toolbar{display:none!important;}
   .bpm-page-wrap{display:block!important;padding:0!important;background:#fff!important;}
   .bpm-a4{width:100%!important;min-height:auto!important;max-height:none!important;padding:0!important;box-shadow:none!important;background:transparent!important;}
+  .bulletin-sheet{width:100%;margin:0;box-shadow:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
 }
 </style>
 </head>
@@ -4675,6 +4676,7 @@ function openBulletinModal(html,title){
   c.innerHTML=html;
   document.getElementById('bpm-title').textContent=title||'Aperçu du bulletin';
   document.body.style.overflow='hidden';
+  document.body.classList.add('bpm-active');
   const ov=document.getElementById('bpm-overlay');
   ov.classList.add('open');
   document.addEventListener('keydown',_bpmEscHandler);
@@ -4684,6 +4686,7 @@ function closeBulletinModal(e){
   document.getElementById('bpm-overlay').classList.remove('open');
   document.getElementById('bpm-content').innerHTML='';
   document.body.style.overflow='';
+  document.body.classList.remove('bpm-active');
   document.removeEventListener('keydown',_bpmEscHandler);
 }
 function _bpmEscHandler(e){if(e.key==='Escape')closeBulletinModal();}
