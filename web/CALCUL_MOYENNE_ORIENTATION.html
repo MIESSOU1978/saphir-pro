@@ -4685,5 +4685,6 @@ window.addEventListener('pagehide',()=>{
   try{navigator.sendBeacon(API+'/api/heartbeat',new Blob([JSON.stringify({session_id:parseInt(sid)})],{type:'application/json'}));}catch(e){}
 });
 
+</script>
 </body>
 </html>
