@@ -3815,15 +3815,25 @@ function renderKnownDevices(){
     return;
   }
   const trustedCount=allDevices.filter(d=>d.kd&&Number(d.kd.trusted)).length;
-  console.log('[Devices] trustedCount='+trustedCount+' _showAllDevices='+_showAllDevices);
+  const untrustedCount=allDevices.length-trustedCount;
+  console.log('[Devices] trustedCount='+trustedCount+' untrustedCount='+untrustedCount+' _showAllDevices='+_showAllDevices);
   allDevices.forEach(d=>{console.log('  fp='+d.fingerprint+' kd='+(d.kd?'yes':'no')+' trusted='+(d.kd?Number(d.kd.trusted):'N/A')+' label='+d.label);});
   const toggleBtn=document.getElementById('users-devices-toggle');
-  toggleBtn.style.display=trustedCount>0?'inline-block':'none';
-  toggleBtn.textContent=_showAllDevices?'Masquer fiables':'Tous ('+allDevices.length+')';
-  toggleBtn.classList.toggle('active',_showAllDevices);
+  toggleBtn.style.display=allDevices.length>0?'inline-block':'none';
+  if(_showAllDevices){
+    toggleBtn.textContent='Masquer fiables';
+    toggleBtn.classList.add('active');
+  }else{
+    toggleBtn.textContent='Tous ('+allDevices.length+')';
+    toggleBtn.classList.remove('active');
+  }
   const devices=_showAllDevices?allDevices:allDevices.filter(d=>!d.kd||!Number(d.kd.trusted));
   console.log('[Devices] showing '+devices.length+' of '+allDevices.length+' devices');
   countEl.textContent=devices.length+' appareil'+(devices.length>1?'s':'')+(_showAllDevices?'':' dont '+trustedCount+' fiable'+(trustedCount>1?'s':''));
+  if(!devices.length&&allDevices.length){
+    container.innerHTML='<div class="users-devices-empty">Tous les appareils sont fiables — cliquez « Masquer fiables » pour tout afficher</div>';
+    return;
+  }
   const unknownCount=devices.filter(d=>!d.kd||!d.kd.trusted).length;
   const alertEl=document.getElementById('users-devices-alert');
   const alertText=document.getElementById('users-devices-alert-text');
