@@ -429,10 +429,7 @@ class _Handler(BaseHTTPRequestHandler):
         if not sid:
             return ""
         try:
-            sessions = db.list_sessions()
-            for s in sessions:
-                if str(s.get("id")) == str(sid):
-                    return s.get("email", "")
+            return db.get_session_email(int(sid))
         except Exception:
             pass
         return ""
@@ -505,7 +502,7 @@ class _Handler(BaseHTTPRequestHandler):
             self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
             self.send_header("Connection", "keep-alive")
             self.send_header("X-Accel-Buffering", "no")
-            self._send_cors_headers()
+            self.send_header("Access-Control-Allow-Origin", self._cors_header())
             self.end_headers()
             # Create client queue
             client_q = queue.Queue(maxsize=100)
@@ -778,13 +775,14 @@ class _Handler(BaseHTTPRequestHandler):
                     return self._json_with_cookie({"ok": True, "role": "student", "session_id": sid}, "session", token, extra_cookies={"saphir_session_id": str(sid)})
                 ip = self._get_real_ip()
                 ua = self.headers.get("User-Agent", "")
+                token = _create_session("admin")
                 sid = db.create_session("admin", ip, ua, email)
                 threading.Thread(target=_send_login_sms, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_send_login_email, args=("admin", ip, email), daemon=True).start()
                 threading.Thread(target=_check_unknown_device, args=(ua, ip, email, "admin"), daemon=True).start()
                 db.add_notification("Connexion réussie", json.dumps({"user": email, "ip": ip, "role": "admin"}, ensure_ascii=False), "success")
                 _sse_emit("login_success", {"message": "Nouvelle connexion : " + email, "user": email, "role": "admin", "ip": ip})
-                return self._json({"ok": True, "role": "admin", "session_id": sid})
+                return self._json_with_cookie({"ok": True, "role": "admin", "session_id": sid}, "session", token, extra_cookies={"saphir_session_id": str(sid)})
 
             if _verify_password(pwd, _hash_password(_APP_PASSWORD)):
                 token = _create_session("admin")
@@ -848,8 +846,8 @@ class _Handler(BaseHTTPRequestHandler):
             try:
                 db.save_login_attempt(
                     email=email, ip=client_ip, ville=ville,
-                    appareil=info.get("device", ""), os_name=info.get("os", ""),
-                    navigateur=info.get("browser", ""), raison=raison, niveau=niveau,
+                    appareil=info.get("appareil", ""), os_name=info.get("os", ""),
+                    navigateur=info.get("navigateur", ""), raison=raison, niveau=niveau,
                 )
             except Exception as exc:
                 print(f"[ERROR] save_login_attempt: {exc}")
@@ -888,6 +886,7 @@ class _Handler(BaseHTTPRequestHandler):
             self.send_response(302)
             self.send_header("Location", "/login")
             self.send_header("Set-Cookie", "session=; Path=/; Max-Age=0")
+            self.send_header("Set-Cookie", "saphir_session_id=; Path=/; Max-Age=0")
             self.end_headers()
             return
 

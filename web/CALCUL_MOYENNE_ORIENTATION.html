@@ -2233,7 +2233,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       <table class="users-table">
         <thead>
           <tr>
-            <th><input type="checkbox" id="users-select-all" onchange="toggleSelectAll(this)"></th>
+            <th><input type="checkbox" id="users-select-all" onchange="toggleSelectAllUsers(this)"></th>
             <th>Utilisateur</th>
             <th>Rôle</th>
             <th>Appareil</th>
@@ -2692,9 +2692,9 @@ function setMOColor(mo){
 function setMention(mo){
   const el=document.getElementById('r-mention');
   let lbl='Non calculée',bg='rgba(255,255,255,.12)',col='rgba(255,255,255,.55)';
-  if(mo>=16){lbl='Félicitations';bg='rgba(134,239,172,.2);color:#86efac';col='#86efac';}
+  if(mo>=16){lbl='Félicitations';bg='rgba(134,239,172,.2)';col='#86efac';}
   else if(mo>=14){lbl='Très bien';bg='rgba(134,239,172,.16)';col='#86efac';}
-  else if(mo>=12){lbl='Bien';bg='rgba(74,222,128,.14)';col:'#4ade80';}
+  else if(mo>=12){lbl='Bien';bg='rgba(74,222,128,.14)';col='#4ade80';}
   else if(mo>=10){lbl='Passable';bg='rgba(251,191,36,.15)';col='#fbbf24';}
   else if(mo>=8){lbl='Insuffisant';bg='rgba(252,165,165,.15)';col='#fca5a5';}
   else if(mo>0){lbl='Très insuffisant';bg='rgba(248,113,113,.18)';col='#f87171';}
@@ -2996,7 +2996,7 @@ function printSelection(){
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins — SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins — SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</style></head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
 }
@@ -3007,7 +3007,7 @@ function exportSelection(){
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   const win=window.open('','_blank','width=900,height=700');
   if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins — SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</head><body>${pages}</body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins — SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</style></head><body>${pages}</body></html>`);
   win.document.close();
   setTimeout(()=>win.print(),600);
 }
@@ -4087,7 +4087,7 @@ function filterUsers(){
   renderUsers(filtered);
 }
 
-function toggleSelectAll(cb){
+function toggleSelectAllUsers(cb){
   document.querySelectorAll('.users-cb:not(:disabled)').forEach(c=>{c.checked=cb.checked;});
   updateDeleteBtn();
 }
@@ -4301,7 +4301,7 @@ ${styles}
   body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
   .bulletin-sheet{margin:0;padding:0;max-height:297mm;overflow:hidden;}
   @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
-</head><body>${html}</body></html>`);
+</style></head><body>${html}</body></html>`);
   win.document.close();
   toast('Aperçu bulletin pour '+d.nom);
 }
@@ -4328,7 +4328,7 @@ function exportUsersPDF(){
     p{font-size:.75rem;color:#60736d;margin-bottom:16px;}
     table{width:100%;border-collapse:collapse;font-size:.75rem;}
     th{background:#f4f8f6;padding:8px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#064E3B;border-bottom:2px solid #d5e5de;}
-    </head><body>
+    </style></head><body>
     <h1>Liste des utilisateurs — SAPHIR Pro</h1>
     <p>${_allSessions.length} session(s) • Exporté le ${new Date().toLocaleDateString('fr-FR')}</p>
     <table><thead><tr><th>Utilisateur</th><th>Rôle</th><th>Appareil</th><th>Ville</th><th>IP</th><th>Connexion</th><th>Déconnexion</th><th>État</th></tr></thead><tbody>${rows}</tbody></table>
