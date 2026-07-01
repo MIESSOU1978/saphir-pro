@@ -868,6 +868,9 @@ msg-dialog .msg-dlg-btn-read:hover{background:#0B6B50;}
 }
 .users-devices-title{font-size:.88rem;font-weight:700;color:#003b32;flex:1;}
 .users-devices-count{font-size:.72rem;color:#60736d;font-weight:600;background:#EAF5F0;padding:2px 8px;border-radius:8px;}
+.users-devices-toggle{margin-left:auto;padding:3px 10px;border:1px solid #B8CEC3;border-radius:6px;background:#fff;color:#064E3B;font-size:.7rem;font-weight:600;cursor:pointer;font-family:'Ebrima',sans-serif;transition:all .15s;}
+.users-devices-toggle:hover{background:#F0F7F3;border-color:#064E3B;}
+.users-devices-toggle.active{background:#064E3B;color:#fff;border-color:#064E3B;}
 .users-devices-list{padding:0;max-height:320px;overflow-y:auto;}
 .users-device-card{
   display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;
@@ -2186,6 +2189,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
     <span class="users-devices-title">Appareils connus</span>
     <span class="users-devices-count" id="users-devices-count">0 appareil(s)</span>
+    <button class="users-devices-toggle" id="users-devices-toggle" onclick="toggleShowAllDevices()" title="Afficher tous les appareils" style="display:none;">Tous</button>
   </div>
   <div class="users-devices-list" id="users-devices-list"></div>
 </div>
@@ -3769,6 +3773,14 @@ showPage=function(id){
   if(id==='users'&&!_sseConnected) _sseConnect();
 };
 
+let _showAllDevices=false;
+function toggleShowAllDevices(){
+  _showAllDevices=!_showAllDevices;
+  const btn=document.getElementById('users-devices-toggle');
+  if(btn){btn.textContent=_showAllDevices?'Masquer fiables':'Tous';btn.classList.toggle('active',_showAllDevices);}
+  renderKnownDevices();
+}
+
 function renderKnownDevices(){
   const container=document.getElementById('users-devices-list');
   const countEl=document.getElementById('users-devices-count');
@@ -3801,13 +3813,20 @@ function renderKnownDevices(){
       deviceMap[kd.fingerprint].kd=kd;
     }
   });
-  const devices=Object.values(deviceMap);
-  if(!devices.length){
+  const allDevices=Object.values(deviceMap);
+  if(!allDevices.length){
     countEl.textContent='0 appareil(s)';
     container.innerHTML='<div class="users-devices-empty">Aucun appareil connecté</div>';
+    document.getElementById('users-devices-toggle').style.display='none';
     return;
   }
-  countEl.textContent=devices.length+' appareil'+(devices.length>1?'s':'');
+  const trustedCount=allDevices.filter(d=>d.kd&&Number(d.kd.trusted)).length;
+  const toggleBtn=document.getElementById('users-devices-toggle');
+  toggleBtn.style.display=trustedCount>0?'inline-block':'none';
+  toggleBtn.textContent=_showAllDevices?'Masquer fiables':'Tous ('+allDevices.length+')';
+  toggleBtn.classList.toggle('active',_showAllDevices);
+  const devices=_showAllDevices?allDevices:allDevices.filter(d=>!d.kd||!Number(d.kd.trusted));
+  countEl.textContent=devices.length+' appareil'+(devices.length>1?'s':'')+(_showAllDevices?'':' dont '+trustedCount+' fiable'+(trustedCount>1?'s':''));
   const unknownCount=devices.filter(d=>!d.kd||!d.kd.trusted).length;
   const alertEl=document.getElementById('users-devices-alert');
   const alertText=document.getElementById('users-devices-alert-text');
