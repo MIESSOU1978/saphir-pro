@@ -3634,7 +3634,7 @@ async function loadUsers(){
     _bannedUsers=rb.ok?await rb.json():[];
     renderUsers(_allSessions);
     renderKnownDevices();
-  }catch(e){}
+  }catch(e){console.error('loadUsers error:',e);}
 }
 
 /* ════ SSE (Server-Sent Events) — Real-time updates ════ */
@@ -3773,9 +3773,12 @@ showPage=function(id){
 let _showAllDevices=false;
 function toggleShowAllDevices(){
   _showAllDevices=!_showAllDevices;
+  console.log('[Devices] Toggle → _showAllDevices='+_showAllDevices);
   const btn=document.getElementById('users-devices-toggle');
   if(btn){btn.textContent=_showAllDevices?'Masquer fiables':'Tous';btn.classList.toggle('active',_showAllDevices);}
   renderKnownDevices();
+  const section=document.getElementById('users-devices-section');
+  if(section){section.style.transition='box-shadow .3s';section.style.boxShadow='0 0 0 2px #064E3B';setTimeout(()=>{section.style.boxShadow='';},600);}
 }
 
 function renderKnownDevices(){
@@ -3804,6 +3807,7 @@ function renderKnownDevices(){
     }
   });
   const allDevices=Object.values(deviceMap);
+  console.log('[Devices] allDevices='+allDevices.length+' _allSessions='+_allSessions.length+' _knownDevices='+_knownDevices.length);
   if(!allDevices.length){
     countEl.textContent='0 appareil(s)';
     container.innerHTML='<div class="users-devices-empty">Aucun appareil connecté</div>';
@@ -3811,11 +3815,14 @@ function renderKnownDevices(){
     return;
   }
   const trustedCount=allDevices.filter(d=>d.kd&&Number(d.kd.trusted)).length;
+  console.log('[Devices] trustedCount='+trustedCount+' _showAllDevices='+_showAllDevices);
+  allDevices.forEach(d=>{console.log('  fp='+d.fingerprint+' kd='+(d.kd?'yes':'no')+' trusted='+(d.kd?Number(d.kd.trusted):'N/A')+' label='+d.label);});
   const toggleBtn=document.getElementById('users-devices-toggle');
   toggleBtn.style.display=trustedCount>0?'inline-block':'none';
   toggleBtn.textContent=_showAllDevices?'Masquer fiables':'Tous ('+allDevices.length+')';
   toggleBtn.classList.toggle('active',_showAllDevices);
   const devices=_showAllDevices?allDevices:allDevices.filter(d=>!d.kd||!Number(d.kd.trusted));
+  console.log('[Devices] showing '+devices.length+' of '+allDevices.length+' devices');
   countEl.textContent=devices.length+' appareil'+(devices.length>1?'s':'')+(_showAllDevices?'':' dont '+trustedCount+' fiable'+(trustedCount>1?'s':''));
   const unknownCount=devices.filter(d=>!d.kd||!d.kd.trusted).length;
   const alertEl=document.getElementById('users-devices-alert');
