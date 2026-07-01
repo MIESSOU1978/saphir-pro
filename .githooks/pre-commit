@@ -1,0 +1,8 @@
+#!/bin/sh
+# Pre-commit hook: verify HTML tag balance before commit
+python "$(git rev-parse --show-toplevel)/audit_html.py"
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "ABORT: HTML tag balance check failed. Fix the file before committing."
+  exit 1
+fi
