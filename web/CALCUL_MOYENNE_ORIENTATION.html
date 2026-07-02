@@ -3765,6 +3765,11 @@ function toggleShowAllDevices(){
   _showAllDevices=!_showAllDevices;
   renderKnownDevices();
 }
+/* Attach toggle onclick directly */
+(function(){
+  var b=document.getElementById('users-devices-toggle');
+  if(b) b.onclick=toggleShowAllDevices;
+})();
 
 function renderKnownDevices(){
   const container=document.getElementById('users-devices-list');
