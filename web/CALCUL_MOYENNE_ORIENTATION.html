@@ -1748,6 +1748,10 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
     <div class="nav-item" onclick="showPage('users')" id="nav-users">
       <span class="nav-ico">04</span> Utilisateurs
     </div>
+     <div class="nav-sep" id="nav-sep-devices"></div>
+    <div class="nav-item" onclick="showPage('devices')" id="nav-devices">
+      <span class="nav-ico">05</span> Appareils
+    </div>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <div class="notif-bell" onclick="toggleNotifPanel()" title="Notifications" id="notif-bell" style="display:none;position:relative;cursor:pointer;width:32px;height:32px;border-radius:8px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;">
@@ -2239,9 +2243,27 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         </button>
       </div>
       <div class="users-activity-list" id="users-activity-list"></div>
-    </div>
+      </div>
 
-<div class="users-section-divider"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PAGE 5 : APPAREILS CONNUS (Admin)
+════════════════════════════════════════════ -->
+<div class="page" id="page-devices">
+  <div class="users-container">
+    <div class="users-header">
+      <div class="users-header-left">
+        <div class="users-header-ico">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div>
+          <div class="users-header-title">Appareils connus</div>
+          <div class="users-header-sub">Gestion des appareils et de leur fiabilité</div>
+        </div>
+      </div>
+    </div>
 
 <div class="users-devices-section" id="users-devices-section">
   <div class="users-devices-header">
@@ -2431,6 +2453,7 @@ let _role='guest';
 function showPage(id){
   if(id==='hist'&&_role!=='admin') return;
   if(id==='users'&&_role!=='admin') return;
+  if(id==='devices'&&_role!=='admin') return;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
@@ -2438,6 +2461,7 @@ function showPage(id){
   window.scrollTo({top:0,left:0,behavior:'auto'});
   if(id==='hist') loadHistory();
   if(id==='users') loadUsers();
+  if(id==='devices') loadUsers();
 }
 
 /* ════ PAGE MGA ════ */
@@ -3526,6 +3550,10 @@ function applyRole(){
     const sepUsers=document.getElementById('nav-sep-users');
     if(navUsers) navUsers.style.display='none';
     if(sepUsers) sepUsers.style.display='none';
+    const navDevices=document.getElementById('nav-devices');
+    const sepDevices=document.getElementById('nav-sep-devices');
+    if(navDevices) navDevices.style.display='none';
+    if(sepDevices) sepDevices.style.display='none';
     const bell=document.getElementById('notif-bell');
     if(bell) bell.style.display='none';
     const msgBtn=document.getElementById('msg-history-btn');
@@ -3535,6 +3563,10 @@ function applyRole(){
     const sepUsers=document.getElementById('nav-sep-users');
     if(navUsers) navUsers.style.display=isWeb?'':'none';
     if(sepUsers) sepUsers.style.display=isWeb?'':'none';
+    const navDevices=document.getElementById('nav-devices');
+    const sepDevices=document.getElementById('nav-sep-devices');
+    if(navDevices) navDevices.style.display=isWeb?'':'none';
+    if(sepDevices) sepDevices.style.display=isWeb?'':'none';
     const bell=document.getElementById('notif-bell');
     if(bell) bell.style.display='flex';
     const msgBtn=document.getElementById('msg-history-btn');
