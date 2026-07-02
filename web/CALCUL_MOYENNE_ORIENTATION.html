@@ -3798,7 +3798,7 @@ showPage=function(id){
   if(id==='users'&&!_sseConnected) _sseConnect();
 };
 
-let _showAllDevices=false;
+let _showAllDevices=true;
 function toggleShowAllDevices(){
   _showAllDevices=!_showAllDevices;
   renderKnownDevices();
