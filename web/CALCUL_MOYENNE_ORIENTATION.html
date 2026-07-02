@@ -3810,7 +3810,9 @@ function renderKnownDevices(){
     const alertEl=document.getElementById('users-devices-alert');if(alertEl)alertEl.style.display='none';
     return;
   }
-  countEl.textContent=devices.length+' appareil'+(devices.length>1?'s':'')+(_showAllDevices?'':' dont '+trustedCount+' fiable'+(trustedCount>1?'s':''));
+  countEl.textContent=_showAllDevices
+    ?allDevices.length+' appareil'+(allDevices.length>1?'s':'')+' ('+trustedCount+' fiable'+(trustedCount>1?'s':'')+')'
+    :devices.length+' appareil'+(devices.length>1?'s':'')+' (+'+trustedCount+' fiable'+(trustedCount>1?'s':'')+' masqué'+(trustedCount>1?'s':'')+')';
   const unknownCount=devices.filter(d=>!d.kd||!d.kd.trusted).length;
   const alertEl=document.getElementById('users-devices-alert');
   const alertText=document.getElementById('users-devices-alert-text');
