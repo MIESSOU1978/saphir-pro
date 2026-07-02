@@ -624,6 +624,12 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .users-actions-dropdown .dd-delete{color:#D92D20;}
 .users-actions-dropdown .dd-delete:hover{background:#FDECEA;}
 .users-actions-dropdown .dd-delete svg{stroke:#D92D20;}
+.users-actions-dropdown .dd-trust-add{color:#064E3B;}
+.users-actions-dropdown .dd-trust-add:hover{background:#EAF5F0;}
+.users-actions-dropdown .dd-trust-add svg{stroke:#064E3B;}
+.users-actions-dropdown .dd-trust-remove{color:#A85B00;}
+.users-actions-dropdown .dd-trust-remove:hover{background:#FFF7E8;}
+.users-actions-dropdown .dd-trust-remove svg{stroke:#A85B00;}
 .users-actions-dropdown svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
 
 /* ── Device badges ── */
@@ -3927,7 +3933,7 @@ function renderUsers(sessions){
     else if(isOnline){statutLabel='En ligne';statutCls='users-statut-online';}
     else{statutLabel='Déconnecté';statutCls='users-statut-offline';}
     const ville=(s.ville||'—').replace(/Ivoiry Coast|Ivory Coast/g,'Côte d\'Ivoire');
-    const fp=_stableFingerprint(s.os,s.navigateur,s.appareil);
+    const fp=s.fingerprint||'';
     const kd=knownMap[fp];
     const isCurrentSession=(s.id===_sessionId);
     let badge='';
@@ -3945,10 +3951,19 @@ function renderUsers(sessions){
     const showBan=!isSelf;
     const showDelete=!isSelf||isOnline;
     const showMsg=!!rawEmail&&!isSelf;
-    const hasDropdown=showBan||showDelete||showMsg;
+    let trustItem='';
+    if(!isCurrentSession&&fp){
+      if(kd&&Number(kd.trusted)){
+        trustItem=`<button class="dd-trust-remove" onclick="toggleDeviceTrust(${kd.id},0)" title="Retirer des fiables"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10a20.29 20.29 0 0 0 5.62-4.38"/><line x1="1" y1="1" x2="23" y2="23"/></svg>Non fiable</button>`;
+      }else{
+        trustItem=`<button class="dd-trust-add" onclick="${kd?'toggleDeviceTrust('+kd.id+',1)':"trustNewDevice('"+fp.replace(/'/g,"\\'")+"','"+(s.appareil||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')+"')"}" title="Marquer comme fiable"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>Fiable</button>`;
+      }
+    }
+    const hasDropdown=showBan||showDelete||showMsg||trustItem;
     let dropdownHTML='';
     if(hasDropdown){
       let items='';
+      if(trustItem) items+=trustItem;
       if(showMsg) items+=`<button class="dd-msg" onclick="openMsgModal('${esc(rawEmail).replace(/'/g,"\\'")}')" title="Envoyer un message"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Message</button>`;
       if(showBan) items+=`<button class="dd-ban" onclick="banUser(${s.id},'${esc(email).replace(/'/g,"\\'")}')" title="Bannir cet utilisateur"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Bannir</button>`;
       if(showDelete) items+=`<button class="dd-delete" onclick="deleteSession(${s.id})" title="Supprimer cette session"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>Supprimer</button>`;
