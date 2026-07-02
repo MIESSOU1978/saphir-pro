@@ -12,7 +12,7 @@ import os
 import sqlite3
 import urllib.request
 import urllib.error
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -861,6 +861,32 @@ def clear_offline_sessions() -> int:
         return len(ids)
     conn = _connect()
     rows = conn.execute("SELECT id FROM sessions WHERE logout_at != ''").fetchall()
+    ids = [r["id"] for r in rows]
+    if not ids:
+        conn.close()
+        return 0
+    placeholders = ",".join("?" * len(ids))
+    conn.execute(f"DELETE FROM activity_log WHERE session_id IN ({placeholders})", ids)
+    conn.execute(f"DELETE FROM sessions WHERE id IN ({placeholders})", ids)
+    conn.commit()
+    conn.close()
+    return len(ids)
+
+
+def auto_cleanup_sessions(days: int = 30) -> int:
+    """Delete all sessions with logout_at older than `days` days."""
+    cutoff = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d %H:%M:%S")
+    if _turso_enabled():
+        old = _turso_exec("SELECT id FROM sessions WHERE logout_at != '' AND logout_at < ?", [cutoff])
+        ids = [int(r["id"]) for r in old]
+        if not ids:
+            return 0
+        placeholders = ",".join("?" * len(ids))
+        _turso_exec_write(f"DELETE FROM activity_log WHERE session_id IN ({placeholders})", ids)
+        _turso_exec_write(f"DELETE FROM sessions WHERE id IN ({placeholders})", ids)
+        return len(ids)
+    conn = _connect()
+    rows = conn.execute("SELECT id FROM sessions WHERE logout_at != '' AND logout_at < ?", (cutoff,)).fetchall()
     ids = [r["id"] for r in rows]
     if not ids:
         conn.close()
