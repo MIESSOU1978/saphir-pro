@@ -3889,15 +3889,18 @@ function renderKnownDevices(){
     const uniqueEmails=[...new Set(d.sessions.map(s=>s.email||'').filter(Boolean))];
     const kdEmails=d.kd&&d.kd.emails?d.kd.emails.split(',').filter(Boolean):[];
     const allEmails=[...new Set([...uniqueEmails,...kdEmails])];
+    const lastSession=d.sessions.length?d.sessions.reduce((a,b)=>(a.login_at||'')>(b.login_at||'')?a:b):null;
+    const dur=lastSession?calcDuration(lastSession.login_at,lastSession.logout_at):'';
+    const durLine=dur?' · ⏱ '+dur:'';
     let detailLine='';
     if(allEmails.length===1){
-      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${esc(allEmails[0])}</div>`;
+      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${esc(allEmails[0])}${durLine}</div>`;
     }else if(allEmails.length>1){
-      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${allEmails.length} utilisateurs associés <span class="users-device-detail-link" onclick="showDeviceUsers(${idx})">Voir</span></div>`;
+      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${allEmails.length} utilisateurs associés <span class="users-device-detail-link" onclick="showDeviceUsers(${idx})">Voir</span>${durLine}</div>`;
     }else if(d.kd){
       detailLine=`<div class="users-device-detail">${esc(d.kd.label||d.label||'Appareil')} · Aucune session active</div>`;
     }else{
-      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · Session active</div>`;
+      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · Session active${durLine}</div>`;
     }
     return `<div class="users-device-card">
       <div class="users-device-info">
