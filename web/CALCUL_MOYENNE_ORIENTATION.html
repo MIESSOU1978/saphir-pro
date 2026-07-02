@@ -2226,6 +2226,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
             <th>IP</th>
             <th>Connexion</th>
             <th>Déconnexion</th>
+            <th>Durée</th>
             <th>Activités</th>
             <th>Actions</th>
           </tr>
@@ -3933,12 +3934,25 @@ function showDeviceUsers(idx){
   document.body.appendChild(modal);
 }
 
+function calcDuration(loginAt,logoutAt){
+  if(!loginAt) return '';
+  const start=new Date(loginAt).getTime();
+  const end=logoutAt?new Date(logoutAt).getTime():Date.now();
+  const ms=end-start;
+  if(ms<60000) return '<1 min';
+  const mins=Math.floor(ms/60000);
+  if(mins<60) return mins+'min';
+  const hrs=Math.floor(mins/60);
+  const rem=mins%60;
+  return hrs+'h'+String(rem).padStart(2,'0');
+}
+
 function renderUsers(sessions){
   const tb=document.getElementById('users-tbody');
   const ct=document.getElementById('users-count');
   if(!sessions.length){
     ct.textContent='Aucune session enregistrée';
-    tb.innerHTML='<tr><td colspan="12" class="users-empty-state">Aucune session enregistrée<div class="users-empty-sub">Les connexions des utilisateurs apparaîtront ici.</div></td></tr>';
+    tb.innerHTML='<tr><td colspan="13" class="users-empty-state">Aucune session enregistrée<div class="users-empty-sub">Les connexions des utilisateurs apparaîtront ici.</div></td></tr>';
     return;
   }
   const n=sessions.length;
@@ -4017,6 +4031,7 @@ function renderUsers(sessions){
       <td style="font-family:monospace;font-size:.72rem;" title="${s.ip||''}">${s.ip||'—'}</td>
       <td style="font-size:.72rem;">${loginDisplay}</td>
       <td style="font-size:.72rem;">${logoutDisplay}</td>
+      <td style="font-size:.72rem;text-align:center;color:${isOnline?'#16a34a':'#6B7280'};">${calcDuration(s.login_at,s.logout_at)}</td>
       <td style="font-size:.72rem;text-align:center;" title="${esc(s.last_activity||'Aucune activité')}">${s.activity_count||0}</td>
       <td>
         <div class="users-actions-cell">
