@@ -1279,6 +1279,23 @@ class _Handler(BaseHTTPRequestHandler):
             _sse_emit("session_kicked", {"message": "Session déconnectée : " + kicked_email, "user": kicked_email, "session_id": sid})
             return self._json({"ok": True})
 
+        # ── REACTIVATE SESSION ──
+        if path.startswith("/api/sessions/") and path.endswith("/reactivate"):
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                sid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            try:
+                user_email = db.get_session_email(sid)
+                db.reactivate_session(sid)
+                db.add_notification("Session réactivée", json.dumps({"user": user_email, "session_id": sid, "action": "réactivation par admin"}, ensure_ascii=False), "success")
+            except Exception as exc:
+                return self._json({"error": "Erreur interne du serveur"}, 500)
+            _sse_emit("session_activated", {"message": "Session réactivée : " + user_email, "user": user_email, "session_id": sid})
+            return self._json({"ok": True})
+
         # ── BAN USER ──
         if path.startswith("/api/sessions/") and path.endswith("/ban"):
             if role != "admin":
