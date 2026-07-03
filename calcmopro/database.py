@@ -749,18 +749,6 @@ def close_session(session_id: int) -> None:
     conn.close()
 
 
-def reactivate_session(session_id: int) -> None:
-    """Reactivate a disconnected session by clearing logout_at."""
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    if _turso_enabled():
-        _turso_exec_write("UPDATE sessions SET logout_at='', last_heartbeat=? WHERE id=?", [now, session_id])
-        return
-    conn = _connect()
-    conn.execute("UPDATE sessions SET logout_at='', last_heartbeat=? WHERE id=?", (now, session_id))
-    conn.commit()
-    conn.close()
-
-
 def heartbeat(session_id: int) -> None:
     """Update last_heartbeat for a session."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

@@ -630,9 +630,6 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .users-actions-dropdown .dd-trust-remove{color:#A85B00;}
 .users-actions-dropdown .dd-trust-remove:hover{background:#FFF7E8;}
 .users-actions-dropdown .dd-trust-remove svg{stroke:#A85B00;}
-.users-actions-dropdown .dd-reactivate{color:#064E3B;}
-.users-actions-dropdown .dd-reactivate:hover{background:#EAF5F0;}
-.users-actions-dropdown .dd-reactivate svg{stroke:#064E3B;}
 .users-actions-dropdown svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
 
 /* ── Device badges ── */
@@ -3602,7 +3599,6 @@ const _sseEventLabels={
   device_trusted:'🟢 Appareil marqué fiable',
   device_removed:'🟠 Appareil retiré des fiables',
   session_kicked:'🔴 Session déconnectée',
-  session_activated:'🟢 Session réactivée',
   user_banned:'🔴 Utilisateur banni',
   user_unbanned:'🟢 Utilisateur débanni',
   session_deleted:'🔴 Session supprimée',
@@ -3789,7 +3785,6 @@ function renderUsers(sessions){
     const showBan=!isSelf;
     const showDelete=!isSelf||isOnline;
     const showMsg=!!rawEmail&&!isSelf;
-    const showReactivate=!isSelf&&logoutAt;
     let trustItem='';
     if(!isCurrentSession&&fp){
       if(kd&&Number(kd.trusted)){
@@ -3798,11 +3793,10 @@ function renderUsers(sessions){
         trustItem=`<button class="dd-trust-add" onclick="${kd?'toggleDeviceTrust('+kd.id+',1)':"trustNewDevice('"+fp.replace(/'/g,"\\'")+"','"+(s.appareil||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')+"')"}" title="Marquer comme fiable"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>Fiable</button>`;
       }
     }
-    const hasDropdown=showBan||showDelete||showMsg||trustItem||showReactivate;
+    const hasDropdown=showBan||showDelete||showMsg||trustItem;
     let dropdownHTML='';
     if(hasDropdown){
       let items='';
-      if(showReactivate) items+=`<button class="dd-reactivate" onclick="reactivateSession(${s.id})" title="Réactiver cette session"><svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>Réactiver</button>`;
       if(trustItem) items+=trustItem;
       if(showMsg) items+=`<button class="dd-msg" onclick="openMsgModal('${esc(rawEmail).replace(/'/g,"\\'")}')" title="Envoyer un message"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Message</button>`;
       if(showBan) items+=`<button class="dd-ban" onclick="banUser(${s.id},'${esc(email).replace(/'/g,"\\'")}')" title="Bannir cet utilisateur"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Bannir</button>`;
@@ -4013,19 +4007,6 @@ async function disconnectUser(id,email){
     if(r.ok){
       toast('Utilisateur déconnecté ✔');
       logActivity('Déconnexion forcée','Sécurité','Utilisateur déconnecté : '+email,'succes');
-      loadUsers();
-    }else{toast('Erreur : '+(data.error||r.status),true);}
-  }catch(e){toast('Erreur réseau',true);}
-}
-
-async function reactivateSession(id){
-  if(!confirm('Réactiver cette session ?')) return;
-  toast('Réactivation…');
-  try{
-    const r=await fetch(API+'/api/sessions/'+id+'/reactivate',{method:'POST',credentials:'same-origin'});
-    const data=await r.json().catch(()=>({}));
-    if(r.ok){
-      toast('Session réactivée ✔');
       loadUsers();
     }else{toast('Erreur : '+(data.error||r.status),true);}
   }catch(e){toast('Erreur réseau',true);}
