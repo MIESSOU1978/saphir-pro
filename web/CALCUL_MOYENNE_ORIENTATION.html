@@ -3582,7 +3582,7 @@ async function loadUsers(){
     _allSessions=await r.json();
     _knownDevices=rd.ok?await rd.json():[];
     _bannedUsers=rb.ok?await rb.json():[];
-    renderUsers(_allSessions);
+    filterUsers();
   }catch(e){console.error('loadUsers error:',e);}
 }
 

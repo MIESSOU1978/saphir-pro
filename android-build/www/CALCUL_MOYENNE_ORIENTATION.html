@@ -624,6 +624,12 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .users-actions-dropdown .dd-delete{color:#D92D20;}
 .users-actions-dropdown .dd-delete:hover{background:#FDECEA;}
 .users-actions-dropdown .dd-delete svg{stroke:#D92D20;}
+.users-actions-dropdown .dd-trust-add{color:#064E3B;}
+.users-actions-dropdown .dd-trust-add:hover{background:#EAF5F0;}
+.users-actions-dropdown .dd-trust-add svg{stroke:#064E3B;}
+.users-actions-dropdown .dd-trust-remove{color:#A85B00;}
+.users-actions-dropdown .dd-trust-remove:hover{background:#FFF7E8;}
+.users-actions-dropdown .dd-trust-remove svg{stroke:#A85B00;}
 .users-actions-dropdown svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
 
 /* ── Device badges ── */
@@ -652,7 +658,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .users-filter-select:focus{background:#EEF7F2;border-color:#0B6B50;outline:none;}
 .users-table-wrap{
   overflow-x:auto;overflow-y:auto;
-  max-height:220px;
+  max-height:550px;
   border:1px solid #d9e5de;border-radius:10px;background:#fff;
   scrollbar-width:thin;scrollbar-color:#c5d5cb #f4f8f6;
 }
@@ -711,6 +717,9 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 }
 .users-act-btn svg{width:16px;height:16px;stroke:#2563EB;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .users-act-btn:hover{background:#EFF6FF;border-color:#2563EB;box-shadow:0 2px 8px rgba(37,99,235,.12);}
+.users-act-btn-active{border-color:#064E3B;background:#E6F4ED;}
+.users-act-btn-active svg{stroke:#064E3B;}
+.users-act-btn-active:hover{background:#CCE8D8;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.15);}
 
 .btn-icon-danger{border-radius:8px;background:#fff;border:1.5px solid #F3B8B2;color:#D92D20;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s ease;padding:0 10px;font-size:.72rem;font-weight:600;gap:5px;white-space:nowrap;}
 .btn-icon-danger svg{width:15px;height:15px;stroke:#D92D20;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
@@ -849,37 +858,6 @@ msg-dialog .msg-dlg-btn-read:hover{background:#0B6B50;}
 .users-trust-remove{color:#A85B00;border-color:#F5C56B;}
 .users-trust-remove:hover{background:#FFF7E8;border-color:#F5A623;}
 
-.users-devices-alert{
-  display:flex;align-items:center;gap:8px;padding:10px 16px;
-  background:#FFF3D6;border:1px solid #F5A623;border-radius:10px;
-  font-size:.8rem;font-weight:600;color:#A85B00;
-}
-.users-devices-section{
-  margin-top:20px;border:1.5px solid #d5e5de;border-radius:12px;
-  background:#fff;overflow:hidden;
-}
-.users-devices-header{
-  display:flex;align-items:center;gap:8px;padding:14px 18px;
-  background:linear-gradient(180deg,#f6f9f5 0%,#eaf3eb 100%);
-  border-bottom:1px solid #d5e5de;
-}
-.users-devices-title{font-size:.88rem;font-weight:700;color:#003b32;flex:1;}
-.users-devices-count{font-size:.72rem;color:#60736d;font-weight:600;background:#EAF5F0;padding:2px 8px;border-radius:8px;}
-.users-devices-list{padding:0;max-height:320px;overflow-y:auto;}
-.users-device-card{
-  display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;
-  padding:12px 18px;border-bottom:1px solid #eef3f0;transition:background .15s;
-}
-.users-device-card:last-child{border-bottom:none;}
-.users-device-card:hover{background:#f8faf9;}
-.users-device-info{display:flex;flex-direction:column;gap:4px;min-width:0;}
-.users-device-label{font-size:.82rem;font-weight:600;color:#003b32;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.users-device-detail{font-size:.68rem;color:#60736d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.users-device-detail-link{font-size:.68rem;color:#064E3B;font-weight:600;cursor:pointer;text-decoration:underline;white-space:nowrap;}
-.users-device-detail-link:hover{color:#043d2b;}
-.users-device-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.users-device-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.users-devices-empty{text-align:center;padding:30px 16px;color:#60736d;font-size:.8rem;}
 .users-activity-panel{
   margin-top:20px;border:1px solid #d5e5de;border-radius:12px;
   background:#fafcfb;padding:18px 20px;
@@ -1665,12 +1643,33 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 .hist-year-filter select{padding:7px 12px;border:1.5px solid #b8cec3;border-radius:8px;font-size:.8rem;color:#064e3b;background:#fff;font-family:'Ebrima',sans-serif;cursor:pointer;}
 .hist-year-filter select:focus{outline:none;border-color:#064e3b;box-shadow:0 0 0 3px rgba(11,107,80,.1);}
 
+/* ── BULLETIN PREVIEW MODAL ── */
+.bpm-overlay{display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);overflow:hidden;}
+.bpm-overlay.open{display:flex;align-items:stretch;justify-content:center;}
+.bpm-container{display:flex;flex-direction:column;width:100%;height:100%;}
+.bpm-toolbar{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:#064E3B;color:#fff;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.2);z-index:1;}
+.bpm-toolbar-title{font-size:.9rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.bpm-toolbar-actions{display:flex;gap:8px;flex-shrink:0;}
+.bpm-btn{border:none;padding:8px 16px;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s;}
+.bpm-btn-print{background:#fff;color:#064E3B;}.bpm-btn-print:hover{background:#F4FAF7;}
+.bpm-btn-close{background:#B42318;color:#fff;}.bpm-btn-close:hover{background:#912018;}
+.bpm-page-wrap{flex:1;overflow-y:auto;padding:20px 16px;display:flex;justify-content:center;background:#e8ece9;}
+.bpm-a4{width:210mm;min-height:297mm;max-height:297mm;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.18);padding:4mm 10mm 1mm 12mm;overflow:hidden;flex-shrink:0;}
+.bpm-a4 .bulletin-sheet{width:100%;margin:0;padding:0;max-height:297mm;overflow:hidden;box-shadow:none;border:none;background:transparent;}
+.bpm-a4 .bulletin-sheet .bp-header{box-shadow:none;border:1px solid #dfe7e2;border-top:0;}
+.bpm-a4 .bulletin-sheet .bp-table-wrap{border:1px solid #bdcdc4;}
+
 @media print{
   @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;@top-left{content:none;}@top-center{content:none;}@top-right{content:none;}@bottom-left{content:none;}@bottom-center{content:none;}@bottom-right{content:none;}}
   html,body{width:auto!important;min-height:0!important;background:#fff!important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
   body{display:block!important;}
-  body>header,body>nav,body>main,body>#toast{display:none!important;}
-  #bulletin-print{display:block!important;}
+  body>header,body>nav,body>main,body>#toast,body>.bpm-toolbar,body>.bpm-page-wrap{display:none!important;}
+  body:not(.bpm-active) #bulletin-print{display:block!important;}
+  body.bpm-active #bulletin-print{display:none!important;}
+  .bpm-overlay{position:static;display:block!important;background:none!important;backdrop-filter:none!important;}
+  .bpm-toolbar{display:none!important;}
+  .bpm-page-wrap{display:block!important;padding:0!important;background:#fff!important;}
+  .bpm-a4{width:100%!important;min-height:auto!important;max-height:none!important;padding:0!important;box-shadow:none!important;background:transparent!important;}
   .bulletin-sheet{width:100%;margin:0;box-shadow:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
 }
 </style>
@@ -2130,6 +2129,10 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
           <svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
           Sélection
         </button>
+        <button class="btn-icon-danger" id="users-delete-offline" onclick="clearOfflineSessions()" title="Supprimer les sessions déconnectées sélectionnées" style="display:none;border-color:#F59E0B;color:#92400E;">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Hors ligne
+        </button>
         <button class="btn-icon-danger" id="users-delete-all" onclick="clearAllUsers()" title="Supprimer toutes les sessions" style="background:#FDECEA;border-color:#D92D20;">
           <svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
           Tout
@@ -2150,17 +2153,63 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       <span id="users-devices-alert-text"></span>
     </div>
 
-    <div class="users-devices-section" id="users-devices-section">
+<div class="users-filters">
+  <input type="text" class="users-search" id="users-search" placeholder="Rechercher..." oninput="filterUsers()">
+  <select class="users-filter-select" id="users-filter-role" onchange="filterUsers()">
+    <option value="">Tous les rôles</option>
+    <option value="admin">Admin</option>
+    <option value="student">Élève</option>
+  </select>
+  <select class="users-filter-select" id="users-filter-device" onchange="filterUsers()">
+    <option value="">Tous les appareils</option>
+    <option value="Ordinateur">Ordinateur</option>
+    <option value="Téléphone">Téléphone</option>
+    <option value="Tablette">Tablette</option>
+  </select>
+  <select class="users-filter-select" id="users-filter-status" onchange="filterUsers()">
+    <option value="">Tous les états</option>
+    <option value="online">En ligne</option>
+    <option value="offline">Déconnecté</option>
+    <option value="banned">Banni</option>
+  </select>
 </div>
-</div>
-<div class="users-devices-section" id="users-devices-section">
-  <div class="users-devices-header">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-    <span class="users-devices-title">Appareils connus</span>
-    <span class="users-devices-count" id="users-devices-count">0 appareil(s)</span>
+
+    <div class="users-table-wrap">
+      <table class="users-table">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="users-select-all" onchange="toggleSelectAllUsers(this)"></th>
+            <th>Utilisateur</th>
+            <th>Rôle</th>
+            <th>Appareil</th>
+            <th>Statut</th>
+            <th>Ville</th>
+            <th>IP</th>
+            <th>Connexion</th>
+            <th>Déconnexion</th>
+            <th>Durée</th>
+            <th>Activités</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="users-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="users-activity-panel" id="users-activity-panel" style="display:none;">
+      <div class="users-activity-header">
+        <div class="users-activity-title" id="users-activity-title">Historique des activités</div>
+        <button class="btn btn-reset" onclick="closeActivityPanel()" style="min-height:32px;padding:4px 12px;font-size:.76rem;">
+          <svg class="btn-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Fermer
+        </button>
+      </div>
+      <div class="users-activity-list" id="users-activity-list"></div>
+      </div>
+
   </div>
-  <div class="users-devices-list" id="users-devices-list"></div>
 </div>
+
 <dialog id="msg-dialog">
   <div class="msg-dlg-header">
     <span class="msg-dlg-icon">&#128172;</span>
@@ -2187,75 +2236,6 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
     <div class="msg-history-empty">Chargement...</div>
   </div>
 </div>
-<div id="msg-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9000;align-items:center;justify-content:center;" onclick="closeMsgModal()">
-  <div style="background:#fff;border-radius:14px;padding:24px 26px;width:420px;max-width:90vw;box-shadow:0 12px 40px rgba(0,0,0,.18);" onclick="event.stopPropagation()">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <div style="font-size:.9rem;font-weight:700;color:#003b32;">Envoyer un message</div>
-      <button onclick="closeMsgModal()" style="background:none;border:none;cursor:pointer;font-size:1.1rem;color:#60736D;">&#10005;</button>
-    </div>
-    <div style="font-size:.76rem;color:#60736D;margin-bottom:12px;">Destinataire : <strong id="msg-recipient"></strong></div>
-    <textarea id="msg-input" rows="4" placeholder="Écrivez votre message ici..." style="width:100%;padding:10px 12px;border:1.5px solid #D5E5DE;border-radius:8px;font-size:.82rem;font-family:inherit;resize:vertical;box-sizing:border-box;"></textarea>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">
-      <button onclick="closeMsgModal()" class="btn btn-reset" style="min-height:34px;padding:6px 14px;font-size:.78rem;">Annuler</button>
-      <button onclick="sendMsg()" class="btn" style="min-height:34px;padding:6px 14px;font-size:.78rem;background:#064E3B;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">Envoyer</button>
-    </div>
-  </div>
-</div>
-<div class="users-filters">
-  <input type="text" class="users-search" id="users-search" placeholder="Rechercher..." oninput="filterUsers()">
-  <select class="users-filter-select" id="users-filter-role" onchange="filterUsers()">
-    <option value="">Tous les rôles</option>
-    <option value="admin">Admin</option>
-    <option value="student">Élève</option>
-  </select>
-  <select class="users-filter-select" id="users-filter-device" onchange="filterUsers()">
-    <option value="">Tous les appareils</option>
-    <option value="Ordinateur">Ordinateur</option>
-    <option value="Téléphone">Téléphone</option>
-    <option value="Tablette">Tablette</option>
-  </select>
-  <select class="users-filter-select" id="users-filter-status" onchange="filterUsers()">
-    <option value="">Tous les états</option>
-    <option value="online">En ligne</option>
-    <option value="offline">Déconnecté</option>
-    <option value="banned">Banni</option>
-  </select>
-</div>
-
-    <div class="users-table-wrap">
-      <table class="users-table">
-        <thead>
-          <tr>
-            <th><input type="checkbox" id="users-select-all" onchange="toggleSelectAll(this)"></th>
-            <th>Utilisateur</th>
-            <th>Rôle</th>
-            <th>Appareil</th>
-            <th>Statut</th>
-            <th>Ville</th>
-            <th>IP</th>
-            <th>Connexion</th>
-            <th>Déconnexion</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody id="users-tbody"></tbody>
-      </table>
-    </div>
-
-    <div class="users-activity-panel" id="users-activity-panel" style="display:none;">
-      <div class="users-activity-header">
-        <div class="users-activity-title" id="users-activity-title">Historique des activités</div>
-        <button class="btn btn-reset" onclick="closeActivityPanel()" style="min-height:32px;padding:4px 12px;font-size:.76rem;">
-          <svg class="btn-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          Fermer
-        </button>
-      </div>
-      <div class="users-activity-list" id="users-activity-list"></div>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL MESSAGE -->
 <div id="msg-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9000;align-items:center;justify-content:center;" onclick="closeMsgModal()">
   <div style="background:#fff;border-radius:14px;padding:24px 26px;width:420px;max-width:90vw;box-shadow:0 12px 40px rgba(0,0,0,.18);" onclick="event.stopPropagation()">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
@@ -2367,6 +2347,28 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
   </article>
 </section>
 
+<!-- ══ BULLETIN PREVIEW MODAL ══ -->
+<div class="bpm-overlay" id="bpm-overlay" onclick="closeBulletinModal(event)">
+  <div class="bpm-container">
+    <div class="bpm-toolbar">
+      <span class="bpm-toolbar-title" id="bpm-title">Aperçu du bulletin</span>
+      <div class="bpm-toolbar-actions">
+        <button class="bpm-btn bpm-btn-print" onclick="printBulletinModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Imprimer / PDF
+        </button>
+        <button class="bpm-btn bpm-btn-close" onclick="closeBulletinModal()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Fermer
+        </button>
+      </div>
+    </div>
+    <div class="bpm-page-wrap">
+      <div class="bpm-a4" id="bpm-content"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ── MATIÈRES ── */
 const MATIERES = [
@@ -2400,9 +2402,9 @@ function buildMGATable(){
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td><span class="mat-label">${m.label}</span></td>
-      <td><input class="note-input" id="${m.id}_t1" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}')"></td>
-      <td><input class="note-input" id="${m.id}_t2" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}')"></td>
-      <td><input class="note-input" id="${m.id}_t3" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}')"></td>
+      <td><input class="note-input" id="${m.id}_t1" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"></td>
+      <td><input class="note-input" id="${m.id}_t2" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"></td>
+      <td><input class="note-input" id="${m.id}_t3" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"></td>
       <td><span class="mga-val" id="${m.id}_mga_val">0,00</span></td>`;
     tb.appendChild(tr);
   });
@@ -2517,15 +2519,15 @@ function buildMOTable(){
     let bepcCell;
     if(m.anglais){
       bepcCell=`<div class="two-notes">
-        <input class="note-input" id="${m.id}_bepc_e" type="text" inputmode="decimal" maxlength="5" placeholder="Écrit" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}')">
-        <input class="note-input" id="${m.id}_bepc_o" type="text" inputmode="decimal" maxlength="5" placeholder="Oral" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}')">
+        <input class="note-input" id="${m.id}_bepc_e" type="text" inputmode="decimal" maxlength="5" placeholder="Écrit" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}');logNoteChange(this.id,this.value)">
+        <input class="note-input" id="${m.id}_bepc_o" type="text" inputmode="decimal" maxlength="5" placeholder="Oral" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}');logNoteChange(this.id,this.value)">
       </div>`;
     } else {
-      bepcCell=`<input class="note-input" id="${m.id}_bepc" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}')">`;
+      bepcCell=`<input class="note-input" id="${m.id}_bepc" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}');logNoteChange(this.id,this.value)">`;
     }
     tr.innerHTML=`
       <td><span class="mat-label">${m.label}</span></td>
-      <td><input class="note-input" id="${m.id}_mga" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}')"></td>
+      <td><input class="note-input" id="${m.id}_mga" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcRowMO('${m.id}')" onblur="formatNoteInput(this);calcRowMO('${m.id}');logNoteChange(this.id,this.value)"></td>
       <td>${bepcCell}</td>
       <td><span class="computed-val" id="${m.id}_sum">—</span></td>
       <td><span class="mat-coef">${m.coef}</span></td>
@@ -2538,6 +2540,7 @@ function toggleTO(){
   _toMode=!_toMode;
   const btn=document.getElementById('to-toggle');
   if(btn) btn.classList.toggle('active',_toMode);
+  logActivity(_toMode?'Activation TO':'Désactivation TO','Calcul MO','Mode TO: '+(_toMode?'activé':'désactivé'));
   MATIERES.forEach(m=>{
     if(!m.anglais) return;
     const oralEl=document.getElementById(m.id+'_bepc_o');
@@ -2683,9 +2686,9 @@ function setMOColor(mo){
 function setMention(mo){
   const el=document.getElementById('r-mention');
   let lbl='Non calculée',bg='rgba(255,255,255,.12)',col='rgba(255,255,255,.55)';
-  if(mo>=16){lbl='Félicitations';bg='rgba(134,239,172,.2);color:#86efac';col='#86efac';}
+  if(mo>=16){lbl='Félicitations';bg='rgba(134,239,172,.2)';col='#86efac';}
   else if(mo>=14){lbl='Très bien';bg='rgba(134,239,172,.16)';col='#86efac';}
-  else if(mo>=12){lbl='Bien';bg='rgba(74,222,128,.14)';col:'#4ade80';}
+  else if(mo>=12){lbl='Bien';bg='rgba(74,222,128,.14)';col='#4ade80';}
   else if(mo>=10){lbl='Passable';bg='rgba(251,191,36,.15)';col='#fbbf24';}
   else if(mo>=8){lbl='Insuffisant';bg='rgba(252,165,165,.15)';col='#fca5a5';}
   else if(mo>0){lbl='Très insuffisant';bg='rgba(248,113,113,.18)';col='#f87171';}
@@ -2983,24 +2986,16 @@ async function deleteSelection(){
 function printSelection(){
   const items=histData.filter(h=>selectedIds.includes(h.id)&&h.matieres);
   if(!items.length){toast('Aucun bulletin sélectionné.',true);return;}
-  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
-  const win=window.open('','_blank','width=900,height=700');
-  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins — SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</head><body>${pages}</body></html>`);
-  win.document.close();
-  setTimeout(()=>win.print(),600);
+  openBulletinModal(pages,'Bulletins — '+items.length+' sélectionné(s)');
+  setTimeout(()=>window.print(),300);
 }
 function exportSelection(){
   const items=histData.filter(h=>selectedIds.includes(h.id)&&h.matieres);
   if(!items.length){toast('Aucun bulletin sélectionné.',true);return;}
-  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
-  const win=window.open('','_blank','width=900,height=700');
-  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletins — SAPHIR Pro</title>${styles}<style>*{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}.bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}.bulletin-sheet:last-child{page-break-after:auto;}@page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}</head><body>${pages}</body></html>`);
-  win.document.close();
-  setTimeout(()=>win.print(),600);
+  openBulletinModal(pages,'Bulletins — '+items.length+' sélectionné(s)');
+  setTimeout(()=>window.print(),300);
 }
 
 /* ── MODIFIER / DUPLIQUER ── */
@@ -3111,20 +3106,9 @@ async function downloadBulletinPDF(id){
     try{const r=await fetch(API+'/api/eleves/'+id,{credentials:'same-origin'});if(r.ok)h=await r.json();}catch(e){}
   }
   if(!h||!h.matieres){toast('Données indisponibles.',true);return;}
-  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
   const page=buildBulletinHTML(h);
-  const win=window.open('','_blank','width=900,height=700');
-  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Bulletin — ${esc(h.nom||'Élève')} — SAPHIR Pro</title>
-${styles}
-<style>
-  body{margin:0;padding:0;background:#fff;}
-   .bulletin-sheet{page-break-after:auto;margin:0;padding:0;max-height:297mm;overflow:hidden;}
-  @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
-</head><body>${page}</body></html>`);
-  win.document.close();
-  setTimeout(()=>win.print(),600);
+  openBulletinModal(page,'Télécharger — '+(h.nom||'Élève'));
+  setTimeout(()=>window.print(),300);
   markPrinted(id);
   logActivity('Téléchargement PDF','Bulletin',h.nom||'');
 }
@@ -3136,43 +3120,8 @@ async function previewBulletinPDF(id){
     try{const r=await fetch(API+'/api/eleves/'+id,{credentials:'same-origin'});if(r.ok)h=await r.json();}catch(e){}
   }
   if(!h||!h.matieres){toast('Données indisponibles.',true);return;}
-  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
   const page=buildBulletinHTML(h);
-  const win=window.open('','_blank','width=900,height=700');
-  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Aperçu — ${h.nom||'Élève'} — SAPHIR Pro</title>
-${styles}
-<style>
-  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:#e8ece9;font-family:'Ebrima','Segoe UI',Arial,sans-serif;width:100%;height:100%;}
-  .preview-toolbar{position:fixed;top:0;left:0;right:0;background:#064E3B;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.2);}
-  .preview-toolbar-title{font-size:.9rem;font-weight:700;}
-  .preview-toolbar-btn{background:#fff;color:#064E3B;border:none;padding:8px 16px;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
-  .preview-toolbar-btn:hover{background:#F4FAF7;}
-  .preview-page-wrap{display:flex;justify-content:center;padding:60px 16px 24px;min-height:100vh;}
-  .preview-a4{width:210mm;min-height:297mm;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.18);padding:4mm 10mm 1mm 12mm;overflow:hidden;}
-  .bulletin-sheet{width:100%;margin:0;padding:0;max-height:297mm;overflow:hidden;box-shadow:none;border:none;background:transparent;}
-  .bulletin-sheet .bp-header{box-shadow:none;border:1px solid #dfe7e2;border-top:0;}
-  .bulletin-sheet .bp-table-wrap{border:1px solid #bdcdc4;}
-  @media print{
-    html,body{margin:0;padding:0;background:#fff;width:auto;height:auto;}
-    .preview-toolbar{display:none!important;}
-    .preview-page-wrap{padding:0;margin:0;display:block;}
-    .preview-a4{width:100%;min-height:auto;padding:0;box-shadow:none;background:transparent;}
-    .bulletin-sheet{width:100%;margin:0;box-shadow:none;}
-    @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
-  }
-</head><body>
-<div class="preview-toolbar">
-  <span class="preview-toolbar-title">Aperçu du bulletin — ${h.nom||'Élève'}</span>
-  <button class="preview-toolbar-btn" onclick="window.print()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Imprimer / PDF</button>
-</div>
-<div class="preview-page-wrap">
-  <div class="preview-a4">${page}</div>
-</div>
-</body></html>`);
-  win.document.close();
+  openBulletinModal(page,'Aperçu — '+(h.nom||'Élève'));
   markPrinted(id);
   logActivity('Aperçu PDF','Bulletin',h.nom||'');
 }
@@ -3264,23 +3213,10 @@ async function printAllBulletins(){
   const yearFilter=document.getElementById('hist-year-select')?.value||'';
   const items=yearFilter?histData.filter(h=>h.annee_scolaire===yearFilter&&h.matieres):histData.filter(h=>h.matieres);
   if(!items.length){toast('Aucun bulletin à imprimer'+(yearFilter?' pour '+yearFilter:'')+'.',true);return;}
-  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
   const pages=items.map(h=>buildBulletinHTML(h)).join('');
   if(!pages){toast('Aucune donnée bulletin trouvée.',true);return;}
-  const win=window.open('','_blank','width=900,height=700');
-  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Bulletins — SAPHIR Pro</title>
-${styles}
-<style>
-  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
-  body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
-  .bulletin-sheet{page-break-after:always;margin:0;padding:0;max-height:297mm;overflow:hidden;}
-  .bulletin-sheet:last-child{page-break-after:auto;}
-  @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
-</head><body>${pages}</body></html>`);
-  win.document.close();
-  setTimeout(()=>{win.print();},600);
+  openBulletinModal(pages,'Bulletins — '+items.length);
+  setTimeout(()=>window.print(),300);
   items.forEach(h=>{if(h.id)markPrinted(h.id);});
   toast('Impression de '+items.length+' bulletin(s)...');
   logActivity('Impression multiple','Bulletin',histData.filter(h=>h.matieres).length+' bulletins');
@@ -3378,10 +3314,10 @@ function buildBulletin(){
 
 function printBulletin(){
   const nom=document.getElementById('mo-nom')?.value?.trim()||'Élève';
-  const origTitle=document.title;
-  document.title='Bulletin — '+nom+' — SAPHIR Pro';
   buildBulletin();
-  setTimeout(()=>{window.print();setTimeout(()=>{document.title=origTitle;},100);},60);
+  document.title='Imprimer — '+nom+' — SAPHIR Pro';
+  window.print();
+  document.title='SAPHIR Pro — Calcul MO';
 }
 
 function loadBulletinPreview(){
@@ -3445,11 +3381,11 @@ function getVal(id){
   return Number.isFinite(value)?value:0;
 }
 function truncate(n,dec){const f=Math.pow(10,dec);const v=Math.floor(n*f+1e-9)/f;const s=String(v);const i=s.indexOf('.');if(i===-1)return s+'.'+'0'.repeat(dec);return s+(s.length-i-1<dec?'0'.repeat(dec-(s.length-i-1)):'');}
-function fmtNum(n,dec){return truncate(n,dec).replace('.',',');}
+function fmtNum(n,dec){const t=truncate(n,dec);const[i,d]=t.split('.');return String(i).padStart(2,'0')+','+d;}
 function fmtMO(n,dec){
   const t=truncate(n,dec);
   const [integer,decimal]=t.split('.');
-  return `${integer},${decimal}`;
+  return String(integer).padStart(2,'0')+','+decimal;
 }
 function exportPDF(){
   const missing=[];
@@ -3473,19 +3409,14 @@ function exportPDF(){
   }
   buildBulletin();
   const nom=document.getElementById('mo-nom')?.value?.trim()||'Élève';
-  const origTitle=document.title;
-  document.title='Bulletin — '+nom+' — SAPHIR Pro';
   saveToHistory().then(id=>{
-    if(id){
-      markPrinted(id);
-      window.print();
-      toast('PDF exporté et enregistré ✔');
-      logActivity('Export PDF','Calcul MO','Export depuis formulaire');
-      sendNotification('PDF exporté','Bulletin téléchargé depuis le formulaire','info');
-      setTimeout(()=>{document.title=origTitle;},100);
-    } else {
-      toast('Enregistrement échoué. PDF non imprimé.',true);
-    }
+    if(id) markPrinted(id);
+    document.title='Télécharger — '+nom+' — SAPHIR Pro';
+    window.print();
+    document.title='SAPHIR Pro — Calcul MO';
+    toast(id?'PDF exporté et enregistré ✔':'PDF imprimé (enregistrement échoué)',!id);
+    logActivity('Export PDF','Calcul MO','Export depuis formulaire');
+    sendNotification('PDF exporté','Bulletin téléchargé depuis le formulaire','info');
   });
 }
 
@@ -3510,50 +3441,11 @@ function previewMO(){
   if(missing.length>0){toast('Note manquante : '+missing[0],true);return;}
   buildBulletin();
   saveToHistory().then(id=>{
-    if(id){
-      markPrinted(id);
-      const page=document.getElementById('bulletin-print').innerHTML;
-      const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
-      const nom=esc((document.getElementById('mo-nom')?.value||'Élève').trim());
-      const win=window.open('','_blank','width=900,height=700');
-      if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-      win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Aperçu — ${nom} — SAPHIR Pro</title>
-${styles}
-<style>
-  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;box-sizing:border-box;}
-  html,body{margin:0;padding:0;background:#e8ece9;font-family:'Ebrima','Segoe UI',Arial,sans-serif;width:100%;height:100%;}
-  .preview-toolbar{position:fixed;top:0;left:0;right:0;background:#064E3B;color:#fff;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;z-index:9999;box-shadow:0 2px 8px rgba(0,0,0,.2);}
-  .preview-toolbar-title{font-size:.9rem;font-weight:700;}
-  .preview-toolbar-btn{background:#fff;color:#064E3B;border:none;padding:8px 16px;border-radius:6px;font-size:.8rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
-  .preview-toolbar-btn:hover{background:#F4FAF7;}
-  .preview-page-wrap{display:flex;justify-content:center;padding:60px 16px 24px;min-height:100vh;}
-  .preview-a4{width:210mm;min-height:297mm;background:#fff;box-shadow:0 2px 16px rgba(0,0,0,.18);padding:4mm 10mm 1mm 12mm;overflow:hidden;}
-  .bulletin-sheet{width:100%;margin:0;padding:0;max-height:297mm;overflow:hidden;box-shadow:none;border:none;background:transparent;}
-  .bulletin-sheet .bp-header{box-shadow:none;border:1px solid #dfe7e2;border-top:0;}
-  .bulletin-sheet .bp-table-wrap{border:1px solid #bdcdc4;}
-  @media print{
-    html,body{margin:0;padding:0;background:#fff;width:auto;height:auto;}
-    .preview-toolbar{display:none!important;}
-    .preview-page-wrap{padding:0;margin:0;display:block;}
-    .preview-a4{width:100%;min-height:auto;padding:0;box-shadow:none;background:transparent;}
-    .bulletin-sheet{width:100%;margin:0;box-shadow:none;}
-    @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
-  }
-</head><body>
-<div class="preview-toolbar">
-  <span class="preview-toolbar-title">Aperçu du bulletin — ${nom}</span>
-  <button class="preview-toolbar-btn" onclick="window.print()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Imprimer / PDF</button>
-</div>
-<div class="preview-page-wrap">
-  <div class="preview-a4">${page}</div>
-</div>
-</body></html>`);
-      win.document.close();
-      logActivity('Aperçu PDF','Calcul MO',nom);
-    } else {
-      toast('Enregistrement échoué. Aperçu non généré.',true);
-    }
+    if(id) markPrinted(id);
+    const page=document.getElementById('bulletin-print').innerHTML;
+    const nom=esc((document.getElementById('mo-nom')?.value||'Élève').trim());
+    openBulletinModal(page,'Aperçu — '+nom);
+    logActivity('Aperçu PDF','Calcul MO',nom);
   });
 }
 
@@ -3664,6 +3556,21 @@ function logActivity(action,module,detail,resultat){
   }).catch(()=>{});
 }
 
+let _noteLogTimer=null;
+let _noteLogChanges=[];
+function logNoteChange(inputId,value){
+  if(!value) return;
+  _noteLogChanges.push({id:inputId,val:value});
+  if(_noteLogTimer) clearTimeout(_noteLogTimer);
+  _noteLogTimer=setTimeout(()=>{
+    if(!_noteLogChanges.length) return;
+    const n=_noteLogChanges.length;
+    const sample=_noteLogChanges.slice(-3).map(c=>c.id.replace(/_/g,' ')+': '+c.val).join(', ');
+    logActivity('Saisie de notes','Calcul MO',n+' note(s) modifiée(s): '+sample);
+    _noteLogChanges=[];
+  },2000);
+}
+
 async function loadUsers(){
   try{
     const [r,rd,rb]=await Promise.all([
@@ -3676,8 +3583,7 @@ async function loadUsers(){
     _knownDevices=rd.ok?await rd.json():[];
     _bannedUsers=rb.ok?await rb.json():[];
     renderUsers(_allSessions);
-    renderKnownDevices();
-  }catch(e){}
+  }catch(e){console.error('loadUsers error:',e);}
 }
 
 /* ════ SSE (Server-Sent Events) — Real-time updates ════ */
@@ -3813,102 +3719,17 @@ showPage=function(id){
   if(id==='users'&&!_sseConnected) _sseConnect();
 };
 
-function renderKnownDevices(){
-  const container=document.getElementById('users-devices-list');
-  const countEl=document.getElementById('users-devices-count');
-  const section=document.getElementById('users-devices-section');
-  if(!container||!section){return;}
-  section.style.display='block';
-  const knownMap={};
-  _knownDevices.forEach(d=>{knownMap[d.fingerprint]=d;});
-  const deviceMap={};
-  function _stableFingerprint(os,nav,device){
-    const key=(os||'Inconnu')+'|'+(nav||'Inconnu')+'|'+(device||'Ordinateur');
-    let h=0x811c9dc5;
-    for(let i=0;i<key.length;i++){h^=key.charCodeAt(i);h=(h*0x01000193)>>>0;}
-    return h.toString(16).padStart(8,'0').substring(0,16);
-  }
-  _allSessions.forEach(s=>{
-    const fp=_stableFingerprint(s.os,s.navigateur,s.appareil);
-    if(!fp) return;
-    if(!deviceMap[fp]){
-      deviceMap[fp]={fingerprint:fp,label:s.appareil||'',os:s.os||'',navigateur:s.navigateur||'',ip:s.ip||'',kd:knownMap[fp]||null,sessions:[]};
-    }
-    deviceMap[fp].sessions.push(s);
-  });
-  const devices=Object.values(deviceMap);
-  if(!devices.length){
-    countEl.textContent='0 appareil(s)';
-    container.innerHTML='<div class="users-devices-empty">Aucun appareil connecté</div>';
-    return;
-  }
-  countEl.textContent=devices.length+' appareil'+(devices.length>1?'s':'');
-  const unknownCount=devices.filter(d=>!d.kd||!d.kd.trusted).length;
-  const alertEl=document.getElementById('users-devices-alert');
-  const alertText=document.getElementById('users-devices-alert-text');
-  if(unknownCount>0){alertEl.style.display='flex';alertText.textContent=unknownCount+' appareil'+(unknownCount>1?'s':'')+' inconnu'+(unknownCount>1?'s':'')+' détecté'+(unknownCount>1?'s':'');}
-  else{alertEl.style.display='none';}
-  container.innerHTML=devices.map((d,idx)=>{
-    const kd=d.kd;
-    const trusted=kd?Number(kd.trusted):0;
-    const isCurrent=d.sessions.some(s=>s.id===_sessionId);
-    let badge='';
-    if(isCurrent){
-      badge=`<span class="users-device-badge users-device-current" title="Cet appareil est en cours d'utilisation">&#9679; Cet appareil</span>`;
-    }else if(kd){
-      badge=trusted
-        ?'<span class="users-device-badge users-device-trusted">&#10003; Fiable</span>'
-        :'<span class="users-device-badge users-device-untrusted">&#9888; Inconnu</span>';
-    }else{
-      badge='<span class="users-device-badge users-device-untrusted">&#9888; Nouvel appareil</span>';
-    }
-    let actions='';
-    if(kd){
-      const trustLabel=trusted?'Retirer des appareils fiables':'Marquer comme fiable';
-      if(trusted){
-        actions=`
-          <button class="users-trust-btn users-trust-remove" onclick="toggleDeviceTrust(${kd.id},0)" title="Retirer des appareils fiables"><svg viewBox="0 0 24 24"><path d="M19.69 14a6.9 6.9 0 0 0 .31-2V5l-8-3-3.16 1.18"/><path d="M4.73 4.73L4 5v7c0 6 8 10 8 10a20.29 20.29 0 0 0 5.62-4.38"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>`;
-      }else{
-        actions=`
-          <button class="users-trust-btn users-trust-add" onclick="toggleDeviceTrust(${kd.id},1)" title="Marquer comme fiable"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></button>`;
-      }
-      actions+=`<button class="btn-icon-danger" onclick="deleteKnownDevice(${kd.id})" title="Supprimer cet appareil connu" style="width:36px;height:36px;"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>`;
-    }else{
-      actions=`<button class="users-trust-btn users-trust-add" onclick="trustNewDevice('${d.fingerprint}','${(d.label||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')" title="Marquer comme fiable"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></button>`;
-    }
-    const uniqueEmails=[...new Set(d.sessions.map(s=>s.email||'').filter(Boolean))];
-    let detailLine='';
-    if(uniqueEmails.length===1){
-      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${esc(uniqueEmails[0])}</div>`;
-    }else if(uniqueEmails.length>1){
-      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · ${uniqueEmails.length} utilisateurs associés <span class="users-device-detail-link" onclick="showDeviceUsers(${idx})">Voir</span></div>`;
-    }else{
-      detailLine=`<div class="users-device-detail">${esc(d.os||'Inconnu')} · ${esc(d.navigateur||'Inconnu')} · Session active</div>`;
-    }
-    return `<div class="users-device-card">
-      <div class="users-device-info">
-        <div class="users-device-label">${esc(d.label||'Appareil inconnu')} ${badge}</div>
-        ${detailLine}
-      </div>
-      <div class="users-device-actions">${actions}</div>
-    </div>`;
-  }).join('');
-  window._deviceUsersMap=devices.map(d=>[...new Set(d.sessions.map(s=>s.email||'').filter(Boolean))]);
-}
-
-function showDeviceUsers(idx){
-  const emails=window._deviceUsersMap?window._deviceUsersMap[idx]:[];
-  if(!emails||!emails.length)return;
-  const list=emails.map(e=>'<div style="padding:6px 0;border-bottom:1px solid #eef3f0;font-size:.8rem;color:#003b32;">'+esc(e)+'</div>').join('');
-  const modal=document.createElement('div');
-  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:9999;';
-  modal.innerHTML=`<div style="background:#fff;border-radius:12px;padding:20px 24px;min-width:280px;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,.18);">
-    <div style="font-size:.88rem;font-weight:700;color:#003b32;margin-bottom:12px;">Utilisateurs associés</div>
-    <div style="max-height:240px;overflow-y:auto;">${list}</div>
-    <div style="text-align:right;margin-top:14px;"><button onclick="this.closest('div[style*=fixed]').remove()" style="padding:6px 16px;border-radius:8px;border:1px solid #B8CEC3;background:#fff;color:#064E3B;font-size:.8rem;font-weight:600;cursor:pointer;">Fermer</button></div>
-  </div>`;
-  modal.addEventListener('click',e=>{if(e.target===modal)modal.remove();});
-  document.body.appendChild(modal);
+function calcDuration(loginAt,logoutAt){
+  if(!loginAt) return '';
+  const start=new Date(loginAt).getTime();
+  const end=logoutAt?new Date(logoutAt).getTime():Date.now();
+  const ms=end-start;
+  if(ms<60000) return '<1 min';
+  const mins=Math.floor(ms/60000);
+  if(mins<60) return mins+'min';
+  const hrs=Math.floor(mins/60);
+  const rem=mins%60;
+  return hrs+'h'+String(rem).padStart(2,'0');
 }
 
 function renderUsers(sessions){
@@ -3916,7 +3737,7 @@ function renderUsers(sessions){
   const ct=document.getElementById('users-count');
   if(!sessions.length){
     ct.textContent='Aucune session enregistrée';
-    tb.innerHTML='<tr><td colspan="11" class="users-empty-state">Aucune session enregistrée<div class="users-empty-sub">Les connexions des utilisateurs apparaîtront ici.</div></td></tr>';
+    tb.innerHTML='<tr><td colspan="13" class="users-empty-state">Aucune session enregistrée<div class="users-empty-sub">Les connexions des utilisateurs apparaîtront ici.</div></td></tr>';
     return;
   }
   const n=sessions.length;
@@ -3924,9 +3745,10 @@ function renderUsers(sessions){
   const knownMap={};
   _knownDevices.forEach(d=>{knownMap[d.fingerprint]=d;});
   function _stableFingerprint(os,nav,device){
-    const key=(os||'Inconnu')+'|'+(nav||'Inconnu')+'|'+(device||'Ordinateur');
+    const s=screen;
+    const parts=[s.width+'x'+s.height,s.colorDepth,new Date().getTimezoneOffset(),navigator.language||navigator.userLanguage||'',navigator.platform||'',navigator.hardwareConcurrency||0,navigator.maxTouchPoints||0].join('|');
     let h=0x811c9dc5;
-    for(let i=0;i<key.length;i++){h^=key.charCodeAt(i);h=(h*0x01000193)>>>0;}
+    for(let i=0;i<parts.length;i++){h^=parts.charCodeAt(i);h=(h*0x01000193)>>>0;}
     return h.toString(16).padStart(8,'0').substring(0,16);
   }
   tb.innerHTML=sessions.map(s=>{
@@ -3945,7 +3767,7 @@ function renderUsers(sessions){
     else if(isOnline){statutLabel='En ligne';statutCls='users-statut-online';}
     else{statutLabel='Déconnecté';statutCls='users-statut-offline';}
     const ville=(s.ville||'—').replace(/Ivoiry Coast|Ivory Coast/g,'Côte d\'Ivoire');
-    const fp=_stableFingerprint(s.os,s.navigateur,s.appareil);
+    const fp=s.fingerprint||'';
     const kd=knownMap[fp];
     const isCurrentSession=(s.id===_sessionId);
     let badge='';
@@ -3963,10 +3785,19 @@ function renderUsers(sessions){
     const showBan=!isSelf;
     const showDelete=!isSelf||isOnline;
     const showMsg=!!rawEmail&&!isSelf;
-    const hasDropdown=showBan||showDelete||showMsg;
+    let trustItem='';
+    if(!isCurrentSession&&fp){
+      if(kd&&Number(kd.trusted)){
+        trustItem=`<button class="dd-trust-remove" onclick="toggleDeviceTrust(${kd.id},0)" title="Retirer des fiables"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10a20.29 20.29 0 0 0 5.62-4.38"/><line x1="1" y1="1" x2="23" y2="23"/></svg>Non fiable</button>`;
+      }else{
+        trustItem=`<button class="dd-trust-add" onclick="${kd?'toggleDeviceTrust('+kd.id+',1)':"trustNewDevice('"+fp.replace(/'/g,"\\'")+"','"+(s.appareil||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')+"')"}" title="Marquer comme fiable"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>Fiable</button>`;
+      }
+    }
+    const hasDropdown=showBan||showDelete||showMsg||trustItem;
     let dropdownHTML='';
     if(hasDropdown){
       let items='';
+      if(trustItem) items+=trustItem;
       if(showMsg) items+=`<button class="dd-msg" onclick="openMsgModal('${esc(rawEmail).replace(/'/g,"\\'")}')" title="Envoyer un message"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Message</button>`;
       if(showBan) items+=`<button class="dd-ban" onclick="banUser(${s.id},'${esc(email).replace(/'/g,"\\'")}')" title="Bannir cet utilisateur"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>Bannir</button>`;
       if(showDelete) items+=`<button class="dd-delete" onclick="deleteSession(${s.id})" title="Supprimer cette session"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>Supprimer</button>`;
@@ -3985,10 +3816,12 @@ function renderUsers(sessions){
       <td style="font-family:monospace;font-size:.72rem;" title="${s.ip||''}">${s.ip||'—'}</td>
       <td style="font-size:.72rem;">${loginDisplay}</td>
       <td style="font-size:.72rem;">${logoutDisplay}</td>
+      <td style="font-size:.72rem;text-align:center;color:${isOnline?'#16a34a':'#6B7280'};">${calcDuration(s.login_at,s.logout_at)}</td>
+      <td style="font-size:.72rem;text-align:center;" title="${esc(s.last_activity||'Aucune activité')}">${s.activity_count||0}</td>
       <td>
         <div class="users-actions-cell">
           ${disconnectBtn}
-          <button class="users-act-btn" onclick="showUserActivities(${s.id},'${email.replace(/'/g,"\\'")}')" title="Voir les activités"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button>
+          <button class="users-act-btn${(s.activity_count||0)>0?' users-act-btn-active':''}" onclick="showUserActivities(${s.id},'${email.replace(/'/g,"\\'")}')" title="Voir les activités (${s.activity_count||0})"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></button>
           ${dropdownHTML}
         </div>
       </td>
@@ -4025,7 +3858,25 @@ function trustNewDevice(fingerprint, label) {
   }).then(r => r.json().catch(()=>({})).then(data => {
     if (r.ok) {
       toast('Appareil marqué comme fiable ✔');
-      sendNotification('Sécurité', 'Nouvel appareil enregistré : ' + (label || 'inconnu'), 'success');
+      sendNotification('Sécurité', 'Appareil marqué fiable : ' + (label || 'inconnu'), 'success');
+      loadUsers();
+    } else {
+      toast('Erreur : ' + (data.error || r.status));
+    }
+  })).catch(e => { toast('Erreur réseau'); });
+}
+
+function blockNewDevice(fingerprint, label) {
+  if(!confirm('Voulez-vous vraiment marquer cet appareil comme NON fiable ?')) return;
+  toast('Enregistrement en cours…');
+  fetch(API + '/api/known-devices', {
+    method: 'POST', credentials: 'same-origin',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({fingerprint: fingerprint, label: label, trusted: 0})
+  }).then(r => r.json().catch(()=>({})).then(data => {
+    if (r.ok) {
+      toast('Appareil marqué comme non fiable ✔');
+      sendNotification('Sécurité', 'Appareil marqué non fiable : ' + (label || 'inconnu'), 'warning');
       loadUsers();
     } else {
       toast('Erreur : ' + (data.error || r.status));
@@ -4070,7 +3921,7 @@ function filterUsers(){
   renderUsers(filtered);
 }
 
-function toggleSelectAll(cb){
+function toggleSelectAllUsers(cb){
   document.querySelectorAll('.users-cb:not(:disabled)').forEach(c=>{c.checked=cb.checked;});
   updateDeleteBtn();
 }
@@ -4079,6 +3930,15 @@ function updateDeleteBtn(){
   const n=document.querySelectorAll('.users-cb:checked').length;
   const btn=document.getElementById('users-delete-selected');
   if(btn) btn.style.display=n>0?'':'none';
+  const offBtn=document.getElementById('users-delete-offline');
+  if(offBtn){
+    let hasOffline=false;
+    document.querySelectorAll('.users-cb:checked').forEach(cb=>{
+      const s=_allSessions.find(x=>x.id===parseInt(cb.value));
+      if(s&&s.logout_at) hasOffline=true;
+    });
+    offBtn.style.display=hasOffline?'':'none';
+  }
 }
 
 function getSelectedUserIds(){
@@ -4102,21 +3962,39 @@ async function deleteSelectedUsers(){
   if(!ids.length){toast('Aucune session supprimable (session active exclue).',true);return;}
   const skipped=getSelectedUserIds().length-ids.length;
   if(!confirm('Supprimer '+ids.length+' session(s) sélectionnée(s) ?'+(skipped?' La session active sera conservée.':'')+' Cette action est irréversible.')) return;
-  for(const id of ids){
-    try{await fetch('/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});}catch(e){}
-  }
-  toast(ids.length+' session(s) supprimée(s)'+(skipped?' (session active conservée)':''));
-  await loadUsers();
+  try{
+    const r=await fetch('/api/sessions/batch-delete',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({ids})});
+    const data=await r.json().catch(()=>({}));
+    if(r.ok){toast((data.deleted||ids.length)+' session(s) supprimée(s)'+(skipped?' (session active conservée)':''));loadUsers();}
+    else{toast('Erreur : '+(data.error||r.status),true);}
+  }catch(e){toast('Erreur réseau',true);}
 }
 
 async function clearAllUsers(){
   const ids=_allSessions.map(s=>s.id).filter(id=>id!==_sessionId);
   if(!ids.length){toast('Aucune autre session à supprimer.',true);return;}
   if(!confirm('Supprimer '+ids.length+' session(s) ?\nVotre session active sera conservée.\nCette action est irréversible.')) return;
-  for(const id of ids){
-    try{await fetch('/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});}catch(e){}
-  }
-  toast(ids.length+' session(s) supprimée(s) (session active conservée)');
+  try{
+    const r=await fetch('/api/sessions/batch-delete',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({ids})});
+    const data=await r.json().catch(()=>({}));
+    if(r.ok){toast((data.deleted||ids.length)+' session(s) supprimée(s) (session active conservée)');loadUsers();}
+    else{toast('Erreur : '+(data.error||r.status),true);}
+  }catch(e){toast('Erreur réseau',true);}
+}
+
+async function clearOfflineSessions(){
+  const ids=getSelectedUserIds().filter(id=>{
+    const s=_allSessions.find(x=>x.id===id);
+    return s&&s.logout_at&&id!==_sessionId;
+  });
+  if(!ids.length){toast('Sélectionnez des sessions déconnectées à supprimer.',true);return;}
+  if(!confirm('Supprimer '+ids.length+' session(s) déconnectée(s) sélectionnée(s) ?')) return;
+  try{
+    const r=await fetch('/api/sessions/batch-delete',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({ids})});
+    const data=await r.json().catch(()=>({}));
+    if(r.ok){toast((data.deleted||ids.length)+' session(s) déconnectée(s) supprimée(s) ✔');}
+    else{toast('Erreur : '+(data.error||r.status),true);}
+  }catch(e){toast('Erreur réseau',true);}
   await loadUsers();
 }
 
@@ -4246,19 +4124,7 @@ function previewBulletinFromAct(idx){
   const d=_actBulletinData[idx];
   if(!d){toast('Données bulletin introuvables.',true);return;}
   const html=buildBulletinHTML(d);
-  const styles=Array.from(document.querySelectorAll('style')).map(s=>s.outerHTML).join('\n');
-  const win=window.open('','_blank','width=900,height=700');
-  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-<title>Aperçu — ${esc(d.nom||'')} — SAPHIR Pro</title>
-${styles}
-<style>
-  *{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
-  body{margin:0;padding:0;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
-  .bulletin-sheet{margin:0;padding:0;max-height:297mm;overflow:hidden;}
-  @page{size:A4 portrait;margin:8mm 10mm 5mm 12mm;}
-</head><body>${html}</body></html>`);
-  win.document.close();
+  openBulletinModal(html,'Aperçu — '+esc(d.nom||''));
   toast('Aperçu bulletin pour '+d.nom);
 }
 
@@ -4278,20 +4144,25 @@ function exportUsersPDF(){
       <td style="padding:8px;border-bottom:1px solid #eee;">${status}</td>
     </tr>`;
   }).join('');
-  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Utilisateurs — SAPHIR Pro</title>
-    <style>body{font-family:'Ebrima',Arial,sans-serif;padding:20px;color:#1a3a2e;}
-    h1{font-size:1.1rem;color:#064E3B;margin-bottom:4px;}
-    p{font-size:.75rem;color:#60736d;margin-bottom:16px;}
-    table{width:100%;border-collapse:collapse;font-size:.75rem;}
-    th{background:#f4f8f6;padding:8px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#064E3B;border-bottom:2px solid #d5e5de;}
-    </head><body>
-    <h1>Liste des utilisateurs — SAPHIR Pro</h1>
-    <p>${_allSessions.length} session(s) • Exporté le ${new Date().toLocaleDateString('fr-FR')}</p>
-    <table><thead><tr><th>Utilisateur</th><th>Rôle</th><th>Appareil</th><th>Ville</th><th>IP</th><th>Connexion</th><th>Déconnexion</th><th>État</th></tr></thead><tbody>${rows}</tbody></table>
-    </body></html>`;
-  const win=window.open('','_blank','width=900,height=700');
-  if(!win){toast('Bloqué par le navigateur. Autorisez les pop-ups.',true);return;}
-  win.document.write(html);win.document.close();setTimeout(()=>win.print(),400);
+  const content=`<div style="padding:20px;font-family:'Ebrima',Arial,sans-serif;color:#1a3a2e;">
+    <h1 style="font-size:1.1rem;color:#064E3B;margin-bottom:4px;">Liste des utilisateurs — SAPHIR Pro</h1>
+    <p style="font-size:.75rem;color:#60736d;margin-bottom:16px;">${_allSessions.length} session(s) • Exporté le ${new Date().toLocaleDateString('fr-FR')}</p>
+    <table style="width:100%;border-collapse:collapse;font-size:.75rem;">
+      <thead><tr>
+        <th style="background:#f4f8f6;padding:8px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#064E3B;border-bottom:2px solid #d5e5de;">Utilisateur</th>
+        <th style="background:#f4f8f6;padding:8px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#064E3B;border-bottom:2px solid #d5e5de;">Rôle</th>
+        <th style="background:#f4f8f6;padding:8px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#064E3B;border-bottom:2px solid #d5e5de;">Appareil</th>
+        <th style="background:#f4f8f6;padding:8px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#064E3B;border-bottom:2px solid #d5e5de;">Ville</th>
+        <th style="background:#f4f8f6;padding:8px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#064E3B;border-bottom:2px solid #d5e5de;">IP</th>
+        <th style="background:#f4f8f6;padding:8px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#064E3B;border-bottom:2px solid #d5e5de;">Connexion</th>
+        <th style="background:#f4f8f6;padding:8px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#064E3B;border-bottom:2px solid #d5e5de;">Déconnexion</th>
+        <th style="background:#f4f8f6;padding:8px;text-align:left;font-size:.7rem;text-transform:uppercase;color:#064E3B;border-bottom:2px solid #d5e5de;">État</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+  openBulletinModal(content,'Utilisateurs — SAPHIR Pro');
+  setTimeout(()=>window.print(),300);
   logActivity('Export PDF','Utilisateurs',_allSessions.length+' session(s)');
 }
 
@@ -4653,6 +4524,7 @@ function filterByYear(){
     _role=d.role||'guest';
     if(d.email){_userEmail=d.email;localStorage.setItem('saphir_email',d.email);}
     else{_userEmail=localStorage.getItem('saphir_email')||'';}
+    if(d.session_id){_sessionId=d.session_id;localStorage.setItem('saphir_session_id',String(d.session_id));}
   }catch(e){_role='guest';}
   applyRole();
   setTimeout(_sseStart,1000);
@@ -4690,6 +4562,33 @@ window.addEventListener('pagehide',()=>{
   if(!sid)return;
   try{navigator.sendBeacon(API+'/api/heartbeat',new Blob([JSON.stringify({session_id:parseInt(sid)})],{type:'application/json'}));}catch(e){}
 });
+
+/* ══ BULLETIN PREVIEW MODAL ══ */
+function openBulletinModal(html,title){
+  const c=document.getElementById('bpm-content');
+  c.innerHTML=html;
+  const label=title||'Aperçu du bulletin';
+  document.getElementById('bpm-title').textContent=label;
+  document.body.style.overflow='hidden';
+  document.body.classList.add('bpm-active');
+  document.title=label+' — SAPHIR Pro';
+  const ov=document.getElementById('bpm-overlay');
+  ov.classList.add('open');
+  document.addEventListener('keydown',_bpmEscHandler);
+}
+function closeBulletinModal(e){
+  if(e&&e.type==='click'&&e.target!==e.currentTarget)return;
+  document.getElementById('bpm-overlay').classList.remove('open');
+  document.getElementById('bpm-content').innerHTML='';
+  document.body.style.overflow='';
+  document.body.classList.remove('bpm-active');
+  document.title='SAPHIR Pro — Calcul MO';
+  document.removeEventListener('keydown',_bpmEscHandler);
+}
+function _bpmEscHandler(e){if(e.key==='Escape')closeBulletinModal();}
+function printBulletinModal(){
+  window.print();
+}
 
 </script>
 </body>

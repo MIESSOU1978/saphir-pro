@@ -359,8 +359,26 @@ document.getElementById('loginForm').addEventListener('submit',async function(e)
       btn.disabled=false;btn.textContent='Se connecter';return;
     }
 
+    /* ── Machine fingerprint ── */
+    function _machineFingerprint(){
+      const s=screen;
+      const parts=[
+        s.width+'x'+s.height,
+        s.colorDepth,
+        new Date().getTimezoneOffset(),
+        navigator.language||navigator.userLanguage||'',
+        navigator.platform||'',
+        navigator.hardwareConcurrency||0,
+        navigator.maxTouchPoints||0
+      ].join('|');
+      let h=0x811c9dc5;
+      for(let i=0;i<parts.length;i++){h^=parts.charCodeAt(i);h=(h*0x01000193)>>>0;}
+      return h.toString(16).padStart(8,'0');
+    }
+    const machineFp=_machineFingerprint();
+
     /* ── Login ── */
-    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({password:pwd,email})});
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({password:pwd,email,machine_fp:machineFp})});
     const d=await r.json();
 
     if(d.ok){
