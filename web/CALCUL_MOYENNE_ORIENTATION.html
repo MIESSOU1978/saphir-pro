@@ -1413,6 +1413,19 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 .to-toggle.active{background:#064E3B;color:#fff;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.25);}
 .to-toggle.active:hover{background:#0B6B50;}
 .to-toggle .to-label{pointer-events:none;line-height:1;}
+.nc-toggle{width:36px;height:36px;border-radius:50%;border:2px solid #B8CEC3;background:#fff;color:#60736D;font-size:.72rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s ease;flex-shrink:0;}
+.nc-toggle:hover{border-color:#064E3B;color:#064E3B;background:#F3F8F5;}
+.nc-toggle.active{background:#064E3B;color:#fff;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.25);}
+.nc-toggle.active:hover{background:#0B6B50;}
+.nc-toggle .nc-label{pointer-events:none;line-height:1;}
+.nc-cell{display:flex;align-items:center;gap:3px;}
+.nc-ind{width:22px;height:22px;min-width:22px;border-radius:50%;background:#F2F4F7;border:1.5px solid #B8CEC3;color:#60736D;font-size:.55rem;font-weight:800;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all .15s ease;line-height:1;flex-shrink:0;}
+.nc-cell.nc-on .nc-ind{display:flex;}
+.nc-ind:hover{border-color:#064E3B;background:#E8F5E9;color:#064E3B;}
+.nc-cell.is-nc .nc-ind{background:#B42318;border-color:#B42318;color:#fff;}
+.nc-cell.is-nc .note-input{width:0;min-width:0;padding:0;border:none;opacity:0;pointer-events:none;overflow:hidden;}
+.nc-badge{font-size:.75rem;font-weight:700;color:#B42318;background:rgba(180,35,24,.1);padding:3px 8px;border-radius:4px;letter-spacing:.3px;white-space:nowrap;display:none;line-height:1.3;flex-shrink:0;}
+.nc-cell.is-nc .nc-badge{display:inline-flex;}
 .two-notes.to-single{display:flex;justify-content:center;}
 .two-notes.to-single .note-input{width:100%;max-width:none;}
 #page-mga .eleve-grid,
@@ -1902,7 +1915,12 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
   </div>
 
   <div class="card">
-    <div class="section-title">Moyennes trimestrielles par matière — Calcul automatique de la MA</div>
+    <div class="section-title-row">
+      <div class="section-title">Moyennes trimestrielles par matière — Calcul automatique de la MA</div>
+      <button class="nc-toggle" id="nc-toggle" onclick="toggleNC()" title="Non classé — Masquer des notes du calcul MA">
+        <span class="nc-label">NC</span>
+      </button>
+    </div>
     <table class="mat-table">
       <thead>
         <tr>
@@ -2379,6 +2397,8 @@ const MATIERES = [
 ];
 const TOTAL_COEF = MATIERES.reduce((s,m)=>s+m.coef,0);
 let _toMode = false;
+let _ncMode = false;
+let _ncState = {};
 
 /* ── NAVIGATION ── */
 let _role='guest';
@@ -2402,34 +2422,73 @@ function buildMGATable(){
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td><span class="mat-label">${m.label}</span></td>
-      <td><input class="note-input" id="${m.id}_t1" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"></td>
-      <td><input class="note-input" id="${m.id}_t2" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"></td>
-      <td><input class="note-input" id="${m.id}_t3" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"></td>
+      <td class="nc-cell${_ncState[m.id+'_t1']?' is-nc':''}${_ncMode?' nc-on':''}"><input class="note-input" id="${m.id}_t1" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"><span class="nc-ind" onclick="markNC('${m.id}_t1',this)" title="Non classé">NC</span><span class="nc-badge">NC</span></td>
+      <td class="nc-cell${_ncState[m.id+'_t2']?' is-nc':''}${_ncMode?' nc-on':''}"><input class="note-input" id="${m.id}_t2" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"><span class="nc-ind" onclick="markNC('${m.id}_t2',this)" title="Non classé">NC</span><span class="nc-badge">NC</span></td>
+      <td class="nc-cell${_ncState[m.id+'_t3']?' is-nc':''}${_ncMode?' nc-on':''}"><input class="note-input" id="${m.id}_t3" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"><span class="nc-ind" onclick="markNC('${m.id}_t3',this)" title="Non classé">NC</span><span class="nc-badge">NC</span></td>
       <td><span class="mga-val" id="${m.id}_mga_val">0,00</span></td>`;
     tb.appendChild(tr);
   });
 }
 
 function calcMGA(mid){
-  const t1=getVal(mid+'_t1'), t2=getVal(mid+'_t2'), t3=getVal(mid+'_t3');
-  const mga=(t1 + 2*t2 + 2*t3)/5;
-  document.getElementById(mid+'_mga_val').textContent=fmtNum(mga,2);
+  const w=[1,2,2],ids=['t1','t2','t3'];
+  let sum=0,totalW=0;
+  ids.forEach((t,i)=>{
+    if(!_ncState[mid+'_'+t]){sum+=w[i]*getVal(mid+'_'+t);totalW+=w[i];}
+  });
+  const el=document.getElementById(mid+'_mga_val');
+  if(totalW===0){el.textContent='NC';el.style.color='#B42318';el.style.fontWeight='700';}
+  else{el.textContent=fmtNum(sum/totalW,2);el.style.color='';el.style.fontWeight='';}
   updateMGASummary();
 }
 
+/* ════ NC (NON CLASSÉ) ════ */
+function toggleNC(){
+  _ncMode=!_ncMode;
+  const btn=document.getElementById('nc-toggle');
+  if(btn) btn.classList.toggle('active',_ncMode);
+  document.querySelectorAll('#mga-tbody .nc-cell').forEach(c=>c.classList.toggle('nc-on',_ncMode));
+  logActivity(_ncMode?'Activation NC':'Désactivation NC','MA Table',_ncMode?'Mode non classé activé':'Mode non classé désactivé');
+}
+function markNC(cellId,el){
+  const cell=el.closest('.nc-cell');
+  const inp=cell?cell.querySelector('.note-input'):null;
+  if(!cell||!inp) return;
+  const trimMap={t1:'1er trimestre',t2:'2e trimestre',t3:'3e trimestre'};
+  const trim=cellId.split('_').pop();
+  const mat=MATIERES.find(m=>cellId.startsWith(m.id));
+  const label=(mat?mat.label:'')+' — '+trimMap[trim];
+  if(_ncState[cellId]){
+    delete _ncState[cellId];
+    cell.classList.remove('is-nc');
+    inp.removeAttribute('readonly');
+    logActivity('Réactivation note','MA Table',label+' réactivé comme note normale');
+  } else {
+    _ncState[cellId]=true;
+    cell.classList.add('is-nc');
+    inp.setAttribute('readonly','readonly');
+    logActivity('Classement NC','MA Table',label+' marqué non classé');
+  }
+  calcMGA(cellId.replace(/_t[123]$/,''));
+  logActivity('Recalcul MGA','MA Table',(mat?mat.label:'')+' recalculé automatiquement');
+}
+
 function updateMGASummary(){
-  let count=0;
+  let count=0,ncCount=0;
   MATIERES.forEach(m=>{
     const t1=document.getElementById(m.id+'_t1');
     const t2=document.getElementById(m.id+'_t2');
     const t3=document.getElementById(m.id+'_t3');
     if((t1&&t1.value!=='')||(t2&&t2.value!=='')||(t3&&t3.value!=='')) count++;
+    if(_ncState[m.id+'_t1']) ncCount++;
+    if(_ncState[m.id+'_t2']) ncCount++;
+    if(_ncState[m.id+'_t3']) ncCount++;
   });
   const badge=document.getElementById('mga-badge-count');
   const msg=document.getElementById('mga-summary-msg');
   const fill=document.getElementById('mga-progress-fill');
   if(badge){
-    badge.textContent=count+' / 4';
+    badge.textContent=count+' / 4'+(ncCount>0?' ('+ncCount+' NC)':'');
     badge.className='mga-badge';
     if(count===4) badge.classList.add('complete');
     else if(count>=3) badge.classList.add('almost');
@@ -2453,20 +2512,23 @@ function resetMGA(){
   document.getElementById('classe').value='';
   document.getElementById('annee_scolaire').value='';
   document.getElementById('etablissement').value='';
+  _ncState={};
+  if(_ncMode) toggleNC();
   MATIERES.forEach(m=>{
-    ['t1','t2','t3'].forEach(t=>{const el=document.getElementById(m.id+'_'+t);if(el)el.value='';});
+    ['t1','t2','t3'].forEach(t=>{const el=document.getElementById(m.id+'_'+t);if(el){el.value='';el.removeAttribute('readonly');}});
     document.getElementById(m.id+'_mga_val').textContent='0,00';
   });
+  buildMGATable();
   updateMGASummary();
   toast('Tous les champs ont été réinitialisés.');
 }
 
 function exportMGAtoMO(){
-  // Vérifie que toutes les matières ont T1, T2, T3 renseignés
   const missing=[];
   const trimLabel={'t1':'T1','t2':'T2','t3':'T3'};
   MATIERES.forEach(m=>{
     ['t1','t2','t3'].forEach(t=>{
+      if(_ncState[m.id+'_'+t]) return;
       const el=document.getElementById(m.id+'_'+t);
       if(!el||el.value==='') missing.push(m.label+' → '+trimLabel[t]);
     });
@@ -2474,8 +2536,7 @@ function exportMGAtoMO(){
   if(missing.length>0){
     toast('Note manquante : '+missing[0],true);return;
   }
-  // Vide d'abord le tableau MO
-  document.querySelectorAll('#page-mo .note-input').forEach(el=>el.value='');
+  document.querySelectorAll('#page-mo .note-input').forEach(el=>{el.value='';delete el.dataset.nc;});
   document.querySelectorAll('#mo-tbody .computed-val, #mo-tbody .sum-val').forEach(el=>el.textContent='—');
   document.getElementById('r-total').textContent='0,00';
   document.getElementById('r-mo').textContent='0,00 / 20';
@@ -2483,12 +2544,18 @@ function exportMGAtoMO(){
   const men=document.getElementById('r-mention');
   men.textContent='—';men.style.background='rgba(148,163,184,0.15)';men.style.color='var(--muted)';
   document.getElementById('mga-badge').style.display='none';
-  // Transfère les MGA calculées vers le module MO
   MATIERES.forEach(m=>{
     const txt=document.getElementById(m.id+'_mga_val').textContent;
-    const val=parseFloat(txt.replace(',','.'));
     const inp=document.getElementById(m.id+'_mga');
-    if(inp && val>0){ inp.value=fmtNum(val,2); calcRowMO(m.id); }
+    if(!inp) return;
+    if(txt==='NC'){
+      inp.value='';inp.dataset.nc='1';calcRowMO(m.id);
+    } else {
+      delete inp.dataset.nc;
+      const val=parseFloat(txt.replace(',','.'));
+      if(val>0) inp.value=fmtNum(val,2);
+      calcRowMO(m.id);
+    }
   });
   // Transfère aussi infos élève
   const nom=document.getElementById('nomEleve').value;
@@ -2564,19 +2631,21 @@ function toggleTO(){
 
 function calcRowMO(mid){
   const m=MATIERES.find(x=>x.id===mid);
+  const mgaEl=document.getElementById(mid+'_mga');
+  if(mgaEl&&mgaEl.dataset.nc==='1'){
+    document.getElementById(mid+'_sum').textContent='NC';
+    document.getElementById(mid+'_prod').textContent='NC';
+    calcTotalMO();
+    return;
+  }
   const mga=getVal(mid+'_mga');
   let bepc=0;
   if(m.anglais){
-    if(_toMode){
-      bepc=getVal(mid+'_bepc_e');
-    } else {
-      bepc=(getVal(mid+'_bepc_e')+getVal(mid+'_bepc_o'))/2;
-    }
+    if(_toMode){bepc=getVal(mid+'_bepc_e');}else{bepc=(getVal(mid+'_bepc_e')+getVal(mid+'_bepc_o'))/2;}
   } else {
     bepc=getVal(mid+'_bepc');
   }
   const sum=mga+bepc, prod=sum*m.coef;
-  const mgaEl=document.getElementById(mid+'_mga');
   const bepcEl=m.anglais?null:document.getElementById(mid+'_bepc');
   const bepcE=m.anglais?document.getElementById(mid+'_bepc_e'):null;
   const bepcO=m.anglais&&!_toMode?document.getElementById(mid+'_bepc_o'):null;
@@ -2589,19 +2658,16 @@ function calcRowMO(mid){
 function calcTotalMO(){
   let total=0,count=0;
   MATIERES.forEach(m=>{
+    const mgaEl=document.getElementById(m.id+'_mga');
+    if(mgaEl&&mgaEl.dataset.nc==='1') return;
     const mga=getVal(m.id+'_mga');
     let bepc=0;
     if(m.anglais){
-      if(_toMode){
-        bepc=getVal(m.id+'_bepc_e');
-      } else {
-        bepc=(getVal(m.id+'_bepc_e')+getVal(m.id+'_bepc_o'))/2;
-      }
+      if(_toMode){bepc=getVal(m.id+'_bepc_e');}else{bepc=(getVal(m.id+'_bepc_e')+getVal(m.id+'_bepc_o'))/2;}
     } else {
       bepc=getVal(m.id+'_bepc');
     }
     total+=(mga+bepc)*m.coef;
-    const mgaEl=document.getElementById(m.id+'_mga');
     const bepcEl=m.anglais?null:document.getElementById(m.id+'_bepc');
     const bepcE=m.anglais?document.getElementById(m.id+'_bepc_e'):null;
     const bepcO=m.anglais&&!_toMode?document.getElementById(m.id+'_bepc_o'):null;
@@ -2710,7 +2776,7 @@ function resetMO(){
   document.getElementById('mo-classe').value='';
   document.getElementById('mo-annee_scolaire').value='';
   document.getElementById('mo-etablissement').value='';
-  document.querySelectorAll('#page-mo .note-input').forEach(el=>el.value='');
+  document.querySelectorAll('#page-mo .note-input').forEach(el=>{el.value='';delete el.dataset.nc;});
   document.querySelectorAll('#mo-tbody .computed-val, #mo-tbody .sum-val').forEach(el=>el.textContent='—');
   document.getElementById('r-total').textContent='0,00';
   document.getElementById('r-mo').textContent='— / 20';
@@ -2859,9 +2925,10 @@ async function saveToHistory(){
   const mo=document.getElementById('r-mo').textContent;
   const mention=document.getElementById('r-mention').textContent;
   const etab=(document.getElementById('mo-etablissement').value||document.getElementById('etablissement')?.value||'').trim();
-  const matieres={_to_mode:_toMode};
+  const matieres={_to_mode:_toMode,_nc_state:JSON.stringify(_ncState)};
   MATIERES.forEach(m=>{
-    const d={mga:parseNoteValue(document.getElementById(m.id+'_mga')?.value)};
+    const mgaInp=document.getElementById(m.id+'_mga');
+    const d={mga:mgaInp&&mgaInp.dataset.nc==='1'?'nc':parseNoteValue(mgaInp?.value)};
     if(m.anglais){d.bepc_ecrit=parseNoteValue(document.getElementById(m.id+'_bepc_e')?.value);d.bepc_oral=parseNoteValue(document.getElementById(m.id+'_bepc_o')?.value);}
     else{d.bepc=parseNoteValue(document.getElementById(m.id+'_bepc')?.value);}
     matieres[m.id]=d;
@@ -3003,7 +3070,9 @@ function editCalc(id){
   const h=histData.find(x=>x.id===id);
   if(!h||!h.matieres){toast('Données indisponibles.',true);return;}
   editingId=id;
+  try{const nj=(h.matieres||{})._nc_state;if(nj) _ncState=JSON.parse(nj);}catch(e){_ncState={};}
   loadCalcToMO(h);
+  buildMGATable();
   document.getElementById('edit-indicator').classList.add('show');
   showPage('mo');
   toast('Modification du calcul enregistré');
@@ -3013,7 +3082,9 @@ function duplicateCalc(id){
   const h=histData.find(x=>x.id===id);
   if(!h||!h.matieres){toast('Données indisponibles.',true);return;}
   editingId=null;
+  try{const nj=(h.matieres||{})._nc_state;if(nj) _ncState=JSON.parse(nj);}catch(e){_ncState={};}
   loadCalcToMO(h);
+  buildMGATable();
   document.getElementById('edit-indicator').classList.remove('show');
   showPage('mo');
   toast('Calcul dupliqué. Vous pouvez le modifier puis l\'enregistrer comme nouveau calcul.');
@@ -3029,7 +3100,12 @@ function loadCalcToMO(h){
   document.querySelectorAll('#page-mo .note-input').forEach(el=>el.value='');
   MATIERES.forEach(m=>{
     const d=(h.matieres||{})[m.id]||{};
-    if(d.mga!=null&&d.mga!==''){const el=document.getElementById(m.id+'_mga');if(el) el.value=fmtNum(Number(d.mga),2);}
+    const mgaInp=document.getElementById(m.id+'_mga');
+    if(d.mga==='nc'){
+      if(mgaInp){mgaInp.value='';mgaInp.dataset.nc='1';}
+    } else if(d.mga!=null&&d.mga!==''){
+      if(mgaInp) mgaInp.value=fmtNum(Number(d.mga),2);
+    }
     if(m.anglais){
       if(d.bepc_ecrit!=null&&d.bepc_ecrit!==''){const el=document.getElementById(m.id+'_bepc_e');if(el) el.value=fmtNum(Number(d.bepc_ecrit),2);}
       if(d.bepc_oral!=null&&d.bepc_oral!==''){const el=document.getElementById(m.id+'_bepc_o');if(el) el.value=fmtNum(Number(d.bepc_oral),2);}
@@ -3144,11 +3220,14 @@ function buildBulletinHTML(h){
   let totalWeighted=0;
   const rows=MATIERES.map(m=>{
     const d=(h.matieres||{})[m.id]||{};
-    const rawMga=d.mga!=null?Number(d.mga):null;
+    const isNC=d.mga==='nc';
+    const rawMga=d.mga!=null&&d.mga!=='nc'?Number(d.mga):null;
     const mgaVal=Number.isFinite(rawMga)?rawMga:null;
-    const mga=mgaVal!=null?fmtNum(mgaVal,2):'—';
+    const mga=isNC?'NC':mgaVal!=null?fmtNum(mgaVal,2):'—';
     let bepc=0,bepcDisplay='',hasData=false;
-    if(m.anglais){
+    if(isNC){
+      bepcDisplay='<span style="color:#B42318;font-weight:700;">NC</span>';
+    } else if(m.anglais){
       const rawEcrit=d.bepc_ecrit!=null?Number(d.bepc_ecrit):null;
       const rawOral=d.bepc_oral!=null?Number(d.bepc_oral):null;
       const ecrit=Number.isFinite(rawEcrit)?rawEcrit:null;
@@ -3169,6 +3248,9 @@ function buildBulletinHTML(h){
       bepc=b!=null?b:0;
       hasData=mgaVal!=null||b!=null;
       bepcDisplay=`<span class="bp-pill bp-pill-bepc">${b!=null?fmtNum(b,2):'—'}</span>`;
+    }
+    if(isNC){
+      return `<tr><td class="bp-matiere">${m.label}</td><td><span class="bp-pill" style="color:#B42318;font-weight:700;">NC</span></td><td>${bepcDisplay}</td><td class="bp-sum"><span style="color:#B42318;font-weight:700;">NC</span></td><td><span class="bp-coef">${m.coef}</span></td><td class="bp-result"><span style="color:#B42318;font-weight:700;">NC</span></td></tr>`;
     }
     const sum=mgaVal!=null?mgaVal+bepc:bepc;
     const prod=sum*m.coef;
