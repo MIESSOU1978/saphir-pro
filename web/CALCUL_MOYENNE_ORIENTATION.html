@@ -1419,13 +1419,14 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 .nc-toggle.active:hover{background:#0B6B50;}
 .nc-toggle .nc-label{pointer-events:none;line-height:1;}
 .nc-cell{position:relative;}
-.nc-ind{position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:#F2F4F7;border:1.5px solid #B8CEC3;color:#60736D;font-size:.55rem;font-weight:800;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all .15s ease;line-height:1;z-index:2;}
-.nc-cell.nc-on .nc-ind{display:flex;}
+.nc-wrap{display:inline-flex;align-items:center;gap:2px;}
+.nc-ind{width:22px;height:22px;min-width:22px;border-radius:50%;background:#F2F4F7;border:1.5px solid #B8CEC3;color:#60736D;font-size:.55rem;font-weight:800;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all .15s ease;line-height:1;flex-shrink:0;}
+.nc-cell.nc-on .nc-ind{display:inline-flex;}
 .nc-ind:hover{border-color:#064E3B;background:#E8F5E9;color:#064E3B;}
 .nc-cell.is-nc .nc-ind{background:#B42318;border-color:#B42318;color:#fff;}
 .nc-cell.is-nc .note-input{opacity:.45;text-decoration:line-through;pointer-events:none;}
-.nc-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:.75rem;font-weight:700;color:#B42318;background:rgba(180,35,24,.1);padding:3px 8px;border-radius:4px;letter-spacing:.3px;white-space:nowrap;display:none;line-height:1.3;z-index:3;}
-.nc-cell.is-nc .nc-badge{display:block;}
+.nc-badge{font-size:.75rem;font-weight:700;color:#B42318;background:rgba(180,35,24,.1);padding:3px 8px;border-radius:4px;letter-spacing:.3px;white-space:nowrap;display:none;line-height:1.3;flex-shrink:0;}
+.nc-cell.is-nc .nc-badge{display:inline-flex;}
 .two-notes.to-single{display:flex;justify-content:center;}
 .two-notes.to-single .note-input{width:100%;max-width:none;}
 #page-mga .eleve-grid,
@@ -2422,9 +2423,9 @@ function buildMGATable(){
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td><span class="mat-label">${m.label}</span></td>
-      <td class="nc-cell${_ncState[m.id+'_t1']?' is-nc':''}${_ncMode?' nc-on':''}"><input class="note-input" id="${m.id}_t1" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"><span class="nc-ind" onclick="markNC('${m.id}_t1',this)" title="Non classé">NC</span><span class="nc-badge">NC</span></td>
-      <td class="nc-cell${_ncState[m.id+'_t2']?' is-nc':''}${_ncMode?' nc-on':''}"><input class="note-input" id="${m.id}_t2" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"><span class="nc-ind" onclick="markNC('${m.id}_t2',this)" title="Non classé">NC</span><span class="nc-badge">NC</span></td>
-      <td class="nc-cell${_ncState[m.id+'_t3']?' is-nc':''}${_ncMode?' nc-on':''}"><input class="note-input" id="${m.id}_t3" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"><span class="nc-ind" onclick="markNC('${m.id}_t3',this)" title="Non classé">NC</span><span class="nc-badge">NC</span></td>
+      <td class="nc-cell${_ncState[m.id+'_t1']?' is-nc':''}${_ncMode?' nc-on':''}"><span class="nc-wrap"><input class="note-input" id="${m.id}_t1" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"><span class="nc-ind" onclick="markNC('${m.id}_t1',this)" title="Non classé">NC</span><span class="nc-badge">NC</span></span></td>
+      <td class="nc-cell${_ncState[m.id+'_t2']?' is-nc':''}${_ncMode?' nc-on':''}"><span class="nc-wrap"><input class="note-input" id="${m.id}_t2" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"><span class="nc-ind" onclick="markNC('${m.id}_t2',this)" title="Non classé">NC</span><span class="nc-badge">NC</span></span></td>
+      <td class="nc-cell${_ncState[m.id+'_t3']?' is-nc':''}${_ncMode?' nc-on':''}"><span class="nc-wrap"><input class="note-input" id="${m.id}_t3" type="text" inputmode="decimal" maxlength="5" placeholder="—" oninput="normalizeNoteInput(this);limitNote(this);calcMGA('${m.id}')" onblur="formatNoteInput(this);calcMGA('${m.id}');logNoteChange(this.id,this.value)"><span class="nc-ind" onclick="markNC('${m.id}_t3',this)" title="Non classé">NC</span><span class="nc-badge">NC</span></span></td>
       <td><span class="mga-val" id="${m.id}_mga_val">0,00</span></td>`;
     tb.appendChild(tr);
   });
