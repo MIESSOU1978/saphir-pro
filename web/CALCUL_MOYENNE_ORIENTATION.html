@@ -1418,14 +1418,14 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 .nc-toggle.active{background:#064E3B;color:#fff;border-color:#064E3B;box-shadow:0 2px 8px rgba(6,78,59,.25);}
 .nc-toggle.active:hover{background:#0B6B50;}
 .nc-toggle .nc-label{pointer-events:none;line-height:1;}
-.nc-cell{display:flex;align-items:center;gap:3px;}
-.nc-ind{width:22px;height:22px;min-width:22px;border-radius:50%;background:#F2F4F7;border:1.5px solid #B8CEC3;color:#60736D;font-size:.55rem;font-weight:800;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all .15s ease;line-height:1;flex-shrink:0;}
+.nc-cell{position:relative;}
+.nc-ind{position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:#F2F4F7;border:1.5px solid #B8CEC3;color:#60736D;font-size:.55rem;font-weight:800;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all .15s ease;line-height:1;z-index:2;}
 .nc-cell.nc-on .nc-ind{display:flex;}
 .nc-ind:hover{border-color:#064E3B;background:#E8F5E9;color:#064E3B;}
 .nc-cell.is-nc .nc-ind{background:#B42318;border-color:#B42318;color:#fff;}
-.nc-cell.is-nc .note-input{width:0;min-width:0;padding:0;border:none;opacity:0;pointer-events:none;overflow:hidden;}
-.nc-badge{font-size:.75rem;font-weight:700;color:#B42318;background:rgba(180,35,24,.1);padding:3px 8px;border-radius:4px;letter-spacing:.3px;white-space:nowrap;display:none;line-height:1.3;flex-shrink:0;}
-.nc-cell.is-nc .nc-badge{display:inline-flex;}
+.nc-cell.is-nc .note-input{opacity:.45;text-decoration:line-through;pointer-events:none;}
+.nc-badge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:.75rem;font-weight:700;color:#B42318;background:rgba(180,35,24,.1);padding:3px 8px;border-radius:4px;letter-spacing:.3px;white-space:nowrap;display:none;line-height:1.3;z-index:3;}
+.nc-cell.is-nc .nc-badge{display:block;}
 .two-notes.to-single{display:flex;justify-content:center;}
 .two-notes.to-single .note-input{width:100%;max-width:none;}
 #page-mga .eleve-grid,
