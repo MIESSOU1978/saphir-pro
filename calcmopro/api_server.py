@@ -659,12 +659,19 @@ class _Handler(BaseHTTPRequestHandler):
 
         if path == "/api/eleves":
             try:
-                if self._get_role() == "admin":
-                    return self._json(db.list_eleves())
+                role = self._get_role()
+                if role == "admin":
+                    rows = db.list_eleves()
+                    print(f"[API] GET /api/eleves → admin → {len(rows)} rows")
+                    return self._json(rows)
                 email = self._get_email()
+                print(f"[API] GET /api/eleves → role={role} email={email!r}")
                 if not email:
+                    print(f"[API] GET /api/eleves → no email, returning empty")
                     return self._json([], 200)
-                return self._json(db.list_eleves(created_by=email))
+                rows = db.list_eleves(created_by=email)
+                print(f"[API] GET /api/eleves → filtered by created_by={email!r} → {len(rows)} rows")
+                return self._json(rows)
             except Exception as exc:
                 print(f"[ERROR] list_eleves: {exc}")
                 return self._json([], 500)
