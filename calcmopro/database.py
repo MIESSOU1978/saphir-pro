@@ -478,16 +478,19 @@ def mark_printed(eleve_id: int) -> None:
     conn.close()
 
 
-def list_eleves() -> list[dict[str, Any]]:
+def list_eleves(created_by: str | None = None) -> list[dict[str, Any]]:
+    _SQL = """
+        SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at,
+               r.total, r.mo, r.mention, r.matieres, r.printed, r.date_calc
+        FROM eleves e
+        LEFT JOIN resultats r ON r.eleve_id = e.id
+    """
     if _turso_enabled():
-        rows = _turso_exec("""
-            SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at,
-                   r.total, r.mo, r.mention, r.matieres, r.printed, r.date_calc
-            FROM eleves e
-            LEFT JOIN resultats r ON r.eleve_id = e.id
-            ORDER BY e.id DESC
-        """)
-        print(f"[DB list_eleves] Turso returned {len(rows)} rows")
+        if created_by:
+            rows = _turso_exec(_SQL + " WHERE e.created_by = ? ORDER BY e.id DESC", [created_by])
+        else:
+            rows = _turso_exec(_SQL + " ORDER BY e.id DESC")
+        print(f"[DB list_eleves] Turso returned {len(rows)} rows" + (f" for created_by={created_by}" if created_by else ""))
         for d in rows:
             d["id"] = int(d["id"]) if d.get("id") is not None else d.get("id")
             if d.get("matieres") and isinstance(d["matieres"], str):
@@ -498,13 +501,10 @@ def list_eleves() -> list[dict[str, Any]]:
         return rows
 
     conn = _connect()
-    rows = conn.execute("""
-        SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at,
-               r.total, r.mo, r.mention, r.matieres, r.printed, r.date_calc
-        FROM eleves e
-        LEFT JOIN resultats r ON r.eleve_id = e.id
-        ORDER BY e.id DESC
-    """).fetchall()
+    if created_by:
+        rows = conn.execute(_SQL + " WHERE e.created_by = ? ORDER BY e.id DESC", (created_by,)).fetchall()
+    else:
+        rows = conn.execute(_SQL + " ORDER BY e.id DESC").fetchall()
     conn.close()
     result = []
     for row in rows:

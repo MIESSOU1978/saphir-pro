@@ -401,6 +401,14 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
   .start-hero{grid-template-columns:1fr;}
 }
 
+@media (max-width:1100px){
+  .hist-card{grid-template-columns:auto auto 1fr;gap:10px;padding:14px;}
+  .hist-card-mo{justify-self:start;min-width:110px;}
+  .hist-badge{width:auto;justify-self:start;}
+  .hist-btn-pdf{width:auto;justify-self:start;}
+  .hist-actions{justify-self:start;grid-column:1/-1;}
+}
+
 @media (max-width:560px){
   .start-card-head{padding:20px 20px 0;}
   .start-card-body{padding:0 20px 14px;}
@@ -488,7 +496,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-badge-fail{background:#FEF2F2;color:#B42318;border:1px solid #FECACA;}
 .hist-badge-none{background:#F9FAFB;color:#60736D;border:1px solid #E5E7EB;}
 
-.hist-actions{display:flex;align-items:center;gap:12px;}
+.hist-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
 .hist-btn-pdf{
   display:inline-flex;align-items:center;gap:6px;width:150px;height:38px;
   padding:0 16px;border-radius:8px;
@@ -2381,7 +2389,7 @@ let _toMode = false;
 /* ── NAVIGATION ── */
 let _role='guest';
 function showPage(id){
-  if(id==='hist'&&_role!=='admin') return;
+  if(id==='hist'&&_role==='guest') return;
   if(id==='users'&&_role!=='admin') return;
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -3579,11 +3587,6 @@ function doLogout(){
 function applyRole(){
   const isWeb=location.hostname!=='localhost'&&location.hostname!=='127.0.0.1';
   if(_role&&_role!=='admin'){
-    const nav=document.getElementById('nav-hist');
-    const page=document.getElementById('page-hist');
-    if(nav){nav.style.display='none';nav.removeAttribute('onclick');}
-    if(page){page.style.display='none';}
-    if(page&&page.classList.contains('active')) showPage('mo');
     const navUsers=document.getElementById('nav-users');
     const sepUsers=document.getElementById('nav-sep-users');
     if(navUsers) navUsers.style.display='none';

@@ -487,6 +487,17 @@ class _Handler(BaseHTTPRequestHandler):
             return real_ip.strip()
         return self.client_address[0]
 
+    def _check_eleve_access(self, eid: int) -> bool:
+        """Return True if the current user may access the given eleve.
+        Admins can access everything.  Students may only access their own records
+        (matched by created_by == session email)."""
+        if self._get_role() == "admin":
+            return True
+        row = db.get_eleve(eid)
+        if row is None:
+            return False
+        return (row.get("created_by") or "") == (self._get_email() or "")
+
     # ── routing ──────────────────────────────────────────────
     def do_GET(self) -> None:
         try:
@@ -647,10 +658,13 @@ class _Handler(BaseHTTPRequestHandler):
                 return self._json([], 500)
 
         if path == "/api/eleves":
-            if self._get_role() != "admin":
-                return self._json({"error": "Accès refusé"}, 403)
             try:
-                return self._json(db.list_eleves())
+                if self._get_role() == "admin":
+                    return self._json(db.list_eleves())
+                email = self._get_email()
+                if not email:
+                    return self._json([], 200)
+                return self._json(db.list_eleves(created_by=email))
             except Exception as exc:
                 print(f"[ERROR] list_eleves: {exc}")
                 return self._json([], 500)
@@ -660,6 +674,8 @@ class _Handler(BaseHTTPRequestHandler):
                 eid = int(path.split("/")[-1])
             except ValueError:
                 return self._json({"error": "id invalide"}, 400)
+            if not self._check_eleve_access(eid):
+                return self._json({"error": "Accès refusé"}, 403)
             row = db.get_eleve(eid)
             return self._json(row if row else {"error": "introuvable"}, 404 if row is None else 200)
 
@@ -1075,6 +1091,8 @@ class _Handler(BaseHTTPRequestHandler):
                 eid = int(path.split("/")[-2])
             except (ValueError, IndexError):
                 return self._json({"error": "id invalide"}, 400)
+            if not self._check_eleve_access(eid):
+                return self._json({"error": "Accès refusé"}, 403)
             try:
                 result = db.duplicate_eleve(eid)
             except Exception as exc:
@@ -1168,6 +1186,8 @@ class _Handler(BaseHTTPRequestHandler):
                 eid = int(path.split("/")[-2])
             except (ValueError, IndexError):
                 return self._json({"error": "id invalide"}, 400)
+            if not self._check_eleve_access(eid):
+                return self._json({"error": "Accès refusé"}, 403)
             try:
                 db.mark_printed(eid)
             except Exception as exc:
@@ -1230,12 +1250,12 @@ class _Handler(BaseHTTPRequestHandler):
             return self._json({"ok": True})
 
         if path.startswith("/api/eleves/"):
-            if role != "admin":
-                return self._json({"error": "Accès refusé"}, 403)
             try:
                 eid = int(path.split("/")[-1])
             except ValueError:
                 return self._json({"error": "id invalide"}, 400)
+            if not self._check_eleve_access(eid):
+                return self._json({"error": "Accès refusé"}, 403)
             try:
                 db.delete_eleve(eid)
             except Exception as exc:
@@ -1378,6 +1398,8 @@ class _Handler(BaseHTTPRequestHandler):
                 eid = int(path.split("/")[-1])
             except ValueError:
                 return self._json({"error": "id invalide"}, 400)
+            if not self._check_eleve_access(eid):
+                return self._json({"error": "Accès refusé"}, 403)
             body = self._read_body()
             nom = (body.get("nom") or "").strip()
             if not nom:
