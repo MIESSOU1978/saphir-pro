@@ -466,8 +466,13 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 }
 .hist-card:last-child{margin-bottom:0;}
 .hist-card:hover{border-color:#b8d4c7;box-shadow:0 4px 16px rgba(6,78,59,.1);transform:translateY(-1px);}
-.hist-card-deleted{opacity:.62;background:#FBF7F7;border-style:dashed;border-color:#E6C9C9;}
-.hist-badge-deleted{display:inline-flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#B42318;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:2px 8px;margin-top:5px;}
+.hist-card-deleted{background:#FFF8F6;border:1px dashed #F3B8B2;opacity:.94;}
+.hist-badge-deleted{display:inline-flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#B42318;background:#FDECEA;border:1px solid #F3B8B2;border-radius:6px;padding:2px 8px;margin-top:5px;}
+.hist-deleted-note{font-size:.62rem;color:#B42318;margin-top:4px;font-style:italic;}
+.hist-btn-restore{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #B8DEC9;color:#064E3B;border-radius:8px;padding:6px 12px;font-size:.74rem;font-weight:700;cursor:pointer;}
+.hist-btn-restore:hover{background:#EAF5F0;border-color:#064E3B;}
+.hist-btn-delete-perm{background:transparent;border:1px solid #F3B8B2;color:#B42318;border-radius:8px;padding:6px 10px;font-size:.68rem;font-weight:600;cursor:pointer;opacity:.85;}
+.hist-btn-delete-perm:hover{background:#FDECEA;}
 .hist-btn-purge{background:#FEF2F2;color:#B42318;border:1px solid #FECACA;}
 .hist-btn-purge:hover{background:#FEE2E2;}
 
@@ -2969,6 +2974,16 @@ async function purgeTrash(){
   }catch(e){toast(e.message||'Erreur.',true);}
 }
 
+async function purgeOne(id){
+  if(!confirm('Supprimer définitivement ce bulletin ?\nCette action est irréversible.')) return;
+  try{
+    const r=await fetch(API+'/api/eleves/'+id+'/purge',{method:'POST',credentials:'same-origin'});
+    if(!r.ok){let msg='Erreur.';try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}throw new Error(msg);}
+    await loadHistory();
+    toast('Bulletin supprimé définitivement.');
+  }catch(e){toast(e.message||'Erreur.',true);}
+}
+
 /* ── SÉLECTION MULTIPLE ── */
 function toggleSelect(id,cb){
   if(cb.checked){if(!selectedIds.includes(id)) selectedIds.push(id);}
@@ -3139,13 +3154,29 @@ function renderHistory(){
           b.textContent='Supprimé';
           info.appendChild(b);
         }
+        if(info&&!card.querySelector('.hist-deleted-note')){
+          const note=document.createElement('div');
+          note.className='hist-deleted-note';
+          note.textContent='Ce calcul a été supprimé. Vous pouvez le restaurer.';
+          info.appendChild(note);
+        }
         const actions=card.querySelector('.hist-actions');
-        if(actions&&!card.querySelector('.hist-restore-btn')){
-          const rb=document.createElement('button');
-          rb.className='hist-btn-edit hist-restore-btn';
-          rb.textContent='↺ Restaurer';
-          rb.onclick=function(){restoreCalc(h.id);};
-          actions.appendChild(rb);
+        if(actions){
+          actions.querySelectorAll('.hist-btn-edit,.hist-btn-icon').forEach(b=>b.style.display='none');
+          if(!card.querySelector('.hist-restore-btn')){
+            const rb=document.createElement('button');
+            rb.className='hist-btn-restore';
+            rb.innerHTML='&#8635; Restaurer';
+            rb.onclick=(function(id){return function(){restoreCalc(id);};})(h.id);
+            actions.appendChild(rb);
+          }
+          if(!card.querySelector('.hist-btn-delete-perm')){
+            const pb=document.createElement('button');
+            pb.className='hist-btn-delete-perm';
+            pb.textContent='Supprimer définitivement';
+            pb.onclick=(function(id){return function(){purgeOne(id);};})(h.id);
+            actions.appendChild(pb);
+          }
         }
       }
     });

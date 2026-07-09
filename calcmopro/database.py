@@ -659,6 +659,20 @@ def delete_eleve(eleve_id: int) -> bool:
     return True
 
 
+def hard_delete_eleve(eleve_id: int) -> bool:
+    """Permanently remove a record (admin trash purge of a single item)."""
+    if _turso_enabled():
+        _turso_exec_write("DELETE FROM resultats WHERE eleve_id=?", [eleve_id])
+        _turso_exec_write("DELETE FROM eleves WHERE id=?", [eleve_id])
+        return True
+    conn = _connect()
+    conn.execute("DELETE FROM resultats WHERE eleve_id=?", (eleve_id,))
+    conn.execute("DELETE FROM eleves WHERE id=?", (eleve_id,))
+    conn.commit()
+    conn.close()
+    return True
+
+
 def delete_multiple_eleves(ids: list[int]) -> int:
     if not ids:
         return 0

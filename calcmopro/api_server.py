@@ -1118,6 +1118,20 @@ class _Handler(BaseHTTPRequestHandler):
             _sse_emit("eleve_restored", {"id": eid})
             return self._json({"ok": True})
 
+        if path.startswith("/api/eleves/") and path.endswith("/purge"):
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                eid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            try:
+                db.hard_delete_eleve(eid)
+            except Exception as exc:
+                return self._json({"error": "Erreur interne du serveur"}, 500)
+            _sse_emit("eleve_deleted", {"id": eid})
+            return self._json({"ok": True})
+
         if path == "/api/eleves/purge":
             if role != "admin":
                 return self._json({"error": "Accès refusé"}, 403)
