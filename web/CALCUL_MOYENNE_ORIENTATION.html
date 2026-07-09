@@ -657,8 +657,8 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-empty-search-clear:hover{background:#F0F7F3;border-color:#064E3B;}
 
 /* ── CUSTOM CONFIRM MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px);opacity:0;transition:opacity .2s;}
-.modal-overlay.show{opacity:1;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px);opacity:0;transition:opacity .2s;}
+.modal-overlay.show{display:flex;opacity:1;}
 .modal-box{background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:28px 30px 22px;max-width:420px;width:90%;transform:scale(.92);transition:transform .2s;}
 .modal-overlay.show .modal-box{transform:scale(1);}
 .modal-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:14px;}
