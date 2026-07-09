@@ -93,35 +93,42 @@ nav{
   backdrop-filter:blur(14px);
   min-height:52px;
 }
+.nav-center{
+  display:flex;align-items:center;justify-content:center;flex:1;gap:4px;
+  position:relative;
+}
+.nav-pill{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  height:36px;
+  border-radius:10px;
+  background:rgba(245,166,35,.12);
+  border:1px solid rgba(245,166,35,.2);
+  box-shadow:0 2px 8px rgba(245,166,35,.1);
+  transition:all .35s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+  z-index:0;
+}
 .nav-item{
   display:flex;align-items:center;gap:8px;
-  padding:14px 22px;
+  padding:10px 20px;
   font-family:'Ebrima','Segoe UI',Arial,sans-serif;font-size:0.82rem;font-weight:600;
   text-transform:uppercase;letter-spacing:0.8px;
   color:rgba(255,255,255,.45);
   cursor:pointer;
-  border-bottom:3px solid transparent;
+  border:none;outline:none;
   transition:all 0.2s;
   white-space:nowrap;
   position:relative;
-  border-left:none;outline:none;
+  border-radius:10px;
+  z-index:1;
 }
 .nav-item:hover{color:rgba(255,255,255,.8);background:rgba(242,182,50,.05);}
 .nav-item.active{
   color:#4ade80;
-  border-bottom-color:#f5a623;
-  background:rgba(74,222,128,.06);
+  background:transparent;
 }
-.nav-item .nav-ico{
-  font-size:0.62rem;font-weight:800;
-  padding:2px 7px;border-radius:4px;
-  background:rgba(255,255,255,.06);color:rgba(255,255,255,.35);
-  letter-spacing:.5px;line-height:1;
-}
-.nav-item.active .nav-ico{
-  background:rgba(245,166,35,.15);color:#f5a623;
-}
-.nav-sep{width:1px;height:20px;background:rgba(255,255,255,.08);margin:0 2px;flex-shrink:0;}
 
 /* ── MAIN CONTENT ── */
 main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direction:column;gap:18px;}
@@ -1251,37 +1258,41 @@ nav{
   backdrop-filter:none;
 }
 .nav-center{
-  display:flex;align-items:center;justify-content:center;flex:1;gap:2px;
+  display:flex;align-items:center;justify-content:center;flex:1;gap:4px;
+  position:relative;
+}
+.nav-pill{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  height:36px;
+  border-radius:10px;
+  background:linear-gradient(135deg,rgba(245,166,35,.12),rgba(245,166,35,.06));
+  border:1px solid rgba(245,166,35,.2);
+  box-shadow:0 2px 8px rgba(245,166,35,.1);
+  transition:all .35s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+  z-index:0;
 }
 .nav-item{
-  min-height:52px;
-  padding:0 22px;
+  position:relative;
+  min-height:42px;
+  padding:0 20px;
   color:#8a9c8f;
-  border-bottom:3px solid transparent;
-  font-size:0.88rem;
-  letter-spacing:.5px;
-  border-left:none;outline:none;
+  font-size:0.85rem;
+  font-weight:600;
+  letter-spacing:.3px;
+  border:none;outline:none;
+  cursor:pointer;
+  border-radius:10px;
+  transition:all .3s ease;
+  z-index:1;
 }
 .nav-item:hover{color:#064e3b;background:rgba(6,78,59,.04);}
 .nav-item.active{
   color:#064e3b;
-  border-bottom-color:#f5a623;
-  background:rgba(6,78,59,.04);
+  background:transparent;
 }
-.nav-item .nav-ico{
-  min-width:auto;
-  padding:2px 7px;border-radius:4px;
-  background:rgba(6,78,59,.06);
-  color:#60736d;
-  font-size:0.65rem;
-  font-weight:800;
-  letter-spacing:.5px;
-}
-.nav-item.active .nav-ico{
-  background:rgba(245,166,35,.12);
-  color:#b45309;
-}
-.nav-sep{height:18px;background:#e2ebe5;margin:0 2px;flex-shrink:0;}
 
 main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
 .page.active{gap:20px;}
@@ -1645,8 +1656,7 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
   .header-meta .app-name{font-size:1.15rem;}
   .header-contact{display:none;}
   nav{top:0;justify-content:flex-start;overflow-x:auto;padding:0 8px;}
-  .nav-item{padding:0 13px;font-size:.7rem;border-left:none !important;outline:none !important;}
-  .nav-sep{display:none !important;}
+  .nav-item{padding:0 13px;font-size:.7rem;}
   main{padding:18px 12px 32px;}
   .page.active{min-width:0;}
   .card{width:100%;min-width:0;padding:16px;}
@@ -1797,22 +1807,12 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 
 <!-- ══ NAV MENU ══ -->
 <nav>
-  <div class="nav-center">
-    <div class="nav-item" onclick="showPage('mga')" id="nav-mga">
-      <span class="nav-ico">01</span> Calcul MA
-    </div>
-    <div class="nav-sep"></div>
-    <div class="nav-item" onclick="showPage('mo')" id="nav-mo">
-      <span class="nav-ico">02</span> Calcul MO
-    </div>
-    <div class="nav-sep"></div>
-    <div class="nav-item" onclick="showPage('hist')" id="nav-hist">
-      <span class="nav-ico">03</span> Historique
-    </div>
-     <div class="nav-sep" id="nav-sep-users"></div>
-    <div class="nav-item" onclick="showPage('users')" id="nav-users">
-      <span class="nav-ico">04</span> Utilisateurs
-    </div>
+  <div class="nav-center" id="nav-center">
+    <div class="nav-pill" id="nav-pill"></div>
+    <div class="nav-item" onclick="showPage('mga')" id="nav-mga">Calcul MA</div>
+    <div class="nav-item" onclick="showPage('mo')" id="nav-mo">Calcul MO</div>
+    <div class="nav-item" onclick="showPage('hist')" id="nav-hist">Historique</div>
+    <div class="nav-item" onclick="showPage('users')" id="nav-users">Utilisateurs</div>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <div class="notif-bell" onclick="toggleNotifPanel()" title="Notifications" id="notif-bell" style="display:none;position:relative;cursor:pointer;width:32px;height:32px;border-radius:8px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;">
@@ -2525,6 +2525,20 @@ let _toMode = false;
 
 /* ── NAVIGATION ── */
 let _role='guest';
+function slideNavPill(){
+  const pill=document.getElementById('nav-pill');
+  if(!pill) return;
+  const active=document.querySelector('.nav-item.active');
+  if(!active){pill.style.opacity='0';return;}
+  const center=document.getElementById('nav-center');
+  const cRect=center.getBoundingClientRect();
+  const aRect=active.getBoundingClientRect();
+  const w=aRect.width+12;
+  const x=aRect.left-cRect.left-6;
+  pill.style.width=w+'px';
+  pill.style.transform='translateY(-50%) translateX('+x+'px)';
+  pill.style.opacity='1';
+}
 function showPage(id){
   if(id==='hist'&&_role==='guest') return;
   if(id==='users'&&_role!=='admin') return;
@@ -2532,6 +2546,7 @@ function showPage(id){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.getElementById('nav-'+id).classList.add('active');
+  slideNavPill();
   window.scrollTo({top:0,left:0,behavior:'auto'});
   if(id==='hist') loadHistory();
   if(id==='users') loadUsers();
@@ -3846,18 +3861,14 @@ function applyRole(){
   const isWeb=location.hostname!=='localhost'&&location.hostname!=='127.0.0.1';
   if(_role&&_role!=='admin'){
     const navUsers=document.getElementById('nav-users');
-    const sepUsers=document.getElementById('nav-sep-users');
     if(navUsers) navUsers.style.display='none';
-    if(sepUsers) sepUsers.style.display='none';
     const bell=document.getElementById('notif-bell');
     if(bell) bell.style.display='none';
     const msgBtn=document.getElementById('msg-history-btn');
     if(msgBtn) msgBtn.style.display='none';
   } else {
     const navUsers=document.getElementById('nav-users');
-    const sepUsers=document.getElementById('nav-sep-users');
     if(navUsers) navUsers.style.display=isWeb?'':'none';
-    if(sepUsers) sepUsers.style.display=isWeb?'':'none';
     const bell=document.getElementById('notif-bell');
     if(bell) bell.style.display='flex';
     const msgBtn=document.getElementById('msg-history-btn');
@@ -3865,6 +3876,7 @@ function applyRole(){
     const purgeBtn=document.getElementById('btn-purge-trash');
     if(purgeBtn) purgeBtn.style.display='inline-flex';
   }
+  slideNavPill();
 }
 
 /* ── MOBILE VIEWPORT FIX ── */
@@ -5050,6 +5062,7 @@ function getFilteredData(){
     else{_userEmail=localStorage.getItem('saphir_email')||'';}
   }catch(e){_role='guest';}
   applyRole();
+  slideNavPill();
   setTimeout(_sseStart,1000);
   updateMsgPoll();
 })();
