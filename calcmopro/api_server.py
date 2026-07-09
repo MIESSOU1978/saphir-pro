@@ -1118,6 +1118,16 @@ class _Handler(BaseHTTPRequestHandler):
             _sse_emit("eleve_restored", {"id": eid})
             return self._json({"ok": True})
 
+        if path == "/api/eleves/purge":
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                n = db.purge_deleted_eleves()
+            except Exception as exc:
+                return self._json({"error": "Erreur interne du serveur"}, 500)
+            _sse_emit("eleves_purged", {"count": n})
+            return self._json({"ok": True, "purged": n})
+
         if path.startswith("/api/eleves/") and path.endswith("/purge"):
             if role != "admin":
                 return self._json({"error": "Accès refusé"}, 403)
@@ -1131,16 +1141,6 @@ class _Handler(BaseHTTPRequestHandler):
                 return self._json({"error": "Erreur interne du serveur"}, 500)
             _sse_emit("eleve_deleted", {"id": eid})
             return self._json({"ok": True})
-
-        if path == "/api/eleves/purge":
-            if role != "admin":
-                return self._json({"error": "Accès refusé"}, 403)
-            try:
-                n = db.purge_deleted_eleves()
-            except Exception as exc:
-                return self._json({"error": "Erreur interne du serveur"}, 500)
-            _sse_emit("eleves_purged", {"count": n})
-            return self._json({"ok": True, "purged": n})
 
         if path.startswith("/api/eleves/") and path.endswith("/duplicate"):
             try:
