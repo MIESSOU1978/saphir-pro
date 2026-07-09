@@ -478,7 +478,7 @@ def mark_printed(eleve_id: int) -> None:
     conn.close()
 
 
-def list_eleves(created_by: str | None = None) -> list[dict[str, Any]]:
+def list_eleves(created_by: str | None = None, include_legacy: bool = False) -> list[dict[str, Any]]:
     _SQL = """
         SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at,
                r.total, r.mo, r.mention, r.matieres, r.printed, r.date_calc
@@ -487,7 +487,10 @@ def list_eleves(created_by: str | None = None) -> list[dict[str, Any]]:
     """
     if _turso_enabled():
         if created_by:
-            rows = _turso_exec(_SQL + " WHERE e.created_by = ? ORDER BY e.id DESC", [created_by])
+            if include_legacy:
+                rows = _turso_exec(_SQL + " WHERE (e.created_by = ? OR e.created_by = '' OR e.created_by IS NULL) ORDER BY e.id DESC", [created_by])
+            else:
+                rows = _turso_exec(_SQL + " WHERE e.created_by = ? ORDER BY e.id DESC", [created_by])
         else:
             rows = _turso_exec(_SQL + " ORDER BY e.id DESC")
         print(f"[DB list_eleves] Turso returned {len(rows)} rows" + (f" for created_by={created_by}" if created_by else ""))
@@ -502,7 +505,10 @@ def list_eleves(created_by: str | None = None) -> list[dict[str, Any]]:
 
     conn = _connect()
     if created_by:
-        rows = conn.execute(_SQL + " WHERE e.created_by = ? ORDER BY e.id DESC", (created_by,)).fetchall()
+        if include_legacy:
+            rows = conn.execute(_SQL + " WHERE (e.created_by = ? OR e.created_by = '' OR e.created_by IS NULL) ORDER BY e.id DESC", (created_by,)).fetchall()
+        else:
+            rows = conn.execute(_SQL + " WHERE e.created_by = ? ORDER BY e.id DESC", (created_by,)).fetchall()
     else:
         rows = conn.execute(_SQL + " ORDER BY e.id DESC").fetchall()
     conn.close()
@@ -514,6 +520,29 @@ def list_eleves(created_by: str | None = None) -> list[dict[str, Any]]:
                 d["matieres"] = json.loads(d["matieres"])
         result.append(d)
     return result
+
+
+def claim_legacy_eleves(email: str) -> int:
+    """Assign legacy records (created before ownership tracking) to the given
+    user.  Only the first student to load history claims them, so each record
+    ends up owned by exactly one account."""
+    if not email:
+        return 0
+    if _turso_enabled():
+        n = _turso_exec_write(
+            "UPDATE eleves SET created_by=? WHERE created_by='' OR created_by IS NULL", [email]
+        )
+        print(f"[DB claim_legacy_eleves] Turso claimed {n} legacy rows for {email}")
+        return n
+    conn = _connect()
+    cur = conn.execute(
+        "UPDATE eleves SET created_by=? WHERE created_by='' OR created_by IS NULL", (email,)
+    )
+    conn.commit()
+    n = cur.rowcount
+    conn.close()
+    print(f"[DB claim_legacy_eleves] claimed {n} legacy rows for {email}")
+    return n
 
 
 def get_eleve(eleve_id: int) -> dict[str, Any] | None:
@@ -590,7 +619,7 @@ def update_eleve(eleve_id: int, nom: str, matricule: str = "", classe: str = "",
     return {"eleve": dict(row), "resultat": dict(res)}
 
 
-def duplicate_eleve(eleve_id: int, created_by: str = "") -> dict[str, Any] | None:
+def duplicate_eleve(eleve_id: int) -> dict[str, Any] | None:
     src = get_eleve(eleve_id)
     if not src:
         return None
@@ -604,7 +633,6 @@ def duplicate_eleve(eleve_id: int, created_by: str = "") -> dict[str, Any] | Non
         mo=src.get("mo", 0),
         mention=src.get("mention", ""),
         matieres=src.get("matieres") or {},
-        created_by=created_by,
     )
 
 

@@ -669,6 +669,7 @@ class _Handler(BaseHTTPRequestHandler):
                 if not email:
                     print(f"[API] GET /api/eleves → no email, returning empty")
                     return self._json([], 200)
+                db.claim_legacy_eleves(email)
                 rows = db.list_eleves(created_by=email)
                 print(f"[API] GET /api/eleves → filtered by created_by={email!r} → {len(rows)} rows")
                 return self._json(rows)
@@ -1059,8 +1060,6 @@ class _Handler(BaseHTTPRequestHandler):
             nom = (body.get("nom") or "").strip()
             if not nom:
                 return self._json({"error": "Le nom est obligatoire."}, 400)
-            session_email = self._get_email()
-            created_by = session_email or "admin"
             try:
                 result = db.save_eleve(
                     nom=nom,
@@ -1073,7 +1072,7 @@ class _Handler(BaseHTTPRequestHandler):
                     mention=body.get("mention", ""),
                     matieres=body.get("matieres"),
                     annee_scolaire=body.get("annee_scolaire", ""),
-                    created_by=created_by,
+                    created_by=body.get("created_by", "") or self._get_email(),
                 )
                 if result.get("error"):
                     return self._json(result, 500)
@@ -1103,8 +1102,7 @@ class _Handler(BaseHTTPRequestHandler):
             if not self._check_eleve_access(eid):
                 return self._json({"error": "Accès refusé"}, 403)
             try:
-                session_email = self._get_email()
-                result = db.duplicate_eleve(eid, created_by=session_email or "admin")
+                result = db.duplicate_eleve(eid)
             except Exception as exc:
                 return self._json({"error": "Erreur interne du serveur"}, 500)
             if result is None:
