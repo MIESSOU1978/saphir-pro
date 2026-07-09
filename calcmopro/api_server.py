@@ -1100,6 +1100,8 @@ class _Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 print(f"[ERROR] delete_multiple_eleves: {exc}")
                 return self._json({"error": "Erreur interne du serveur"}, 500)
+            _sse_emit("eleve_deleted", {"ids": ids})
+            db.add_notification("Suppression", f"{count} calcul(s) supprimé(s)", "warning")
             return self._json({"ok": True, "deleted": count})
 
         if path.startswith("/api/eleves/") and path.endswith("/duplicate"):
@@ -1276,6 +1278,8 @@ class _Handler(BaseHTTPRequestHandler):
                 db.delete_eleve(eid)
             except Exception as exc:
                 return self._json({"error": "Erreur interne du serveur"}, 500)
+            _sse_emit("eleve_deleted", {"id": eid})
+            db.add_notification("Suppression", f"Calcul #{eid} supprimé", "warning")
             return self._json({"ok": True})
 
         if path == "/api/sessions/clear":

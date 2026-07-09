@@ -3723,6 +3723,14 @@ function _sseOnEvent(data){
         showMsgDialog({id:evt.id,sender:evt.sender,message:evt.message,created_at:new Date().toLocaleString('fr-FR')});
       }
     }
+    /* When an eleve is deleted elsewhere, refresh history if visible */
+    if(type==='eleve_deleted'){
+      const histPage=document.getElementById('page-hist');
+      if(histPage&&histPage.classList.contains('active')){
+        loadHistory();
+      }
+      return;
+    }
     /* Show toast notification */
     _sseShowToast(type,msg);
     /* Refresh users page if visible — debounced to avoid losing checkboxes */
