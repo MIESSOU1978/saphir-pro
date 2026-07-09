@@ -597,6 +597,65 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-empty-text{font-size:.9rem;color:#003b32;font-weight:600;}
 .hist-empty-sub{font-size:.76rem;color:#9fb0a6;margin-top:6px;line-height:1.5;}
 
+/* ── SEARCH BAR ── */
+.hist-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.hist-search-wrap{position:relative;flex:1;min-width:200px;}
+.hist-search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#9fb0a6;font-size:.82rem;pointer-events:none;}
+.hist-search{width:100%;padding:9px 14px 9px 36px;border:1.5px solid #b8cec3;border-radius:8px;font-size:.82rem;color:#003b32;background:#fff;font-family:'Ebrima','Segoe UI',Arial,sans-serif;transition:border-color .2s,box-shadow .2s;outline:none;}
+.hist-search:focus{border-color:#064e3b;box-shadow:0 0 0 3px rgba(11,107,80,.1);}
+.hist-search::placeholder{color:#9fb0a6;}
+.hist-search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#9fb0a6;cursor:pointer;font-size:.82rem;padding:2px 4px;display:none;}
+.hist-search-clear.show{display:block;}
+.hist-search-clear:hover{color:#B42318;}
+
+/* ── VIEW TOGGLE ── */
+.hist-view-toggle{display:inline-flex;border:1.5px solid #b8cec3;border-radius:8px;overflow:hidden;flex-shrink:0;}
+.hist-view-btn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:none;background:#fff;color:#60736d;cursor:pointer;transition:all .15s;font-size:.82rem;}
+.hist-view-btn:not(:last-child){border-right:1px solid #b8cec3;}
+.hist-view-btn.active{background:#064e3b;color:#fff;}
+.hist-view-btn:hover:not(.active){background:#F0F7F3;}
+
+/* ── SORT CONTROLS ── */
+.hist-sort-bar{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.hist-sort-label{font-size:.72rem;color:#60736d;font-weight:600;}
+.hist-sort-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;border:1px solid #D5E5DE;background:#fff;color:#60736d;font-size:.7rem;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
+.hist-sort-btn:hover{background:#F0F7F3;border-color:#064E3B;color:#064E3B;}
+.hist-sort-btn.active{background:#EAF5F0;border-color:#064E3B;color:#064E3B;}
+.hist-sort-arrow{font-size:.6rem;opacity:.6;}
+
+/* ── PAGINATION ── */
+.hist-pagination{display:flex;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:8px;}
+.hist-page-info{font-size:.76rem;color:#60736d;}
+.hist-page-controls{display:flex;align-items:center;gap:4px;}
+.hist-page-btn{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:32px;padding:0 8px;border-radius:6px;border:1px solid #D5E5DE;background:#fff;color:#064E3B;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
+.hist-page-btn:hover:not(:disabled):not(.active){background:#F0F7F3;border-color:#064E3B;}
+.hist-page-btn.active{background:#064E3B;color:#fff;border-color:#064E3B;}
+.hist-page-btn:disabled{opacity:.4;cursor:not-allowed;}
+.hist-page-size{display:inline-flex;align-items:center;gap:4px;margin-left:10px;}
+.hist-page-size label{font-size:.72rem;color:#60736d;}
+.hist-page-size select{padding:4px 8px;border:1px solid #D5E5DE;border-radius:6px;font-size:.76rem;color:#064E3B;background:#fff;font-family:'Ebrima',sans-serif;cursor:pointer;}
+
+/* ── COMPACT VIEW ── */
+.hist-card-compact{grid-template-columns:auto auto 1fr auto auto;padding:10px 14px !important;gap:10px !important;min-height:auto !important;}
+.hist-card-compact .hist-card-mo{min-width:auto !important;min-height:auto !important;padding:4px 10px !important;}
+.hist-card-compact .hist-card-mo .mo-value{font-size:.76rem !important;}
+.hist-card-compact .hist-card-mo .mo-label{display:none;}
+.hist-card-compact .hist-card-date,.hist-card-compact .hist-card-author{display:none;}
+.hist-card-compact .hist-badge{width:auto !important;height:auto !important;padding:3px 8px !important;font-size:.66rem !important;}
+.hist-card-compact .hist-actions{gap:6px !important;}
+.hist-card-compact .hist-btn-edit,.hist-card-compact .hist-btn-dup{padding:4px 8px !important;font-size:.7rem !important;}
+.hist-card-compact .hist-btn-icon{width:28px !important;height:28px !important;}
+.hist-card-compact .hist-btn-pdf{width:auto !important;height:auto !important;padding:4px 10px !important;}
+.hist-card-compact .hist-btn-del{padding:4px 8px !important;font-size:.7rem !important;}
+
+/* ── EMPTY SEARCH STATE ── */
+.hist-empty-search{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;}
+.hist-empty-search-icon{font-size:2rem;margin-bottom:10px;opacity:.5;}
+.hist-empty-search-title{font-size:.88rem;font-weight:700;color:#003b32;margin-bottom:4px;}
+.hist-empty-search-sub{font-size:.76rem;color:#9fb0a6;margin-bottom:14px;}
+.hist-empty-search-clear{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border-radius:8px;border:1px solid #b8cec3;background:#fff;color:#064E3B;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
+.hist-empty-search-clear:hover{background:#F0F7F3;border-color:#064E3B;}
+
 /* ── USERS PAGE ── */
 .users-container{
   background:#fff;border:1px solid #d9e5de;border-radius:14px;
@@ -1569,6 +1628,10 @@ main{max-width:1180px;padding:28px 22px 46px;gap:20px;}
   .hist-header{flex-direction:column;align-items:flex-start;}
   .hist-sel-bar{flex-direction:column;align-items:flex-start;}
   .hist-sel-actions{width:100%;}
+  .hist-toolbar{flex-direction:column;align-items:stretch;}
+  .hist-search-wrap{min-width:0;}
+  .hist-sort-bar{overflow-x:auto;flex-wrap:nowrap;}
+  .hist-pagination{flex-direction:column;align-items:center;}
 }
 
 /* Fenêtre native compacte : tout le module reste visible sans défilement. */
@@ -2115,6 +2178,24 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         <option value="">Toutes les années</option>
       </select>
     </div>
+    <div class="hist-toolbar" id="hist-toolbar">
+      <div class="hist-search-wrap">
+        <span class="hist-search-ico">&#128269;</span>
+        <input type="text" class="hist-search" id="hist-search" placeholder="Rechercher un élève, matricule, classe..." oninput="onSearchInput()" autocomplete="off">
+        <button class="hist-search-clear" id="hist-search-clear" onclick="clearSearch()">&#10005;</button>
+      </div>
+      <div class="hist-view-toggle">
+        <button class="hist-view-btn active" id="view-cards" onclick="setViewMode('cards')" title="Vue cartes">&#9783;</button>
+        <button class="hist-view-btn" id="view-compact" onclick="setViewMode('compact')" title="Vue compacte">&#9776;</button>
+      </div>
+    </div>
+    <div class="hist-sort-bar" id="hist-sort-bar">
+      <span class="hist-sort-label">Trier :</span>
+      <button class="hist-sort-btn active" data-sort="date" onclick="toggleSort('date')">&#128197; Date <span class="hist-sort-arrow">&#9650;</span></button>
+      <button class="hist-sort-btn" data-sort="nom" onclick="toggleSort('nom')">A-Z <span class="hist-sort-arrow"></span></button>
+      <button class="hist-sort-btn" data-sort="mo" onclick="toggleSort('mo')">MO <span class="hist-sort-arrow"></span></button>
+      <button class="hist-sort-btn" data-sort="mention" onclick="toggleSort('mention')">Mention <span class="hist-sort-arrow"></span></button>
+    </div>
     <div class="hist-sel-bar" id="hist-sel-bar">
       <div class="hist-sel-count"><span id="hist-sel-count-num">0</span> calcul(s) sélectionné(s)</div>
       <div class="hist-sel-actions">
@@ -2125,6 +2206,21 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
       </div>
     </div>
     <div id="hist-list"></div>
+    <div class="hist-pagination" id="hist-pagination" style="display:none;">
+      <div class="hist-page-info" id="hist-page-info"></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="hist-page-controls" id="hist-page-controls"></div>
+        <div class="hist-page-size">
+          <label>Afficher :</label>
+          <select id="hist-page-size" onchange="onPageSizeChange()">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2763,6 +2859,15 @@ let selectedIds=[];
 
 const API='';let _userEmail='';
 
+/* ── SEARCH / SORT / PAGINATION / VIEW STATE ── */
+let _histSearch='';
+let _histSortField='date';
+let _histSortDir='asc';
+let _histPage=1;
+let _histPageSize=25;
+let _histViewMode='cards';
+let _histFiltered=[];
+
 /* ── MODE BROUILLON ── */
 function saveDraft(){
   try{
@@ -2994,9 +3099,7 @@ function toggleSelect(id,cb){
   updateSelBar();
 }
 function selectAll(){
-  const yearFilter=document.getElementById('hist-year-select')?.value||'';
-  const filtered=yearFilter?histData.filter(h=>h.annee_scolaire===yearFilter):histData;
-  selectedIds=filtered.map(h=>h.id);
+  selectedIds=_histFiltered.map(h=>h.id);
   document.querySelectorAll('.hist-select').forEach(cb=>cb.checked=true);
   updateSelBar();
 }
@@ -3102,39 +3205,79 @@ function renderHistory(){
   const div=document.getElementById('hist-list');
   const countEl=document.getElementById('hist-count');
   const yearFilter=document.getElementById('hist-year-select')?.value||'';
-  const filtered=yearFilter?histData.filter(h=>h.annee_scolaire===yearFilter):histData;
-  const n=filtered.length;
+  const allFiltered=getFilteredData();
+  _histFiltered=allFiltered;
+  const n=allFiltered.length;
   const totalCount=histData.length;
-  if(countEl) countEl.textContent=n+(n<=1?' calcul enregistré':' calculs enregistrés')+(yearFilter?' — Année : '+yearFilter:(totalCount!=n?' ('+totalCount+' au total)':''));
+  if(countEl){
+    let label=n+(n<=1?' calcul enregistré':' calculs enregistrés');
+    if(yearFilter) label+=' — Année : '+yearFilter;
+    if(_histSearch) label+=' — Recherche : « '+_histSearch+' »';
+    if(totalCount!=n&&!_histSearch&&!yearFilter) label+=' ('+totalCount+' au total)';
+    countEl.textContent=label;
+  }
   const btnAll=document.getElementById('btn-print-all');
   if(btnAll) btnAll.style.display=n>1?'inline-flex':'none';
   if(!n){
-    div.innerHTML=yearFilter?'<div class="hist-empty-state"><div class="hist-empty-icon">&#128197;</div><div class="hist-empty-text">Aucun calcul pour '+esc(yearFilter)+'</div><div class="hist-empty-sub">Essayez une autre année ou sélectionnez "Toutes les années".</div></div>':'<div class="hist-empty-state"><div class="hist-empty-icon">&#128196;</div><div class="hist-empty-text">Aucun calcul enregistré</div><div class="hist-empty-sub">Les calculs sauvegardés apparaîtront ici.</div></div>';
-    selectedIds=[];updateSelBar();
+    if(_histSearch){
+      div.innerHTML='<div class="hist-empty-search"><div class="hist-empty-search-icon">&#128269;</div><div class="hist-empty-search-title">Aucun résultat pour « '+esc(_histSearch)+' »</div><div class="hist-empty-search-sub">Essayez avec d\'autres termes de recherche.</div><button class="hist-empty-search-clear" onclick="clearSearch()">&#10005; Effacer la recherche</button></div>';
+    } else if(yearFilter){
+      div.innerHTML='<div class="hist-empty-state"><div class="hist-empty-icon">&#128197;</div><div class="hist-empty-text">Aucun calcul pour '+esc(yearFilter)+'</div><div class="hist-empty-sub">Essayez une autre année ou sélectionnez "Toutes les années".</div></div>';
+    } else {
+      div.innerHTML='<div class="hist-empty-state"><div class="hist-empty-icon">&#128196;</div><div class="hist-empty-text">Aucun calcul enregistré</div><div class="hist-empty-sub">Les calculs sauvegardés apparaîtront ici.</div></div>';
+    }
+    selectedIds=[];updateSelBar();renderPagination(0);
     return;
   }
-  div.innerHTML='<div style="margin-bottom:10px;display:flex;align-items:center;gap:8px;"><input type="checkbox" class="hist-select" onchange="toggleSelectAll(this)" title="Tout sélectionner" '+(selectedIds.length===n?'checked':'')+'><span style="font-size:.78rem;color:#60736D;">Tout sélectionner</span></div>'+filtered.map(h=>{
-    const rawMo=h.mo!=null&&typeof h.mo==='object'?(h.mo.value!=null?h.mo.value:null):h.mo;
-    const moVal=rawMo!=null&&!isNaN(Number(rawMo))?Number(rawMo):null;
-    const moDisplay=moVal!=null?truncate(moVal,2).replace('.',',')+' / 20':'\u2014';
-    const rawMention=h.mention!=null&&typeof h.mention==='object'?(h.mention.value!=null?h.mention.value:null):h.mention;
-    const mention=rawMention||'\u2014';
-    let badgeClass='hist-badge-none';
-    if(mention==='Très bien'||mention==='Bien'||mention==='Félicitations') badgeClass='hist-badge-pass';
-    else if(mention==='Passable'||mention==='Assez bien') badgeClass='hist-badge-warn';
-    else if(typeof mention==='string'&&mention.includes('Insuffisant')) badgeClass='hist-badge-fail';
-    const dateStr=h.date_calc||h.created_at||'';
-    const datePart=dateStr?dateStr.split(' ')[0].split('T')[0]:'';
-    const dateDisplay=datePart?datePart.split('-').reverse().join('/'):'';
-    const timePart=dateStr?(dateStr.includes('T')?dateStr.split('T')[1]:dateStr.split(' ')[1]||''):'';
-    const timeDisplay=timePart?timePart.split('.')[0].substring(0,5):'';
-    const checked=selectedIds.includes(h.id)?'checked':'';
-    const yearBadge=h.annee_scolaire?'<span style="font-size:.66rem;font-weight:600;color:#064E3B;background:#EAF5F0;border:1px solid #B8CEC3;border-radius:5px;padding:1px 6px;margin-left:6px;">'+esc(h.annee_scolaire)+'</span>':'';
-    const rawCreatedBy=h.created_by!=null&&typeof h.created_by==='object'?(h.created_by.value!=null?h.created_by.value:null):h.created_by;
-    const authorEmail=rawCreatedBy||'Non renseigné';
-    const rawPrinted=h.printed!=null&&typeof h.printed==='object'?(h.printed.value!=null?h.printed.value:null):h.printed;
-    const isPrinted=Number(rawPrinted)===1;
-    const printedBadge=isPrinted?'<span class="hist-badge-printed" title="Bulletin imprimé"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>':'<span class="hist-badge-printed hist-badge-notprinted" title="Non imprimé"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B8CEC3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>';
+  const pageStart=(_histPage-1)*_histPageSize;
+  const pageData=allFiltered.slice(pageStart,pageStart+_histPageSize);
+  const isCompact=_histViewMode==='compact';
+  const cardClass='hist-card'+(isCompact?' hist-card-compact':'');
+  div.innerHTML='<div style="margin-bottom:10px;display:flex;align-items:center;gap:8px;"><input type="checkbox" class="hist-select" onchange="toggleSelectAll(this)" title="Tout sélectionner" '+(selectedIds.length===n?'checked':'')+'><span style="font-size:.78rem;color:#60736D;">Tout sélectionner</span></div>'+pageData.map(h=>{
+    return '<div class="'+cardClass+'"><input type="checkbox" class="hist-select" '+checked+' onchange="toggleSelect('+h.id+',this)" title="Sélectionner">'+printedBadge+'<div class="hist-card-info"><div class="hist-card-name" title="'+esc(h.nom||'\u2014')+'">'+esc(h.nom||'\u2014')+'</div><div class="hist-card-meta" title="'+esc((h.matricule||'\u2014')+' · '+(h.classe||'\u2014')+' · '+(h.etablissement||'\u2014'))+'">'+esc(h.matricule||'\u2014')+' &middot; '+esc(h.classe||'\u2014')+' &middot; '+esc(h.etablissement||'\u2014')+'</div>'+(dateDisplay?'<div class="hist-card-date" title="Enregistr\u00e9 le '+dateStr+'">&#128197; '+dateDisplay+(timeDisplay?' &agrave; '+timeDisplay:'')+'</div>':'')+'<div class="hist-card-author" title="Enregistr\u00e9 par">&#9993; '+esc(authorEmail)+'</div></div><div class="hist-card-mo"><div class="mo-value">'+moDisplay+'</div><div class="mo-label">Moyenne</div></div><span class="hist-badge '+badgeClass+'">'+esc(mention)+'</span><div class="hist-actions"><button class="hist-btn-edit" onclick="editCalc('+h.id+')" title="Modifier ce calcul">&#9998; Modifier</button><button class="hist-btn-icon" onclick="duplicateCalc('+h.id+')" title="Dupliquer ce calcul"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button><button class="hist-btn-icon" onclick="previewBulletinPDF('+h.id+')" title="Aperçu du bulletin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button class="hist-btn-icon" onclick="downloadBulletinPDF('+h.id+')" title="T\u00e9l\u00e9charger le bulletin en PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button><button class="hist-btn-del" onclick="confirmDelHistory('+h.id+',this)" title="Supprimer ce calcul">&#128465; Supprimer</button></div></div>';
+  }).join('');
+  if(_role==='admin'){
+    div.querySelectorAll('.hist-card').forEach((card,i)=>{
+      const h=pageData[i];
+      if(h&&h.deleted){
+        card.classList.add('hist-card-deleted');
+        const info=card.querySelector('.hist-card-info');
+        if(info&&!card.querySelector('.hist-badge-deleted')){
+          const b=document.createElement('span');
+          b.className='hist-badge hist-badge-deleted';
+          b.textContent='Supprimé';
+          info.appendChild(b);
+        }
+        if(info&&!card.querySelector('.hist-deleted-note')){
+          const note=document.createElement('div');
+          note.className='hist-deleted-note';
+          note.textContent='Ce calcul a été supprimé. Vous pouvez le restaurer.';
+          info.appendChild(note);
+        }
+        const actions=card.querySelector('.hist-actions');
+        if(actions){
+          actions.querySelectorAll('.hist-btn-edit,.hist-btn-icon').forEach(b=>b.style.display='none');
+          if(!card.querySelector('.hist-restore-btn')){
+            const rb=document.createElement('button');
+            rb.className='hist-btn-restore';
+            rb.innerHTML='&#8635; Restaurer';
+            rb.onclick=(function(id){return function(){restoreCalc(id);};})(h.id);
+            actions.appendChild(rb);
+          }
+          if(!card.querySelector('.hist-btn-delete-perm')){
+            const pb=document.createElement('button');
+            pb.className='hist-btn-delete-perm';
+            pb.textContent='Supprimer définitivement';
+            pb.onclick=(function(id){return function(){purgeOne(id);};})(h.id);
+            actions.appendChild(pb);
+          }
+        }
+      }
+    });
+  }
+  renderPagination(n);
+  updateSelBar();
+}
     return '<div class="hist-card"><input type="checkbox" class="hist-select" '+checked+' onchange="toggleSelect('+h.id+',this)" title="Sélectionner">'+printedBadge+'<div class="hist-card-info"><div class="hist-card-name" title="'+esc(h.nom||'\u2014')+'">'+esc(h.nom||'\u2014')+'</div><div class="hist-card-meta" title="'+esc((h.matricule||'\u2014')+' · '+(h.classe||'\u2014')+' · '+(h.etablissement||'\u2014'))+'">'+esc(h.matricule||'\u2014')+' &middot; '+esc(h.classe||'\u2014')+' &middot; '+esc(h.etablissement||'\u2014')+'</div>'+(dateDisplay?'<div class="hist-card-date" title="Enregistr\u00e9 le '+dateStr+'">&#128197; '+dateDisplay+(timeDisplay?' &agrave; '+timeDisplay:'')+'</div>':'')+'<div class="hist-card-author" title="Enregistr\u00e9 par">&#9993; '+esc(authorEmail)+'</div></div><div class="hist-card-mo"><div class="mo-value">'+moDisplay+'</div><div class="mo-label">Moyenne</div></div><span class="hist-badge '+badgeClass+'">'+esc(mention)+'</span><div class="hist-actions"><button class="hist-btn-edit" onclick="editCalc('+h.id+')" title="Modifier ce calcul">&#9998; Modifier</button><button class="hist-btn-icon" onclick="duplicateCalc('+h.id+')" title="Dupliquer ce calcul"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button><button class="hist-btn-icon" onclick="previewBulletinPDF('+h.id+')" title="Aperçu du bulletin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button class="hist-btn-icon" onclick="downloadBulletinPDF('+h.id+')" title="T\u00e9l\u00e9charger le bulletin en PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button><button class="hist-btn-icon hist-btn-icon-del" onclick="confirmDelHistory('+h.id+',this)" title="Supprimer ce calcul"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></div>';
   }).join('');
   if(_role==='admin'){
@@ -4613,7 +4756,124 @@ function updateYearFilter(){
   document.getElementById('hist-year-filter').style.display=years.length?'flex':'none';
 }
 function filterByYear(){
+  _histPage=1;
   renderHistory();
+}
+
+/* ── SEARCH ── */
+function onSearchInput(){
+  const input=document.getElementById('hist-search');
+  const clear=document.getElementById('hist-search-clear');
+  _histSearch=(input.value||'').trim().toLowerCase();
+  clear.classList.toggle('show',_histSearch.length>0);
+  _histPage=1;
+  renderHistory();
+}
+function clearSearch(){
+  const input=document.getElementById('hist-search');
+  if(input) input.value='';
+  _histSearch='';
+  const clear=document.getElementById('hist-search-clear');
+  if(clear) clear.classList.remove('show');
+  _histPage=1;
+  renderHistory();
+}
+
+/* ── SORT ── */
+function toggleSort(field){
+  if(_histSortField===field){
+    _histSortDir=_histSortDir==='asc'?'desc':'asc';
+  } else {
+    _histSortField=field;
+    _histSortDir='asc';
+  }
+  _histPage=1;
+  document.querySelectorAll('.hist-sort-btn').forEach(btn=>{
+    const isActive=btn.dataset.sort===_histSortField;
+    btn.classList.toggle('active',isActive);
+    const arrow=btn.querySelector('.hist-sort-arrow');
+    if(arrow) arrow.textContent=isActive?(_histSortDir==='asc'?'▲':'▼'):'';
+  });
+  renderHistory();
+}
+
+/* ── VIEW MODE ── */
+function setViewMode(mode){
+  _histViewMode=mode;
+  document.getElementById('view-cards').classList.toggle('active',mode==='cards');
+  document.getElementById('view-compact').classList.toggle('active',mode==='compact');
+  renderHistory();
+}
+
+/* ── PAGINATION ── */
+function onPageSizeChange(){
+  const sel=document.getElementById('hist-page-size');
+  _histPageSize=parseInt(sel.value)||25;
+  _histPage=1;
+  renderHistory();
+}
+function goToPage(page){
+  _histPage=page;
+  renderHistory();
+  const list=document.getElementById('hist-list');
+  if(list) list.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function renderPagination(total){
+  const pag=document.getElementById('hist-pagination');
+  const info=document.getElementById('hist-page-info');
+  const controls=document.getElementById('hist-page-controls');
+  if(!pag||!info||!controls) return;
+  if(total===0){pag.style.display='none';return;}
+  pag.style.display='flex';
+  const totalPages=Math.ceil(total/_histPageSize);
+  if(_histPage>totalPages) _histPage=totalPages;
+  const start=(_histPage-1)*_histPageSize+1;
+  const end=Math.min(_histPage*_histPageSize,total);
+  info.textContent='Affichage de '+start+' à '+end+' sur '+total+' résultat(s)';
+  let html='';
+  html+='<button class="hist-page-btn" onclick="goToPage(1)"'+(_histPage===1?' disabled':'')+'>&#171;</button>';
+  html+='<button class="hist-page-btn" onclick="goToPage('+(_histPage-1)+')"'+(_histPage===1?' disabled':'')+'>&#8249;</button>';
+  const maxVisible=5;
+  let startPage=Math.max(1,_histPage-Math.floor(maxVisible/2));
+  let endPage=Math.min(totalPages,startPage+maxVisible-1);
+  if(endPage-startPage<maxVisible-1) startPage=Math.max(1,endPage-maxVisible+1);
+  if(startPage>1) html+='<button class="hist-page-btn" onclick="goToPage(1)">1</button><span style="color:#9fb0a6;font-size:.76rem;">...</span>';
+  for(let i=startPage;i<=endPage;i++){
+    html+='<button class="hist-page-btn'+(i===_histPage?' active':'')+'" onclick="goToPage('+i+')">'+i+'</button>';
+  }
+  if(endPage<totalPages) html+='<span style="color:#9fb0a6;font-size:.76rem;">...</span><button class="hist-page-btn" onclick="goToPage('+totalPages+')">'+totalPages+'</button>';
+  html+='<button class="hist-page-btn" onclick="goToPage('+(_histPage+1)+')"'+(_histPage===totalPages?' disabled':'')+'>&#8250;</button>';
+  html+='<button class="hist-page-btn" onclick="goToPage('+totalPages+')"'+(_histPage===totalPages?' disabled':'')+'>&#187;</button>';
+  controls.innerHTML=html;
+}
+
+/* ── FILTER + SORT + PAGINATE ── */
+function getFilteredData(){
+  const yearFilter=document.getElementById('hist-year-select')?.value||'';
+  let data=histData;
+  if(yearFilter) data=data.filter(h=>h.annee_scolaire===yearFilter);
+  if(_histSearch){
+    data=data.filter(h=>{
+      const nom=(h.nom||'').toLowerCase();
+      const matricule=(h.matricule||'').toLowerCase();
+      const classe=(h.classe||'').toLowerCase();
+      const etab=(h.etablissement||'').toLowerCase();
+      return nom.includes(_histSearch)||matricule.includes(_histSearch)||classe.includes(_histSearch)||etab.includes(_histSearch);
+    });
+  }
+  data.sort((a,b)=>{
+    let va,vb;
+    switch(_histSortField){
+      case 'nom':va=(a.nom||'').toLowerCase();vb=(b.nom||'').toLowerCase();break;
+      case 'mo':va=parseFloat(a.mo)||0;vb=parseFloat(b.mo)||0;break;
+      case 'mention':va=(a.mention||'').toLowerCase();vb=(b.mention||'').toLowerCase();break;
+      case 'date':default:va=a.date_calc||a.created_at||'';vb=b.date_calc||b.created_at||'';break;
+    }
+    if(va<vb) return _histSortDir==='asc'?-1:1;
+    if(va>vb) return _histSortDir==='asc'?1:-1;
+    return 0;
+  });
+  return data;
 }
 
 /* ── INIT: fetch role from server first ── */
