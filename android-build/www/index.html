@@ -2528,16 +2528,19 @@ let _role='guest';
 function slideNavPill(){
   const pill=document.getElementById('nav-pill');
   if(!pill) return;
-  const active=document.querySelector('.nav-item.active');
-  if(!active){pill.style.opacity='0';return;}
-  const center=document.getElementById('nav-center');
-  const cRect=center.getBoundingClientRect();
-  const aRect=active.getBoundingClientRect();
-  const w=aRect.width+12;
-  const x=aRect.left-cRect.left-6;
-  pill.style.width=w+'px';
-  pill.style.transform='translateY(-50%) translateX('+x+'px)';
-  pill.style.opacity='1';
+  requestAnimationFrame(()=>{
+    const active=document.querySelector('.nav-item.active');
+    if(!active){pill.style.opacity='0';return;}
+    const center=document.getElementById('nav-center');
+    const cRect=center.getBoundingClientRect();
+    const aRect=active.getBoundingClientRect();
+    const w=aRect.width+16;
+    const x=aRect.left-cRect.left-8;
+    pill.style.width=w+'px';
+    pill.style.left='0';
+    pill.style.transform='translateY(-50%) translateX('+x+'px)';
+    pill.style.opacity='1';
+  });
 }
 function showPage(id){
   if(id==='hist'&&_role==='guest') return;
@@ -5072,6 +5075,8 @@ _notifPoll=setInterval(loadNotifications,15000);
 loadHistory();
 checkDraft();
 window.addEventListener('beforeprint',buildBulletin);
+window.addEventListener('resize',slideNavPill);
+window.addEventListener('load',slideNavPill);
 if(new URLSearchParams(window.location.search).get('bulletin-preview')==='demo') loadBulletinPreview();
 
 /* ── HEARTBEAT: keep session alive + detect disconnection ── */
