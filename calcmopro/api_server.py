@@ -1059,6 +1059,8 @@ class _Handler(BaseHTTPRequestHandler):
             nom = (body.get("nom") or "").strip()
             if not nom:
                 return self._json({"error": "Le nom est obligatoire."}, 400)
+            session_email = self._get_email()
+            created_by = session_email or "admin"
             try:
                 result = db.save_eleve(
                     nom=nom,
@@ -1071,7 +1073,7 @@ class _Handler(BaseHTTPRequestHandler):
                     mention=body.get("mention", ""),
                     matieres=body.get("matieres"),
                     annee_scolaire=body.get("annee_scolaire", ""),
-                    created_by=body.get("created_by", "") or self._get_email(),
+                    created_by=created_by,
                 )
                 if result.get("error"):
                     return self._json(result, 500)
@@ -1101,7 +1103,8 @@ class _Handler(BaseHTTPRequestHandler):
             if not self._check_eleve_access(eid):
                 return self._json({"error": "Accès refusé"}, 403)
             try:
-                result = db.duplicate_eleve(eid)
+                session_email = self._get_email()
+                result = db.duplicate_eleve(eid, created_by=session_email or "admin")
             except Exception as exc:
                 return self._json({"error": "Erreur interne du serveur"}, 500)
             if result is None:

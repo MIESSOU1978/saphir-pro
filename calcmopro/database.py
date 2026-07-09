@@ -590,7 +590,7 @@ def update_eleve(eleve_id: int, nom: str, matricule: str = "", classe: str = "",
     return {"eleve": dict(row), "resultat": dict(res)}
 
 
-def duplicate_eleve(eleve_id: int) -> dict[str, Any] | None:
+def duplicate_eleve(eleve_id: int, created_by: str = "") -> dict[str, Any] | None:
     src = get_eleve(eleve_id)
     if not src:
         return None
@@ -604,6 +604,7 @@ def duplicate_eleve(eleve_id: int) -> dict[str, Any] | None:
         mo=src.get("mo", 0),
         mention=src.get("mention", ""),
         matieres=src.get("matieres") or {},
+        created_by=created_by,
     )
 
 

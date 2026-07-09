@@ -4613,11 +4613,11 @@ function filterByYear(){
   applyRole();
   setTimeout(_sseStart,1000);
   updateMsgPoll();
+  loadHistory();
 })();
 requestNotifPermission();
 loadNotifications();
 _notifPoll=setInterval(loadNotifications,15000);
-loadHistory();
 checkDraft();
 window.addEventListener('beforeprint',buildBulletin);
 if(new URLSearchParams(window.location.search).get('bulletin-preview')==='demo') loadBulletinPreview();
