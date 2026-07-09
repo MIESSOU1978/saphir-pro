@@ -1087,10 +1087,18 @@ class _Handler(BaseHTTPRequestHandler):
             if not ids:
                 return self._json({"error": "Aucun ID fourni"}, 400)
             if role != "admin":
-                return self._json({"error": "Accès refusé"}, 403)
+                email = self._get_email()
+                if not email:
+                    return self._json({"error": "Accès refusé"}, 403)
+                db.claim_legacy_eleves(email)
+                owned = [eid for eid in ids if self._check_eleve_access(eid)]
+                if not owned:
+                    return self._json({"ok": True, "deleted": 0})
+                ids = owned
             try:
                 count = db.delete_multiple_eleves(ids)
             except Exception as exc:
+                print(f"[ERROR] delete_multiple_eleves: {exc}")
                 return self._json({"error": "Erreur interne du serveur"}, 500)
             return self._json({"ok": True, "deleted": count})
 
