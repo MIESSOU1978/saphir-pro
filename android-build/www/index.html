@@ -432,7 +432,7 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 }
 .hist-title{font-size:.95rem;font-weight:700;color:#003b32;letter-spacing:.2px;}
 .hist-subtitle{font-size:.74rem;color:#60736d;margin-top:2px;}
-.hist-btn-print,.hist-btn-clear,.hist-btn-refresh{
+.hist-btn-print,.hist-btn-clear,.hist-btn-refresh,.hist-btn-purge{
   display:inline-flex;align-items:center;gap:6px;
   padding:8px 18px;border-radius:8px;
   font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;
@@ -452,10 +452,10 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
   background:#F4FAF7;border-color:#064E3B;color:#053d2e;box-shadow:0 2px 8px rgba(6,78,59,.1);
 }
 .hist-btn-clear{
-  background:#FFF8F6;color:#B42318;border:1px solid #E7A6A0;
+  background:#FFF8F6;color:#B42318;border:1px solid #F3B8B2;
 }
 .hist-btn-clear:hover{
-  background:#FDECEA;border-color:#d4817a;color:#911b12;
+  background:#FDECEA;border-color:#B42318;color:#911b12;
 }
 .hist-actions-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
 
@@ -473,8 +473,8 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-btn-restore:hover{background:#EAF5F0;border-color:#064E3B;}
 .hist-btn-delete-perm{background:transparent;border:1px solid #F3B8B2;color:#B42318;border-radius:8px;padding:6px 10px;font-size:.68rem;font-weight:600;cursor:pointer;opacity:.85;}
 .hist-btn-delete-perm:hover{background:#FDECEA;}
-.hist-btn-purge{background:#FEF2F2;color:#B42318;border:1px solid #FECACA;}
-.hist-btn-purge:hover{background:#FEE2E2;}
+.hist-btn-purge{background:#FDECEA;color:#B42318;border:1px solid #D92D20;}
+.hist-btn-purge:hover{background:#FECACA;border-color:#B42318;color:#911b12;}
 
 .hist-card-info{min-width:0;}
 .hist-card-name{font-size:.9rem;font-weight:700;color:#003b32;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -2106,7 +2106,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
           &#128465; Vider l'historique
         </button>
         <button class="hist-btn-purge" id="btn-purge-trash" onclick="purgeTrash()" style="display:none;">
-          &#128465; Vider la corbeille
+          &#9940; Vider la corbeille
         </button>
       </div>
     </div>
@@ -2950,7 +2950,7 @@ async function clearHistory(){
 }
 
 function confirmClearHistory(){
-  const msg='Voulez-vous vraiment déplacer tout l\'historique dans la corbeille ?\n\nLes calculs resteront visibles par l\'administrateur et pourront être restaurés.\nCette action est irréversible pour l\'élève.';
+  const msg='Voulez-vous vraiment vider l\'historique ?\nLes calculs seront déplacés vers la corbeille.';
   if(!confirm(msg)) return;
   clearHistory();
 }
@@ -2965,7 +2965,7 @@ async function restoreCalc(id){
 }
 
 async function purgeTrash(){
-  if(!confirm('Voulez-vous vraiment supprimer définitivement tous les bulletins de la corbeille ?\nCette action est irréversible.')) return;
+  if(!confirm('Voulez-vous vraiment vider définitivement la corbeille ?\nCette action est irréversible.')) return;
   try{
     const r=await fetch(API+'/api/eleves/purge',{method:'POST',credentials:'same-origin'});
     if(!r.ok){let msg='Erreur.';try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}throw new Error(msg);}
