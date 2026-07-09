@@ -656,6 +656,25 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 .hist-empty-search-clear{display:inline-flex;align-items:center;gap:5px;padding:7px 16px;border-radius:8px;border:1px solid #b8cec3;background:#fff;color:#064E3B;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .15s;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
 .hist-empty-search-clear:hover{background:#F0F7F3;border-color:#064E3B;}
 
+/* ── CUSTOM CONFIRM MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px);opacity:0;transition:opacity .2s;}
+.modal-overlay.show{opacity:1;}
+.modal-box{background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.25);padding:28px 30px 22px;max-width:420px;width:90%;transform:scale(.92);transition:transform .2s;}
+.modal-overlay.show .modal-box{transform:scale(1);}
+.modal-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:14px;}
+.modal-icon.warn{background:#FEF2F2;color:#B42318;border:1px solid #FECACA;}
+.modal-icon.danger{background:#FDECEA;color:#D92D20;border:1px solid #F3B8B2;}
+.modal-icon.info{background:#EAF5F0;color:#064E3B;border:1px solid #B8DEC9;}
+.modal-msg{font-size:.88rem;color:#1a2e23;font-weight:600;line-height:1.5;margin-bottom:20px;white-space:pre-line;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;}
+.modal-btn{padding:9px 20px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid transparent;font-family:'Ebrima','Segoe UI',Arial,sans-serif;}
+.modal-btn-cancel{background:#fff;color:#60736d;border-color:#D5E5DE;}
+.modal-btn-cancel:hover{background:#F0F7F3;border-color:#064E3B;}
+.modal-btn-ok{background:#064E3B;color:#fff;border-color:#064E3B;}
+.modal-btn-ok:hover{background:#0d7a56;}
+.modal-btn-danger{background:#B42318;color:#fff;border-color:#B42318;}
+.modal-btn-danger:hover{background:#911b12;}
+
 /* ── USERS PAGE ── */
 .users-container{
   background:#fff;border:1px solid #d9e5de;border-radius:14px;
@@ -2386,6 +2405,16 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 
 </main>
 <div id="toast"></div>
+<div class="modal-overlay" id="custom-modal" onclick="if(event.target===this)_modalResolve(false)">
+  <div class="modal-box">
+    <div class="modal-icon warn" id="modal-icon">&#9888;</div>
+    <div class="modal-msg" id="modal-msg"></div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" id="modal-cancel" onclick="_modalResolve(false)">Annuler</button>
+      <button class="modal-btn modal-btn-ok" id="modal-ok" onclick="_modalResolve(true)">Confirmer</button>
+    </div>
+  </div>
+</div>
 <div class="draft-toast" id="draft-toast">
   <span>&#128196; Une saisie non enregistrée a été retrouvée. Voulez-vous la reprendre ?</span>
   <button class="draft-toast-btn yes" onclick="restoreDraft()">Reprendre</button>
@@ -2876,11 +2905,11 @@ function setMention(mo){
   el.textContent=lbl;el.style.background=bg;el.style.color=col;
 }
 
-function resetMO(){
+async function resetMO(){
   if(!editingId){
     const draft=loadDraft();
     if(draft&&(draft.nom||draft.matricule||Object.values(draft.matieres||{}).some(v=>v.mga||v.bepc||v.bepc_ecrit||v.bepc_oral))){
-      if(!confirm('Une saisie non enregistrée existe. Voulez-vous réinitialiser et perdre ce brouillon ?')) return;
+      if(!(await customConfirm('Une saisie non enregistrée existe. Voulez-vous réinitialiser et perdre ce brouillon ?'))) return;
       dismissDraft();
     }
   }
@@ -3100,8 +3129,8 @@ async function supprimerCalculHistorique(id,btn){
   }
 }
 
-function confirmDelHistory(id,btn){
-  if(!confirm('Voulez-vous vraiment supprimer ce calcul ? Cette action est irréversible.')) return;
+async function confirmDelHistory(id,btn){
+  if(!(await customConfirm('Voulez-vous vraiment supprimer ce calcul ?',{type:'danger',okText:'Supprimer'}))) return;
   supprimerCalculHistorique(id,btn);
 }
 
@@ -3123,9 +3152,9 @@ async function clearHistory(){
   sendNotification('Historique vidé','Tous les calculs ont été déplacés dans la corbeille','warning');
 }
 
-function confirmClearHistory(){
+async function confirmClearHistory(){
   const msg='Voulez-vous vraiment vider l\'historique ?\nLes calculs seront déplacés vers la corbeille.';
-  if(!confirm(msg)) return;
+  if(!(await customConfirm(msg))) return;
   clearHistory();
 }
 
@@ -3139,7 +3168,7 @@ async function restoreCalc(id){
 }
 
 async function purgeTrash(){
-  if(!confirm('Voulez-vous vraiment vider définitivement la corbeille ?\nCette action est irréversible.')) return;
+  if(!(await customConfirm('Voulez-vous vraiment vider définitivement la corbeille ?\nCette action est irréversible.',{type:'danger',okText:'Vider la corbeille'}))) return;
   try{
     const r=await fetch(API+'/api/eleves/purge',{method:'POST',credentials:'same-origin'});
     if(!r.ok){let msg='Erreur.';try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}throw new Error(msg);}
@@ -3149,7 +3178,7 @@ async function purgeTrash(){
 }
 
 async function purgeOne(id){
-  if(!confirm('Supprimer définitivement ce bulletin ?\nCette action est irréversible.')) return;
+  if(!(await customConfirm('Supprimer définitivement ce bulletin ?',{type:'danger',okText:'Supprimer définitivement'}))) return;
   try{
     const r=await fetch(API+'/api/eleves/'+id+'/purge',{method:'POST',credentials:'same-origin'});
     if(!r.ok){let msg='Erreur.';try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}throw new Error(msg);}
@@ -3188,7 +3217,7 @@ function updateSelBar(){
 async function deleteSelection(){
   if(!selectedIds.length) return;
   const n=selectedIds.length;
-  if(!confirm('Voulez-vous vraiment supprimer les '+n+' calcul(s) sélectionné(s) ?\nCette action est irréversible.')) return;
+  if(!(await customConfirm('Voulez-vous vraiment supprimer les '+n+' calcul(s) sélectionné(s) ?',{type:'danger',okText:'Supprimer'}))) return;
   try{
     const r=await fetch(API+'/api/eleves/delete-multiple',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({ids:selectedIds})});
     if(!r.ok){
@@ -3748,6 +3777,34 @@ function toast(msg,isErr=false){
   t._timer=setTimeout(()=>t.classList.remove('show'),isErr?5000:3200);
 }
 
+/* ── CUSTOM CONFIRM MODAL ── */
+let _modalResolve=null;
+function customConfirm(msg,opts={}){
+  return new Promise(resolve=>{
+    _modalResolve=resolve;
+    const overlay=document.getElementById('custom-modal');
+    const msgEl=document.getElementById('modal-msg');
+    const icon=document.getElementById('modal-icon');
+    const okBtn=document.getElementById('modal-ok');
+    const cancelBtn=document.getElementById('modal-cancel');
+    msgEl.textContent=msg;
+    const type=opts.type||'warn';
+    icon.className='modal-icon '+type;
+    icon.innerHTML=type==='danger'?'&#9888;':type==='info'?'&#8505;':'&#9888;';
+    okBtn.textContent=opts.okText||'Confirmer';
+    cancelBtn.textContent=opts.cancelText||'Annuler';
+    if(type==='danger'){okBtn.className='modal-btn modal-btn-danger';}
+    else{okBtn.className='modal-btn modal-btn-ok';}
+    overlay.classList.add('show');
+    okBtn.focus();
+  });
+}
+function _modalResolve(val){
+  const overlay=document.getElementById('custom-modal');
+  if(overlay) overlay.classList.remove('show');
+  if(_modalResolve){_modalResolve(val);_modalResolve=null;}
+}
+
 /* ── ROLE-BASED UI ── */
 function doLogout(){
   const sid=localStorage.getItem('saphir_session_id');
@@ -4132,9 +4189,9 @@ function renderUsers(sessions){
   }).join('');
 }
 
-function toggleDeviceTrust(deviceId, trusted) {
-  if(trusted && !confirm('Voulez-vous vraiment marquer cet appareil comme fiable ?')) return;
-  if(!trusted && !confirm('Voulez-vous vraiment retirer cet appareil des appareils fiables ?')) return;
+async function toggleDeviceTrust(deviceId, trusted) {
+  if(trusted && !(await customConfirm('Voulez-vous vraiment marquer cet appareil comme fiable ?',{type:'info',okText:'Confirmer'}))) return;
+  if(!trusted && !(await customConfirm('Voulez-vous vraiment retirer cet appareil des appareils fiables ?',{type:'warn',okText:'Retirer'}))) return;
   const action = trusted ? 'trust' : 'untrust';
   const label = trusted ? 'fiable' : 'non reconnu';
   toast('Mise à jour en cours…');
@@ -4151,8 +4208,8 @@ function toggleDeviceTrust(deviceId, trusted) {
   })).catch(e => { toast('Erreur réseau'); });
 }
 
-function trustNewDevice(fingerprint, label) {
-  if(!confirm('Voulez-vous vraiment marquer cet appareil comme fiable ?')) return;
+async function trustNewDevice(fingerprint, label) {
+  if(!(await customConfirm('Voulez-vous vraiment marquer cet appareil comme fiable ?',{type:'info',okText:'Confirmer'}))) return;
   toast('Enregistrement en cours…');
   fetch(API + '/api/known-devices', {
     method: 'POST', credentials: 'same-origin',
@@ -4169,8 +4226,8 @@ function trustNewDevice(fingerprint, label) {
   })).catch(e => { toast('Erreur réseau'); });
 }
 
-function blockNewDevice(fingerprint, label) {
-  if(!confirm('Voulez-vous vraiment marquer cet appareil comme NON fiable ?')) return;
+async function blockNewDevice(fingerprint, label) {
+  if(!(await customConfirm('Voulez-vous vraiment marquer cet appareil comme NON fiable ?',{type:'warn',okText:'Confirmer'}))) return;
   toast('Enregistrement en cours…');
   fetch(API + '/api/known-devices', {
     method: 'POST', credentials: 'same-origin',
@@ -4187,8 +4244,8 @@ function blockNewDevice(fingerprint, label) {
   })).catch(e => { toast('Erreur réseau'); });
 }
 
-function deleteKnownDevice(deviceId) {
-  if(!confirm('Voulez-vous vraiment supprimer cet appareil connu ? Cette action est irréversible.')) return;
+async function deleteKnownDevice(deviceId) {
+  if(!(await customConfirm('Voulez-vous vraiment supprimer cet appareil connu ?',{type:'danger',okText:'Supprimer'}))) return;
   toast('Suppression…');
   fetch(API + '/api/known-devices/' + deviceId, {
     method: 'DELETE', credentials: 'same-origin'
@@ -4250,7 +4307,7 @@ function getSelectedUserIds(){
 
 async function deleteSession(id){
   if(id===_sessionId){toast('Impossible de supprimer votre session active.',true);return;}
-  if(!confirm('Supprimer cette session ?')) return;
+  if(!(await customConfirm('Supprimer cette session ?',{type:'danger',okText:'Supprimer'}))) return;
   toast('Suppression…');
   try{
     const r=await fetch(API+'/api/sessions/'+id,{method:'DELETE',credentials:'same-origin'});
@@ -4264,7 +4321,7 @@ async function deleteSelectedUsers(){
   const ids=getSelectedUserIds().filter(id=>id!==_sessionId);
   if(!ids.length){toast('Aucune session supprimable (session active exclue).',true);return;}
   const skipped=getSelectedUserIds().length-ids.length;
-  if(!confirm('Supprimer '+ids.length+' session(s) sélectionnée(s) ?'+(skipped?' La session active sera conservée.':'')+' Cette action est irréversible.')) return;
+  if(!(await customConfirm('Supprimer '+ids.length+' session(s) sélectionnée(s) ?'+(skipped?' La session active sera conservée.':''),{type:'danger',okText:'Supprimer'}))) return;
   try{
     const r=await fetch('/api/sessions/batch-delete',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({ids})});
     const data=await r.json().catch(()=>({}));
@@ -4276,7 +4333,7 @@ async function deleteSelectedUsers(){
 async function clearAllUsers(){
   const ids=_allSessions.map(s=>s.id).filter(id=>id!==_sessionId);
   if(!ids.length){toast('Aucune autre session à supprimer.',true);return;}
-  if(!confirm('Supprimer '+ids.length+' session(s) ?\nVotre session active sera conservée.\nCette action est irréversible.')) return;
+  if(!(await customConfirm('Supprimer '+ids.length+' session(s) ?\nVotre session active sera conservée.',{type:'danger',okText:'Supprimer'}))) return;
   try{
     const r=await fetch('/api/sessions/batch-delete',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({ids})});
     const data=await r.json().catch(()=>({}));
@@ -4291,7 +4348,7 @@ async function clearOfflineSessions(){
     return s&&s.logout_at&&id!==_sessionId;
   });
   if(!ids.length){toast('Sélectionnez des sessions déconnectées à supprimer.',true);return;}
-  if(!confirm('Supprimer '+ids.length+' session(s) déconnectée(s) sélectionnée(s) ?')) return;
+  if(!(await customConfirm('Supprimer '+ids.length+' session(s) déconnectée(s) sélectionnée(s) ?',{type:'danger',okText:'Supprimer'}))) return;
   try{
     const r=await fetch('/api/sessions/batch-delete',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({ids})});
     const data=await r.json().catch(()=>({}));
@@ -4302,7 +4359,7 @@ async function clearOfflineSessions(){
 }
 
 async function disconnectUser(id,email){
-  if(!confirm('Voulez-vous vraiment déconnecter cet utilisateur ?')) return;
+  if(!(await customConfirm('Voulez-vous vraiment déconnecter cet utilisateur ?',{type:'warn',okText:'Déconnecter'}))) return;
   toast('Déconnexion en cours…');
   try{
     const r=await fetch(API+'/api/sessions/'+id+'/disconnect',{method:'POST',credentials:'same-origin'});
@@ -4319,8 +4376,8 @@ async function banUser(id,email){
   if(id===_sessionId){toast('Vous ne pouvez pas vous bannir vous-même.',true);return;}
   const motif=prompt('Motif du bannissement (optionnel) :');
   if(motif===null) return;
-  if(!confirm('Attention : cette action va bannir définitivement cet utilisateur.\nIl ne pourra plus accéder à l\'application.\nVoulez-vous continuer ?')) return;
-  if(!confirm('Dernière confirmation : bannir '+email+' définitivement ?')) return;
+  if(!(await customConfirm('Attention : cette action va bannir définitivement cet utilisateur.\nIl ne pourra plus accéder à l\'application.\nVoulez-vous continuer ?',{type:'danger',okText:'Bannir'}))) return;
+  if(!(await customConfirm('Dernière confirmation : bannir '+email+' définitivement ?',{type:'danger',okText:'Bannir définitivement'}))) return;
   toast('Bannissement en cours…');
   try{
     const r=await fetch(API+'/api/sessions/'+id+'/ban',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({email,motif})});
@@ -4601,7 +4658,7 @@ function renderNotifications(list){
 }
 async function quickBan(email){
   if(!email) return;
-  if(!confirm('Bannir définitivement '+email+' ?')) return;
+  if(!(await customConfirm('Bannir définitivement '+email+' ?',{type:'danger',okText:'Bannir'}))) return;
   try{
     const sessions=await fetch(API+'/api/sessions',{credentials:'same-origin'}).then(r=>r.json()).catch(()=>[]);
     const target=sessions.find(s=>(s.email||'').toLowerCase()===email.toLowerCase());
