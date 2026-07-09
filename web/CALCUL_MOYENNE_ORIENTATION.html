@@ -466,6 +466,10 @@ main{width:100%;max-width:1180px;padding:26px 22px 44px;display:flex;flex-direct
 }
 .hist-card:last-child{margin-bottom:0;}
 .hist-card:hover{border-color:#b8d4c7;box-shadow:0 4px 16px rgba(6,78,59,.1);transform:translateY(-1px);}
+.hist-card-deleted{opacity:.62;background:#FBF7F7;border-style:dashed;border-color:#E6C9C9;}
+.hist-badge-deleted{display:inline-flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#B42318;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:2px 8px;margin-top:5px;}
+.hist-btn-purge{background:#FEF2F2;color:#B42318;border:1px solid #FECACA;}
+.hist-btn-purge:hover{background:#FEE2E2;}
 
 .hist-card-info{min-width:0;}
 .hist-card-name{font-size:.9rem;font-weight:700;color:#003b32;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -2112,6 +2116,9 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
         <button class="hist-btn-clear" onclick="confirmClearHistory()">
           &#128465; Vider l'historique
         </button>
+        <button class="hist-btn-purge" id="btn-purge-trash" onclick="purgeTrash()" style="display:none;">
+          &#128465; Vider la corbeille
+        </button>
       </div>
     </div>
     <div class="hist-year-filter" id="hist-year-filter" style="display:none;">
@@ -3001,15 +3008,34 @@ async function clearHistory(){
   }
   histData=[];selectedIds=[];
   renderHistory();
-  toast('Historique vidé.');
-  logActivity('Vider l historique','Historique','Tous les calculs supprimés');
-  sendNotification('Historique vidé','Tous les calculs ont été supprimés','warning');
+  toast('Historique déplacé dans la corbeille.');
+  logActivity('Vider l historique','Historique','Tous les calculs déplacés dans la corbeille');
+  sendNotification('Historique vidé','Tous les calculs ont été déplacés dans la corbeille','warning');
 }
 
 function confirmClearHistory(){
-  const msg='Voulez-vous vraiment vider tout l\'historique ?\n\nTous les calculs enregistrés seront supprimés définitivement de la base de données.\nCette action est irréversible.';
+  const msg='Voulez-vous vraiment déplacer tout l\'historique dans la corbeille ?\n\nLes calculs resteront visibles par l\'administrateur et pourront être restaurés.\nCette action est irréversible pour l\'élève.';
   if(!confirm(msg)) return;
   clearHistory();
+}
+
+async function restoreCalc(id){
+  try{
+    const r=await fetch(API+'/api/eleves/'+id+'/restore',{method:'POST',credentials:'same-origin'});
+    if(!r.ok){let msg='Erreur.';try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}throw new Error(msg);}
+    await loadHistory();
+    toast('Calcul restauré.');
+  }catch(e){toast(e.message||'Erreur.',true);}
+}
+
+async function purgeTrash(){
+  if(!confirm('Voulez-vous vraiment supprimer définitivement tous les bulletins de la corbeille ?\nCette action est irréversible.')) return;
+  try{
+    const r=await fetch(API+'/api/eleves/purge',{method:'POST',credentials:'same-origin'});
+    if(!r.ok){let msg='Erreur.';try{const j=await r.json();if(j.error)msg=j.error;}catch(e){}throw new Error(msg);}
+    await loadHistory();
+    toast('Corbeille vidée.');
+  }catch(e){toast(e.message||'Erreur.',true);}
 }
 
 /* ── SÉLECTION MULTIPLE ── */
@@ -3171,6 +3197,29 @@ function renderHistory(){
     const printedBadge=isPrinted?'<span class="hist-badge-printed" title="Bulletin imprimé"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#064E3B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>':'<span class="hist-badge-printed hist-badge-notprinted" title="Non imprimé"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B8CEC3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>';
     return '<div class="hist-card"><input type="checkbox" class="hist-select" '+checked+' onchange="toggleSelect('+h.id+',this)" title="Sélectionner">'+printedBadge+'<div class="hist-card-info"><div class="hist-card-name" title="'+esc(h.nom||'\u2014')+'">'+esc(h.nom||'\u2014')+'</div><div class="hist-card-meta" title="'+esc((h.matricule||'\u2014')+' · '+(h.classe||'\u2014')+' · '+(h.etablissement||'\u2014'))+'">'+esc(h.matricule||'\u2014')+' &middot; '+esc(h.classe||'\u2014')+' &middot; '+esc(h.etablissement||'\u2014')+'</div>'+(dateDisplay?'<div class="hist-card-date" title="Enregistr\u00e9 le '+dateStr+'">&#128197; '+dateDisplay+(timeDisplay?' &agrave; '+timeDisplay:'')+'</div>':'')+'<div class="hist-card-author" title="Enregistr\u00e9 par">&#9993; '+esc(authorEmail)+'</div></div><div class="hist-card-mo"><div class="mo-value">'+moDisplay+'</div><div class="mo-label">Moyenne</div></div><span class="hist-badge '+badgeClass+'">'+esc(mention)+'</span><div class="hist-actions"><button class="hist-btn-edit" onclick="editCalc('+h.id+')" title="Modifier ce calcul">&#9998; Modifier</button><button class="hist-btn-icon" onclick="duplicateCalc('+h.id+')" title="Dupliquer ce calcul"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button><button class="hist-btn-icon" onclick="previewBulletinPDF('+h.id+')" title="Aperçu du bulletin"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button><button class="hist-btn-icon" onclick="downloadBulletinPDF('+h.id+')" title="T\u00e9l\u00e9charger le bulletin en PDF"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button><button class="hist-btn-icon hist-btn-icon-del" onclick="confirmDelHistory('+h.id+',this)" title="Supprimer ce calcul"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button></div></div>';
   }).join('');
+  if(_role==='admin'){
+    div.querySelectorAll('.hist-card').forEach((card,i)=>{
+      const h=filtered[i];
+      if(h&&h.deleted){
+        card.classList.add('hist-card-deleted');
+        const info=card.querySelector('.hist-card-info');
+        if(info&&!card.querySelector('.hist-badge-deleted')){
+          const b=document.createElement('span');
+          b.className='hist-badge hist-badge-deleted';
+          b.textContent='Supprimé';
+          info.appendChild(b);
+        }
+        const actions=card.querySelector('.hist-actions');
+        if(actions&&!card.querySelector('.hist-restore-btn')){
+          const rb=document.createElement('button');
+          rb.className='hist-btn-edit hist-restore-btn';
+          rb.textContent='↺ Restaurer';
+          rb.onclick=function(){restoreCalc(h.id);};
+          actions.appendChild(rb);
+        }
+      }
+    });
+  }
   updateSelBar();
 }
 
@@ -3577,6 +3626,8 @@ function applyRole(){
     if(bell) bell.style.display='flex';
     const msgBtn=document.getElementById('msg-history-btn');
     if(msgBtn) msgBtn.style.display='flex';
+    const purgeBtn=document.getElementById('btn-purge-trash');
+    if(purgeBtn) purgeBtn.style.display='inline-flex';
   }
 }
 
@@ -3725,6 +3776,14 @@ function _sseOnEvent(data){
     }
     /* When an eleve is deleted elsewhere, refresh history if visible */
     if(type==='eleve_deleted'){
+      const histPage=document.getElementById('page-hist');
+      if(histPage&&histPage.classList.contains('active')){
+        loadHistory();
+      }
+      return;
+    }
+    /* When an eleve is restored or trash purged, refresh history if visible */
+    if(type==='eleve_restored'||type==='eleves_purged'){
       const histPage=document.getElementById('page-hist');
       if(histPage&&histPage.classList.contains('active')){
         loadHistory();

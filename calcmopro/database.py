@@ -167,12 +167,17 @@ def init_db() -> None:
                 annee       TEXT DEFAULT '',
                 annee_scolaire TEXT DEFAULT '',
                 created_by  TEXT DEFAULT '',
-                created_at  TEXT DEFAULT (datetime('now','localtime'))
+                created_at  TEXT DEFAULT (datetime('now','localtime')),
+                deleted     INTEGER DEFAULT 0
             )
         """)
         # Add created_by column if missing (existing databases)
         try:
             _turso_exec("ALTER TABLE eleves ADD COLUMN created_by TEXT DEFAULT ''")
+        except Exception:
+            pass
+        try:
+            _turso_exec("ALTER TABLE eleves ADD COLUMN deleted INTEGER DEFAULT 0")
         except Exception:
             pass
         _turso_exec("""
@@ -315,7 +320,8 @@ def init_db() -> None:
             annee       TEXT DEFAULT '',
             annee_scolaire TEXT DEFAULT '',
             created_by  TEXT DEFAULT '',
-            created_at  TEXT DEFAULT (datetime('now','localtime'))
+            created_at  TEXT DEFAULT (datetime('now','localtime')),
+            deleted     INTEGER DEFAULT 0
         );
         CREATE TABLE IF NOT EXISTS resultats (
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -412,6 +418,10 @@ def init_db() -> None:
     except Exception:
         pass
     try:
+        conn.execute("ALTER TABLE eleves ADD COLUMN deleted INTEGER DEFAULT 0")
+    except Exception:
+        pass
+    try:
         conn.execute("ALTER TABLE resultats ADD COLUMN printed INTEGER DEFAULT 0")
     except Exception:
         pass
@@ -478,24 +488,30 @@ def mark_printed(eleve_id: int) -> None:
     conn.close()
 
 
-def list_eleves(created_by: str | None = None, include_legacy: bool = False) -> list[dict[str, Any]]:
+def list_eleves(created_by: str | None = None, include_legacy: bool = False, include_deleted: bool = False) -> list[dict[str, Any]]:
     _SQL = """
-        SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at,
+        SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at, e.deleted,
                r.total, r.mo, r.mention, r.matieres, r.printed, r.date_calc
         FROM eleves e
         LEFT JOIN resultats r ON r.eleve_id = e.id
     """
-    if _turso_enabled():
-        if created_by:
-            if include_legacy:
-                rows = _turso_exec(_SQL + " WHERE (e.created_by = ? OR e.created_by = '' OR e.created_by IS NULL) ORDER BY e.id DESC", [created_by])
-            else:
-                rows = _turso_exec(_SQL + " WHERE e.created_by = ? ORDER BY e.id DESC", [created_by])
+    conditions = []
+    args: list = []
+    if created_by:
+        if include_legacy:
+            conditions.append("(e.created_by = ? OR e.created_by = '' OR e.created_by IS NULL)")
         else:
-            rows = _turso_exec(_SQL + " ORDER BY e.id DESC")
-        print(f"[DB list_eleves] Turso returned {len(rows)} rows" + (f" for created_by={created_by}" if created_by else ""))
+            conditions.append("e.created_by = ?")
+        args.append(created_by)
+    if not include_deleted:
+        conditions.append("e.deleted = 0")
+    where = (" WHERE " + " AND ".join(conditions)) if conditions else ""
+    if _turso_enabled():
+        rows = _turso_exec(_SQL + where + " ORDER BY e.id DESC", args)
+        print(f"[DB list_eleves] Turso returned {len(rows)} rows" + (f" for created_by={created_by}" if created_by else "") + (" (includes deleted)" if include_deleted else ""))
         for d in rows:
             d["id"] = int(d["id"]) if d.get("id") is not None else d.get("id")
+            d["deleted"] = int(d.get("deleted") or 0)
             if d.get("matieres") and isinstance(d["matieres"], str):
                 try:
                     d["matieres"] = json.loads(d["matieres"])
@@ -504,13 +520,7 @@ def list_eleves(created_by: str | None = None, include_legacy: bool = False) -> 
         return rows
 
     conn = _connect()
-    if created_by:
-        if include_legacy:
-            rows = conn.execute(_SQL + " WHERE (e.created_by = ? OR e.created_by = '' OR e.created_by IS NULL) ORDER BY e.id DESC", (created_by,)).fetchall()
-        else:
-            rows = conn.execute(_SQL + " WHERE e.created_by = ? ORDER BY e.id DESC", (created_by,)).fetchall()
-    else:
-        rows = conn.execute(_SQL + " ORDER BY e.id DESC").fetchall()
+    rows = conn.execute(_SQL + where + " ORDER BY e.id DESC", tuple(args)).fetchall()
     conn.close()
     result = []
     for row in rows:
@@ -548,7 +558,7 @@ def claim_legacy_eleves(email: str) -> int:
 def get_eleve(eleve_id: int) -> dict[str, Any] | None:
     if _turso_enabled():
         rows = _turso_exec("""
-            SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at,
+            SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at, e.deleted,
                    r.total, r.mo, r.mention, r.matieres, r.printed, r.date_calc
             FROM eleves e
             LEFT JOIN resultats r ON r.eleve_id = e.id
@@ -558,6 +568,7 @@ def get_eleve(eleve_id: int) -> dict[str, Any] | None:
             return None
         d = rows[0]
         d["id"] = int(d["id"]) if d.get("id") is not None else d.get("id")
+        d["deleted"] = int(d.get("deleted") or 0)
         if d.get("matieres") and isinstance(d["matieres"], str):
             try:
                 d["matieres"] = json.loads(d["matieres"])
@@ -567,7 +578,7 @@ def get_eleve(eleve_id: int) -> dict[str, Any] | None:
 
     conn = _connect()
     row = conn.execute("""
-        SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at,
+        SELECT e.id, e.nom, e.matricule, e.classe, e.etablissement, e.annee, e.annee_scolaire, e.created_by, e.created_at, e.deleted,
                r.total, r.mo, r.mention, r.matieres, r.printed, r.date_calc
         FROM eleves e
         LEFT JOIN resultats r ON r.eleve_id = e.id
@@ -637,13 +648,12 @@ def duplicate_eleve(eleve_id: int) -> dict[str, Any] | None:
 
 
 def delete_eleve(eleve_id: int) -> bool:
+    """Soft delete: mark the record as deleted (kept for admin audit)."""
     if _turso_enabled():
-        _turso_exec_write("DELETE FROM resultats WHERE eleve_id=?", [eleve_id])
-        _turso_exec_write("DELETE FROM eleves WHERE id=?", [eleve_id])
+        _turso_exec_write("UPDATE eleves SET deleted=1 WHERE id=?", [eleve_id])
         return True
     conn = _connect()
-    conn.execute("DELETE FROM resultats WHERE eleve_id=?", (eleve_id,))
-    conn.execute("DELETE FROM eleves WHERE id=?", (eleve_id,))
+    conn.execute("UPDATE eleves SET deleted=1 WHERE id=?", (eleve_id,))
     conn.commit()
     conn.close()
     return True
@@ -654,27 +664,49 @@ def delete_multiple_eleves(ids: list[int]) -> int:
         return 0
     if _turso_enabled():
         placeholders = ",".join("?" * len(ids))
-        _turso_exec_write(f"DELETE FROM resultats WHERE eleve_id IN ({placeholders})", ids)
-        _turso_exec_write(f"DELETE FROM eleves WHERE id IN ({placeholders})", ids)
+        _turso_exec_write(f"UPDATE eleves SET deleted=1 WHERE id IN ({placeholders})", ids)
         return len(ids)
     conn = _connect()
     placeholders = ",".join("?" * len(ids))
-    conn.execute(f"DELETE FROM resultats WHERE eleve_id IN ({placeholders})", ids)
-    conn.execute(f"DELETE FROM eleves WHERE id IN ({placeholders})", ids)
+    conn.execute(f"UPDATE eleves SET deleted=1 WHERE id IN ({placeholders})", ids)
     conn.commit()
     conn.close()
     return len(ids)
 
 
-def clear_all() -> int:
+def restore_eleve(eleve_id: int) -> bool:
+    """Restore a soft-deleted record (admin trash action)."""
     if _turso_enabled():
-        _turso_exec_write("DELETE FROM resultats")
-        _turso_exec_write("DELETE FROM eleves")
+        _turso_exec_write("UPDATE eleves SET deleted=0 WHERE id=?", [eleve_id])
+        return True
+    conn = _connect()
+    conn.execute("UPDATE eleves SET deleted=0 WHERE id=?", (eleve_id,))
+    conn.commit()
+    conn.close()
+    return True
+
+
+def purge_deleted_eleves() -> int:
+    """Permanently remove all soft-deleted records (admin trash purge)."""
+    if _turso_enabled():
+        _turso_exec_write("DELETE FROM resultats WHERE eleve_id IN (SELECT id FROM eleves WHERE deleted=1)")
+        _turso_exec_write("DELETE FROM eleves WHERE deleted=1")
         return 0
     conn = _connect()
-    conn.execute("DELETE FROM resultats")
+    conn.execute("DELETE FROM resultats WHERE eleve_id IN (SELECT id FROM eleves WHERE deleted=1)")
+    n = conn.execute("DELETE FROM eleves WHERE deleted=1").rowcount
+    conn.commit()
+    conn.close()
+    return n
+
+
+def clear_all() -> int:
+    if _turso_enabled():
+        _turso_exec_write("UPDATE eleves SET deleted=1")
+        return 0
+    conn = _connect()
+    conn.execute("UPDATE eleves SET deleted=1")
     count = conn.execute("SELECT changes()").fetchone()[0]
-    conn.execute("DELETE FROM eleves")
     conn.commit()
     conn.close()
     return count

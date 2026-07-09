@@ -661,8 +661,8 @@ class _Handler(BaseHTTPRequestHandler):
             try:
                 role = self._get_role()
                 if role == "admin":
-                    rows = db.list_eleves()
-                    print(f"[API] GET /api/eleves → admin → {len(rows)} rows")
+                    rows = db.list_eleves(include_deleted=True)
+                    print(f"[API] GET /api/eleves → admin (incl. deleted) → {len(rows)} rows")
                     return self._json(rows)
                 email = self._get_email()
                 print(f"[API] GET /api/eleves → role={role} email={email!r}")
@@ -670,7 +670,7 @@ class _Handler(BaseHTTPRequestHandler):
                     print(f"[API] GET /api/eleves → no email, returning empty")
                     return self._json([], 200)
                 db.claim_legacy_eleves(email)
-                rows = db.list_eleves(created_by=email)
+                rows = db.list_eleves(created_by=email, include_legacy=True)
                 print(f"[API] GET /api/eleves → filtered by created_by={email!r} → {len(rows)} rows")
                 return self._json(rows)
             except Exception as exc:
@@ -1103,6 +1103,30 @@ class _Handler(BaseHTTPRequestHandler):
             _sse_emit("eleve_deleted", {"ids": ids})
             db.add_notification("Suppression", f"{count} calcul(s) supprimé(s)", "warning")
             return self._json({"ok": True, "deleted": count})
+
+        if path.startswith("/api/eleves/") and path.endswith("/restore"):
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                eid = int(path.split("/")[-2])
+            except (ValueError, IndexError):
+                return self._json({"error": "id invalide"}, 400)
+            try:
+                db.restore_eleve(eid)
+            except Exception as exc:
+                return self._json({"error": "Erreur interne du serveur"}, 500)
+            _sse_emit("eleve_restored", {"id": eid})
+            return self._json({"ok": True})
+
+        if path == "/api/eleves/purge":
+            if role != "admin":
+                return self._json({"error": "Accès refusé"}, 403)
+            try:
+                n = db.purge_deleted_eleves()
+            except Exception as exc:
+                return self._json({"error": "Erreur interne du serveur"}, 500)
+            _sse_emit("eleves_purged", {"count": n})
+            return self._json({"ok": True, "purged": n})
 
         if path.startswith("/api/eleves/") and path.endswith("/duplicate"):
             try:
