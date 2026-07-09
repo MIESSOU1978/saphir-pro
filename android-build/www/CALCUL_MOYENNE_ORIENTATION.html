@@ -2388,13 +2388,13 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
 
 </main>
 <div id="toast"></div>
-<div class="modal-overlay" id="custom-modal" onclick="if(event.target===this)_modalResolve(false)">
+<div class="modal-overlay" id="custom-modal" onclick="if(event.target===this)resolveModal(false)">
   <div class="modal-box">
     <div class="modal-icon warn" id="modal-icon">&#9888;</div>
     <div class="modal-msg" id="modal-msg"></div>
     <div class="modal-actions">
-      <button class="modal-btn modal-btn-cancel" id="modal-cancel" onclick="_modalResolve(false)">Annuler</button>
-      <button class="modal-btn modal-btn-ok" id="modal-ok" onclick="_modalResolve(true)">Confirmer</button>
+      <button class="modal-btn modal-btn-cancel" id="modal-cancel" onclick="resolveModal(false)">Annuler</button>
+      <button class="modal-btn modal-btn-ok" id="modal-ok" onclick="resolveModal(true)">Confirmer</button>
     </div>
   </div>
 </div>
@@ -3740,7 +3740,7 @@ function customConfirm(msg,opts={}){
     okBtn.focus();
   });
 }
-function _modalResolve(val){
+function resolveModal(val){
   const overlay=document.getElementById('custom-modal');
   if(overlay) overlay.classList.remove('show');
   if(_modalResolve){_modalResolve(val);_modalResolve=null;}
