@@ -3609,17 +3609,17 @@ async function shareWhatsApp(id){
   const mention=h.mention||'—';
   const etab=h.etablissement||'';
   const annee=h.annee_scolaire||'';
-  let msg='\u{1F4CB} *BULLETIN SCOLAIRE*\n\n';
-  msg+='\u{1F464} Élève : *'+nom+'*\n';
-  msg+='\u{1F3EB} Classe : *'+classe+'*\n';
-  if(etab) msg+='\u{1F3DB}\uFE0F Établissement : *'+etab+'*\n';
-  if(annee) msg+='\u{1F4C5} Année : *'+annee+'*\n';
-  msg+='\u{1F4CA} Moyenne d\'Orientation : *'+mo+'/20*\n';
-  msg+='\u{1F3C5} Mention : *'+mention+'*\n\n';
-  msg+='Envoyé via *SAPHIR Pro*';
-  const waUrl='https://wa.me/?text='+encodeURIComponent(msg);
-  window.open(waUrl,'_blank');
-  toast('WhatsApp ouvert ✔');
+  let msg='\uD83D\uDCCB BULLETIN SCOLAIRE\n\n';
+  msg+='\uD83D\uDC64 Élève : '+nom+'\n';
+  msg+='\uD83C\uDFEB Classe : '+classe+'\n';
+  if(etab) msg+='\uD83C\uDFDB\uFE0F Établissement : '+etab+'\n';
+  if(annee) msg+='\uD83D\uDCC5 Année : '+annee+'\n';
+  msg+='\uD83D\uDCCA Moyenne d\'Orientation : '+mo+'/20\n';
+  msg+='\uD83C\uDFC5 Mention : '+mention+'\n\n';
+  msg+='Envoyé via SAPHIR Pro';
+  await navigator.clipboard.writeText(msg).catch(()=>{});
+  window.open('https://wa.me','_blank');
+  toast('Message copié — collez-le dans WhatsApp (Ctrl+V)');
   markPrinted(id);
   logActivity('Partage WhatsApp','Bulletin',nom);
 }
