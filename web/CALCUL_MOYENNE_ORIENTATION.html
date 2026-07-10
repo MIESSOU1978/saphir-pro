@@ -3618,15 +3618,18 @@ async function shareWhatsApp(id){
   msg+='Mention : '+mention+'\n\n';
   msg+='Envoyé via SAPHIR Pro';
   toast('Génération du bulletin PDF…');
+  const fileName='Bulletin_'+(nom.replace(/\s+/g,'_'))+'.pdf';
   try{
-    const doc=generateBulletinPDF(h);
-    const blob=doc.output('blob');
-    const file=new File([blob],'Bulletin_'+(nom.replace(/\s+/g,'_'))+'.pdf',{type:'application/pdf'});
+    const blob=await bulletinToPdfBlob(h);
+    const file=new File([blob],fileName,{type:'application/pdf'});
     if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
       await navigator.share({files:[file],text:msg,title:'Bulletin scolaire — '+nom});
       toast('Bulletin partagé ✔');
     }else{
-      doc.save('Bulletin_'+(nom.replace(/\s+/g,'_'))+'.pdf');
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download=fileName;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      URL.revokeObjectURL(url);
       const waUrl='https://wa.me/?text='+encodeURIComponent(msg+'\n\nLe fichier PDF a été téléchargé. Joignez-le au message.');
       window.open(waUrl,'_blank');
       toast('PDF téléchargé — joignez-le au message WhatsApp');
@@ -3636,6 +3639,30 @@ async function shareWhatsApp(id){
   }catch(e){
     console.error('WhatsApp share error:',e);
     toast('Erreur PDF: '+e.message,true);
+  }
+}
+
+/* Rend le bulletin EXACT (design HTML) en PDF blob via html2canvas sur élément visible */
+async function bulletinToPdfBlob(h){
+  const wrap=document.createElement('div');
+  wrap.id='_wa_render_wrap';
+  wrap.style.cssText='position:fixed;left:0;top:0;width:794px;background:#ffffff;z-index:2147483647;overflow:visible;';
+  wrap.innerHTML=buildBulletinHTML(h);
+  const sheet=wrap.querySelector('.bulletin-sheet');
+  if(sheet){sheet.style.width='794px';sheet.style.maxHeight='none';sheet.style.overflow='visible';sheet.style.margin='0';sheet.style.boxShadow='none';}
+  document.body.appendChild(wrap);
+  try{
+    await new Promise(r=>setTimeout(r,350));
+    const target=sheet||wrap;
+    const blob=await html2pdf().set({
+      margin:0,
+      image:{type:'jpeg',quality:0.98},
+      html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',width:794,windowWidth:794,scrollX:0,scrollY:0},
+      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
+    }).from(target).outputPdf('blob');
+    return blob;
+  }finally{
+    wrap.remove();
   }
 }
 function shareSMS(id){
