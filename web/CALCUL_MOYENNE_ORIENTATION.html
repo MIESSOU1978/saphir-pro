@@ -3462,44 +3462,20 @@ async function shareWhatsApp(id){
   msg+='📊 *Moyenne d\'Orientation :* '+mo+'/20\n';
   msg+='🏅 *Mention :* '+mention+'\n\n';
   msg+='Envoyé via *SAPHIR Pro*';
-  toast('Génération du bulletin PDF…');
-  try{
-    const allStyles=Array.from(document.querySelectorAll('style')).map(s=>s.textContent).join('\n');
-    const container=document.createElement('div');
-    container.setAttribute('id','_wa_pdf_render');
-    container.innerHTML='<style>'+allStyles+'</style>'+buildBulletinHTML(h);
-    container.style.cssText='position:fixed;left:0;top:0;z-index:-1;width:794px;background:#fff;opacity:1;pointer-events:none;';
-    document.body.appendChild(container);
-    await new Promise(r=>setTimeout(r,200));
-    const pdf=await html2pdf().set({
-      margin:[10,10,10,10],filename:'Bulletin_'+(nom.replace(/\s+/g,'_'))+'.pdf',
-      image:{type:'jpeg',quality:0.98},html2canvas:{scale:2,useCORS:true,logging:false},
-      jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
-    }).from(container).outputPdf('blob');
-    container.remove();
-    const file=new File([pdf],'Bulletin_'+(nom.replace(/\s+/g,'_'))+'.pdf',{type:'application/pdf'});
-    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],text:msg,title:'Bulletin scolaire — '+nom});
-      toast('Bulletin partagé ✔');
-    }else{
-      const url=URL.createObjectURL(pdf);
-      const a=document.createElement('a');
-      a.href=url;a.download='Bulletin_'+(nom.replace(/\s+/g,'_'))+'.pdf';
-      document.body.appendChild(a);a.click();document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      const waUrl='https://wa.me/?text='+encodeURIComponent(msg+'\n\n📎 Le fichier PDF a été téléchargé. Joignez-le au message.');
-      window.open(waUrl,'_blank');
-      toast('PDF téléchargé — joignez-le au message WhatsApp');
-    }
-    markPrinted(id);
-    logActivity('Partage WhatsApp','Bulletin',nom);
-  }catch(e){
-    console.error('WhatsApp share error:',e);
-    document.getElementById('_wa_pdf_render')?.remove();
-    const waUrl='https://wa.me/?text='+encodeURIComponent(msg);
-    window.open(waUrl,'_blank');
-    toast('Ouvrez WhatsApp — copiez le message');
-  }
+  const bulletinHTML=buildBulletinHTML(h);
+  const allCSS=Array.from(document.querySelectorAll('style')).map(s=>s.textContent).join('\n');
+  const w=window.open('','_blank','width=800,height=900');
+  if(!w){toast('Pop-up bloqué — autorisez les pop-ups pour ce site.',true);return;}
+  w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletin — '+nom+'</title>');
+  w.document.write('<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}body{margin:0;background:#e5e7eb;display:flex;justify-content:center;}');
+  w.document.write(allCSS);
+  w.document.write('</style></head><body>'+bulletinHTML+'</body></html>');
+  w.document.close();
+  await new Promise(r=>setTimeout(r,600));
+  w.print();
+  await navigator.clipboard.writeText(msg).catch(()=>{});
+  toast('Bulletin ouvert — enregistrez en PDF puis partagez sur WhatsApp');
+  logActivity('Partage WhatsApp','Bulletin',nom);
 }
 function shareSMS(id){
   let h=histData.find(x=>x.id===id);
