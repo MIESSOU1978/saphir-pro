@@ -3371,6 +3371,146 @@ function markPrinted(id){
     .catch(e=>{console.error('markPrinted failed:',e);});
 }
 
+/* ════ GÉNÉRATION PDF DIRECTE AVEC jsPDF ════ */
+function generateBulletinPDF(h){
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
+  const W=210,H=297,M=15;
+  const cw=W-2*M;
+  const isTO=!!(h.to_mode||(h.matieres&&h.matieres._to_mode));
+  const nom=(h.nom||'NON RENSEIGNÉ').toUpperCase();
+  const classe=h.classe||'-';
+  const school=h.etablissement||'NON RENSEIGNÉ';
+  const year=(h.annee_scolaire||h.annee||'-')+(isTO?' — TEST D\'ORIENTATION':'');
+  const matricule=h.matricule||'-';
+  const d=new Date();
+  const today=String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()+' à '+d.getHours()+'h'+String(d.getMinutes()).padStart(2,'0');
+  let totalWeighted=0;
+  const rowData=MATIERES.map(m=>{
+    const dd=(h.matieres||{})[m.id]||{};
+    const isNC=dd.mga==='nc';
+    const rawMga=dd.mga!=null&&dd.mga!=='nc'?Number(dd.mga):null;
+    const mga=Number.isFinite(rawMga)?rawMga:null;
+    let bepc=0;
+    if(isNC){/* NC */}
+    else if(m.anglais){
+      const re=dd.bepc_ecrit!=null?Number(dd.bepc_ecrit):null;
+      const ro=dd.bepc_oral!=null?Number(dd.bepc_oral):null;
+      const ecrit=Number.isFinite(re)?re:null;
+      const oral=Number.isFinite(ro)?ro:null;
+      bepc=ecrit!=null&&oral!=null?(ecrit+oral)/2:(ecrit!=null?ecrit:0);
+      if(isTO) bepc=ecrit!=null?ecrit:0;
+    }else{
+      const rb=dd.bepc!=null?Number(dd.bepc):null;
+      bepc=Number.isFinite(rb)?rb:0;
+    }
+    const sum=isNC?null:(mga!=null?mga+bepc:bepc);
+    const prod=isNC?null:(sum!=null?sum*m.coef:0);
+    if(!isNC&&sum!=null) totalWeighted+=prod||0;
+    return{label:m.label,mga,bepc,sum,prod,coef:m.coef,isNC};
+  });
+  const mo=totalWeighted/(2*TOTAL_COEF);
+  let mention='';
+  if(mo>=16) mention='Félicitations';
+  else if(mo>=14) mention='Très bien';
+  else if(mo>=12) mention='Bien';
+  else if(mo>=10) mention='Passable';
+  else if(mo>=8) mention='Insuffisant';
+  else if(mo>0) mention='Très insuffisistant';
+  const fmt=n=>{if(n==null)return'NC';const s=n.toFixed(2);const[i,d2]=s.split('.');return(i.padStart(2,'0')+','+d2);};
+  let y=0;
+  function txt(t,x,yp,size,style,color,align){doc.setFont('helvetica',style||'normal');doc.setFontSize(size||10);doc.setTextColor(...(color||[26,36,32]));doc.text(t,x,yp,{align:align||'left'});}
+  function line(x1,yp1,x2,yp2,color,width){doc.setDrawColor(...(color||[0,0,0]));doc.setLineWidth(width||0.2);doc.line(x1,yp1,x2,yp2);}
+  function rect(x,yp,w2,h2,fc,sc){if(fc){doc.setFillColor(...fc);doc.rect(x,yp,w2,h2,'F');}if(sc){doc.setDrawColor(...sc);doc.rect(x,yp,w2,h2,'S');}}
+  y=M;
+  rect(M,y,cw*0.33,3,[247,127,0]);
+  rect(M+cw*0.33,y,cw*0.34,3,[255,255,255]);
+  rect(M+cw*0.67,y,cw*0.33,3,[0,158,96]);
+  y+=6;
+  doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(11,61,46);
+  doc.text('MINISTÈRE DE L\'ÉDUCATION NATIONALE,',W/2,y,{align:'center'});y+=3.5;
+  doc.text('DE L\'ALPHABÉTISATION ET DE L\'ENSEIGNEMENT TECHNIQUE',W/2,y,{align:'center'});y+=5;
+  doc.setFont('helvetica','bold');doc.setFontSize(9);
+  doc.text('République de Côte d\'Ivoire',W/2,y,{align:'center'});y+=4;
+  doc.setFont('helvetica','normal');doc.setFontSize(8);
+  doc.text('Union - Discipline - Travail',W/2,y,{align:'center'});y+=5;
+  line(M,y,W-M,y,[223,231,226],0.4);y+=6;
+  doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(11,61,46);
+  doc.text('Calcul de la Moyenne d\'Orientation',W/2,y,{align:'center'});y+=5;
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(80,100,90);
+  doc.text('Fiche individuelle de calcul de la moyenne d\'orientation',W/2,y,{align:'center'});y+=8;
+  rect(M,y,cw,6,[240,247,242]);y+=4.5;
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(11,61,46);
+  txt('1',M+3,y-0.5,8,'bold');txt('Informations de l\'élève',M+8,y-0.5,9,'bold');y+=5;
+  line(M,y,W-M,y,[223,231,226],0.2);y+=6;
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(11,61,46);
+  txt(nom,M,y,11,'bold');y+=5;
+  doc.setFont('helvetica','normal');doc.setFontSize(9);
+  txt('Classe : '+classe+'    |    '+school+'    |    Année : '+year,M,y,9);y+=5;
+  txt('Matricule : '+matricule,M,y,8,'normal',[120,140,130]);y+=8;
+  rect(M,y,cw,6,[240,247,242]);y+=4.5;
+  txt('2',M+3,y-0.5,8,'bold');txt('Relevé des notes par matière',M+8,y-0.5,9,'bold');y+=5;
+  line(M,y,W-M,y,[223,231,226],0.2);y+=5;
+  const cols=[M,M+38,M+62,M+88,M+112,M+134];
+  const colLabels=['Matière','MA','Note BEPC','MA + BEPC','Cœff.','Total pondéré'];
+  rect(M,y,cw,7,[11,61,46]);y+=5;
+  doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(255,255,255);
+  colLabels.forEach((l,i)=>txt(l,cols[i],y-1,8,'bold',[255,255,255],i>0?'center':'left'));
+  y+=3;
+  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(26,36,32);
+  rowData.forEach(r=>{
+    if(y>H-40){doc.addPage();y=M;}
+    const bg=r.isNC?[253,236,234]:undefined;
+    if(bg) rect(M,y-4,cw,6,bg);
+    txt(r.label,cols[0],y,8,'bold');
+    txt(r.isNC?'NC':fmt(r.mga),cols[1],y,8,'normal',r.isNC?[180,35,24]:undefined,'center');
+    txt(r.isNC?'NC':fmt(r.bepc),cols[2],y,8,'normal',r.isNC?[180,35,24]:undefined,'center');
+    txt(r.isNC?'NC':fmt(r.sum),cols[3],y,8,'normal',r.isNC?[180,35,24]:undefined,'center');
+    txt(String(r.coef),cols[4],y,8,'normal',undefined,'center');
+    txt(r.isNC?'NC':fmt(r.prod),cols[5],y,8,'normal',r.isNC?[180,35,24]:undefined,'center');
+    y+=6;
+    line(M,y-1.5,W-M,y-1.5,[223,231,226],0.1);
+  });
+  y+=2;
+  doc.setFont('helvetica','italic');doc.setFontSize(7);doc.setTextColor(120,140,130);
+  txt('Total pondéré = (MA + Note BEPC) × Coefficient',M,y,7,'italic');y+=8;
+  rect(M,y,cw,6,[240,247,242]);y+=4.5;
+  txt('3',M+3,y-0.5,8,'bold');txt('Synthèse',M+8,y-0.5,9,'bold');y+=5;
+  line(M,y,W-M,y,[223,231,226],0.2);y+=5;
+  const bw=cw/2-2;
+  rect(M,y,bw,22,[240,247,242],[189,205,196]);
+  txt('Total général pondéré',M+5,y+5,9,'normal');
+  doc.setFont('helvetica','bold');doc.setFontSize(16);doc.setTextColor(11,61,46);
+  txt(fmt(totalWeighted),M+5,y+14,16,'bold');y+=0;
+  const moColor=mo>=10?[6,78,59]:[180,35,24];
+  rect(M+bw+4,y,bw,22,[240,247,242],moColor);
+  txt('Moyenne d\'orientation',M+bw+9,y+5,9,'normal');
+  doc.setFont('helvetica','bold');doc.setFontSize(18);doc.setTextColor(...moColor);
+  txt(fmt(mo)+' / 20',M+bw+9,y+14,18,'bold');
+  y+=25;
+  if(mention){
+    const mColor=mo>=10?[6,78,59]:[180,35,24];
+    const mw=doc.getTextWidth(mention)+12;
+    rect(W/2-mw/2,y,mw,8,mColor);
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(255,255,255);
+    txt(mention,W/2,y+5.5,10,'bold',[255,255,255],'center');
+    y+=12;
+  }
+  y=H-35;
+  line(M,y,W-M,y,[223,231,226],0.3);y+=5;
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(11,61,46);
+  txt('SAPHIR Pro',M,y,9,'bold');
+  doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(120,140,130);
+  txt('Système d\'Aide à l\'Orientation Scolaire',M+30,y,7);
+  txt('07 08 10 98 40 / 01 52 03 06 22',W-M,y,7,'normal',[120,140,130],'right');
+  y+=5;
+  doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(150,160,155);
+  txt('Projet à but non lucratif — développé pour accompagner les utilisateurs.',M,y,6.5);
+  y+=6;
+  txt('Édité via SAPHIR Pro — Document généré le '+today,M,y,7);
+  return doc;
+}
+
 /* ════ PARTAGE WHATSAPP ════ */
 async function shareWhatsApp(id){
   let h=histData.find(x=>x.id===id);
@@ -3384,28 +3524,34 @@ async function shareWhatsApp(id){
   const mention=h.mention||'—';
   const etab=h.etablissement||'';
   const annee=h.annee_scolaire||'';
-  let msg='📋 *Bulletin scolaire*\n\n';
-  msg+='👤 *Élève :* '+nom+'\n';
-  msg+='🏫 *Classe :* '+classe+'\n';
-  if(etab) msg+='🏛️ *Établissement :* '+etab+'\n';
-  if(annee) msg+='📅 *Année :* '+annee+'\n';
-  msg+='📊 *Moyenne d\'Orientation :* '+mo+'/20\n';
-  msg+='🏅 *Mention :* '+mention+'\n\n';
-  msg+='Envoyé via *SAPHIR Pro*';
-  const bulletinHTML=buildBulletinHTML(h);
-  const allCSS=Array.from(document.querySelectorAll('style')).map(s=>s.textContent).join('\n');
-  const w=window.open('','_blank','width=800,height=900');
-  if(!w){toast('Pop-up bloqué — autorisez les pop-ups pour ce site.',true);return;}
-  w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bulletin — '+nom+'</title>');
-  w.document.write('<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}body{margin:0;background:#e5e7eb;display:flex;justify-content:center;}');
-  w.document.write(allCSS);
-  w.document.write('</style></head><body>'+bulletinHTML+'</body></html>');
-  w.document.close();
-  await new Promise(r=>setTimeout(r,600));
-  w.print();
-  await navigator.clipboard.writeText(msg).catch(()=>{});
-  toast('Bulletin ouvert — enregistrez en PDF puis partagez sur WhatsApp');
-  logActivity('Partage WhatsApp','Bulletin',nom);
+  let msg='Bulletin scolaire\n\n';
+  msg+='Élève : '+nom+'\n';
+  msg+='Classe : '+classe+'\n';
+  if(etab) msg+='Établissement : '+etab+'\n';
+  if(annee) msg+='Année : '+annee+'\n';
+  msg+='Moyenne d\'Orientation : '+mo+'/20\n';
+  msg+='Mention : '+mention+'\n\n';
+  msg+='Envoyé via SAPHIR Pro';
+  toast('Génération du bulletin PDF…');
+  try{
+    const doc=generateBulletinPDF(h);
+    const blob=doc.output('blob');
+    const file=new File([blob],'Bulletin_'+(nom.replace(/\s+/g,'_'))+'.pdf',{type:'application/pdf'});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],text:msg,title:'Bulletin scolaire — '+nom});
+      toast('Bulletin partagé ✔');
+    }else{
+      doc.save('Bulletin_'+(nom.replace(/\s+/g,'_'))+'.pdf');
+      const waUrl='https://wa.me/?text='+encodeURIComponent(msg+'\n\nLe fichier PDF a été téléchargé. Joignez-le au message.');
+      window.open(waUrl,'_blank');
+      toast('PDF téléchargé — joignez-le au message WhatsApp');
+    }
+    markPrinted(id);
+    logActivity('Partage WhatsApp','Bulletin',nom);
+  }catch(e){
+    console.error('WhatsApp share error:',e);
+    toast('Erreur de génération PDF',true);
+  }
 }
 function shareSMS(id){
   let h=histData.find(x=>x.id===id);
