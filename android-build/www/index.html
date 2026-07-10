@@ -2522,7 +2522,7 @@ body.bulletin-preview .bulletin-sheet{width:190mm;margin:0;background:#fff;box-s
   </article>
 </section>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
 <script>
 /* ── MATIÈRES ── */
@@ -3420,7 +3420,7 @@ function generateBulletinPDF(h){
   else if(mo>0) mention='Très insuffisistant';
   const fmt=n=>{if(n==null)return'NC';const s=n.toFixed(2);const[i,d2]=s.split('.');return(i.padStart(2,'0')+','+d2);};
   let y=0;
-  function txt(t,x,yp,size,style,color,align){doc.setFont('helvetica',style||'normal');doc.setFontSize(size||10);doc.setTextColor(...(color||[26,36,32]));doc.text(t,x,yp,{align:align||'left'});}
+  function txt(t,x,yp,size,style,color,align){doc.setFont('helvetica',style||'normal');doc.setFontSize(size||10);const c=(color&&color.length>=3)?color:[26,36,32];doc.setTextColor(c[0],c[1],c[2]);doc.text(String(t),x,yp,{align:align||'left'});}
   function line(x1,yp1,x2,yp2,color,width){doc.setDrawColor(...(color||[0,0,0]));doc.setLineWidth(width||0.2);doc.line(x1,yp1,x2,yp2);}
   function rect(x,yp,w2,h2,fc,sc){if(fc){doc.setFillColor(...fc);doc.rect(x,yp,w2,h2,'F');}if(sc){doc.setDrawColor(...sc);doc.rect(x,yp,w2,h2,'S');}}
   y=M;
