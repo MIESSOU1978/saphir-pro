@@ -3542,37 +3542,19 @@ async function shareWhatsApp(id){
   const mention=h.mention||'—';
   const etab=h.etablissement||'';
   const annee=h.annee_scolaire||'';
-  let msg='Bulletin scolaire\n\n';
-  msg+='Élève : '+nom+'\n';
-  msg+='Classe : '+classe+'\n';
-  if(etab) msg+='Établissement : '+etab+'\n';
-  if(annee) msg+='Année : '+annee+'\n';
-  msg+='Moyenne d\'Orientation : '+mo+'/20\n';
-  msg+='Mention : '+mention+'\n\n';
-  msg+='Envoyé via SAPHIR Pro';
-  toast('Génération du bulletin PDF…');
-  const fileName='Bulletin_'+(nom.replace(/\s+/g,'_'))+'.pdf';
-  try{
-    const blob=await bulletinToPdfBlob(h);
-    const file=new File([blob],fileName,{type:'application/pdf'});
-    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-      await navigator.share({files:[file],text:msg,title:'Bulletin scolaire — '+nom});
-      toast('Bulletin partagé ✔');
-    }else{
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');a.href=url;a.download=fileName;
-      document.body.appendChild(a);a.click();document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      const waUrl='https://wa.me/?text='+encodeURIComponent(msg+'\n\nLe fichier PDF a été téléchargé. Joignez-le au message.');
-      window.open(waUrl,'_blank');
-      toast('PDF téléchargé — joignez-le au message WhatsApp');
-    }
-    markPrinted(id);
-    logActivity('Partage WhatsApp','Bulletin',nom);
-  }catch(e){
-    console.error('WhatsApp share error:',e);
-    toast('Erreur PDF: '+e.message,true);
-  }
+  let msg='📋 *BULLETIN SCOLAIRE*\n\n';
+  msg+='👤 *Élève :* '+nom+'\n';
+  msg+='🏫 *Classe :* '+classe+'\n';
+  if(etab) msg+='🏛️ *Établissement :* '+etab+'\n';
+  if(annee) msg+='📅 *Année :* '+annee+'\n';
+  msg+='📊 *Moyenne d\'Orientation :* '+mo+'/20\n';
+  msg+='🏅 *Mention :* '+mention+'\n\n';
+  msg+='_Envoyé via SAPHIR Pro_';
+  const waUrl='https://wa.me/?text='+encodeURIComponent(msg);
+  window.open(waUrl,'_blank');
+  toast('WhatsApp ouvert ✔');
+  markPrinted(id);
+  logActivity('Partage WhatsApp','Bulletin',nom);
 }
 
 /* Rend le bulletin EXACT (design HTML) en PDF blob : html2canvas + jsPDF addImage (aspect ratio conservé) */
