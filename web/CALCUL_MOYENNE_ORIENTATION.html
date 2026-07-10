@@ -3617,9 +3617,9 @@ async function shareWhatsApp(id){
   msg+='\uD83D\uDCCA Moyenne d\'Orientation : '+mo+'/20\n';
   msg+='\uD83C\uDFC5 Mention : '+mention+'\n\n';
   msg+='Envoyé via SAPHIR Pro';
-  await navigator.clipboard.writeText(msg).catch(()=>{});
-  window.open('https://wa.me','_blank');
+  try{await navigator.clipboard.writeText(msg);}catch(e){}
   toast('Message copié — collez-le dans WhatsApp (Ctrl+V)');
+  window.open('https://wa.me','_blank');
   markPrinted(id);
   logActivity('Partage WhatsApp','Bulletin',nom);
 }
