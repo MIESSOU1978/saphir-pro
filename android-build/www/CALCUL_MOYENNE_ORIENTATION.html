@@ -3413,7 +3413,11 @@ async function shareWhatsApp(id){
   try{
     const container=document.createElement('div');
     container.innerHTML=buildBulletinHTML(h);
+    const styleEl=document.createElement('style');
+    styleEl.textContent=Array.from(document.querySelectorAll('style')).map(s=>s.textContent).join('\n');
+    container.prepend(styleEl);
     container.style.position='fixed';container.style.left='-9999px';container.style.top='0';
+    container.style.width='210mm';container.style.background='#fff';
     document.body.appendChild(container);
     const pdf=await html2pdf().set({
       margin:[10,10,10,10],filename:'Bulletin_'+(nom.replace(/\s+/g,'_'))+'.pdf',
